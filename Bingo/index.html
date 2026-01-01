@@ -18,12 +18,14 @@
       --border: clamp(1px, 0.35vmin, 3px);
       --radius: clamp(10px, 2vmin, 18px);
 
-      /* Board size: fits any screen without squeezing */
+      /* Board size */
       --board-max: 720px;
-      --board-min: 280px;
 
-      /* Cell text (prevents squeeze by scaling smoothly) */
+      /* Main number font */
       --cell-font: clamp(16px, 6.2vmin, 34px);
+
+      /* ✅ FREE font (smaller + always fits) */
+      --free-font: clamp(11px, 3.4vmin, 20px);
 
       /* Button font */
       --btn-font: clamp(13px, 3vw, 16px);
@@ -96,7 +98,6 @@
     button:active{ transform: scale(.99); }
     button.secondary{ background: #eef0f7; color: #111; font-weight: 750; }
 
-    /* ✅ The key: board always fits viewport and never gets "squeezed" */
     .board{
       width: 100%;
       display: grid;
@@ -104,10 +105,9 @@
     }
 
     .grid{
-      /* square board that fits screen */
       width: min(100%, var(--board-max));
       height: min(100vw - (var(--page-pad) * 2) - (var(--card-pad) * 2), var(--board-max));
-      max-height: calc(100svh - 240px); /* keep room for header/buttons on small screens */
+      max-height: calc(100svh - 240px);
       aspect-ratio: 1 / 1;
 
       display:grid;
@@ -118,7 +118,6 @@
       touch-action: manipulation;
     }
 
-    /* Ensure board doesn't become too tiny */
     @media (max-height: 520px){
       .grid{ max-height: calc(100svh - 190px); }
     }
@@ -140,11 +139,30 @@
       min-height: 0;
       -webkit-tap-highlight-color: transparent;
       line-height: 1;
-      padding: 6px;
+      padding: clamp(4px, 0.9vmin, 8px);
+      overflow: hidden; /* ✅ never overflow text outside */
     }
     .cell:active{ transform: scale(.99); }
     .cell.marked{ background: #111; color: #fff; }
-    .cell.free{ background: #111; color: #fff; letter-spacing: .06em; }
+
+    /* ✅ Make FREE always fit */
+    .cell.free{
+      background: #111;
+      color: #fff;
+      font-size: var(--free-font);
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap;     /* ✅ no wrapping */
+      max-width: 100%;
+    }
+    .cell.free > span{
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis; /* just in case (won't be needed for FREE) */
+      transform: translateZ(0);
+    }
 
     .cell.win{
       outline: clamp(2px, 0.6vmin, 4px) solid #2a63ff;
@@ -166,7 +184,6 @@
       opacity: .85;
     }
 
-    /* Modal */
     .modal{
       position: fixed;
       inset: 0;
@@ -247,10 +264,8 @@
     let lastBoardKey = null;
     let bingoLocked = false;
 
-    // Sound starts ON
     let soundEnabled = true;
 
-    // Shared AudioContext
     let audioCtx = null;
     function getAudioCtx() {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -300,7 +315,6 @@
         osc.stop(now + decay + 0.05);
       });
 
-      // strike click
       const noiseDur = 0.05;
       const bufferSize = Math.floor(ctx.sampleRate * noiseDur);
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -321,7 +335,6 @@
       noise.stop(now + noiseDur + 0.01);
     }
 
-    // Random helpers
     function randInt(min, maxInclusive) {
       const range = maxInclusive - min + 1;
       if (window.crypto && crypto.getRandomValues) {
@@ -381,16 +394,18 @@
       board.forEach((v, idx) => {
         const cell = document.createElement("div");
         cell.className = "cell";
-        cell.textContent = v;
+
+        // ✅ wrap text in span so we can control FREE sizing safely
+        const span = document.createElement("span");
+        span.textContent = v;
+        cell.appendChild(span);
 
         if (idx === FREE_INDEX) {
           cell.classList.add("free", "marked");
         }
 
         cell.addEventListener("click", async () => {
-          // allow toggling FREE too (your original behavior)
           cell.classList.toggle("marked");
-          // keep FREE styling
           if (idx === FREE_INDEX) cell.classList.add("free");
           await maybeBingo();
         });
@@ -412,7 +427,6 @@
       document.getElementById("seedInfo").textContent = "ID: " + id;
     }
 
-    // Bingo checking
     function getCells() {
       return Array.from(document.querySelectorAll(".cell"));
     }
@@ -448,10 +462,9 @@
 
     function numbersInLine(indices) {
       const cells = getCells();
-      return indices.map(i => cells[i]?.textContent).filter(v => v != null);
+      return indices.map(i => cells[i]?.innerText).filter(v => v != null);
     }
 
-    // Modal
     const modal = document.getElementById("bingoModal");
     const bingoNums = document.getElementById("bingoNums");
 
@@ -486,7 +499,6 @@
       await bellBeep(1.6);
     }
 
-    // Buttons
     document.getElementById("newBtn").addEventListener("click", () => {
       closeModal();
       newBoard();
@@ -509,7 +521,6 @@
       if (e.target === modal) closeModal();
     });
 
-    // Sound button
     const soundBtn = document.getElementById("soundBtn");
     function refreshSoundBtn() {
       soundBtn.textContent = soundEnabled ? "🔊 Mute" : "🔇 Muted";
@@ -529,7 +540,6 @@
       }
     });
 
-    // First entry
     newBoard();
   </script>
 </body>
