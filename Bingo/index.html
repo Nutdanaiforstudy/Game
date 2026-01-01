@@ -95,11 +95,16 @@
 
     .cell.marked{ background: #111; color: #fff; }
 
-    /* ✅ FREE cell style */
     .cell.free{
       background: #111;
       color: #fff;
       letter-spacing: .06em;
+    }
+
+    /* ✅ highlight winning line cells (optional) */
+    .cell.win{
+      outline: clamp(2px, 0.6vmin, 4px) solid #2a63ff;
+      outline-offset: -2px;
     }
 
     .footer{
@@ -115,6 +120,54 @@
       font-size: clamp(11px, 2.6vw, 12px);
       opacity: .85;
     }
+
+    /* ✅ Modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal.show{ display: flex; }
+    .dialog{
+      width: min(520px, 100%);
+      background: #fff;
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.2);
+    }
+    .dialog h2{
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+    .dialog p{
+      margin: 0 0 12px;
+      color: #333;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+    .pillRow{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .pill{
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #f2f4fa;
+      border: 1px solid rgba(0,0,0,.08);
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .dialog .actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 
@@ -126,7 +179,7 @@
     </h1>
 
     <p class="sub">
-      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • เมื่อจบรอบกดปุ่ม <b>“หยิบใบใหม่”</b>
+      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • ถ้าได้ Bingo จะมี Pop-up แจ้งเลขที่ชนะ
     </p>
 
     <div class="controls">
@@ -144,10 +197,25 @@
     </div>
   </div>
 
+  <!-- ✅ Bingo Modal -->
+  <div class="modal" id="bingoModal" role="dialog" aria-modal="true" aria-labelledby="bingoTitle">
+    <div class="dialog">
+      <h2 id="bingoTitle">🎉 BINGO!</h2>
+      <p id="bingoDesc">คุณได้บิงโกด้วยเลขชุดนี้:</p>
+      <div class="pillRow" id="bingoNums"></div>
+      <div class="actions">
+        <button id="closeModalBtn" class="secondary">ปิด</button>
+        <button id="newFromModalBtn">หยิบใบใหม่</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SIZE = 5;
     const FREE_INDEX = 12; // center of 5x5 (0..24)
+
     let lastBoardKey = null;
+    let bingoLocked = false; // ✅ prevent popup spam until reset
 
     // --- Helpers: cryptographically-strong randomness when available ---
     function randInt(min, maxInclusive) {
@@ -174,12 +242,11 @@
       return array;
     }
 
-    // ✅ generate 24 unique numbers (1..50) and place FREE in the center
     function generateBoardNumbers() {
       const pool = Array.from({ length: 50 }, (_, i) => i + 1);
       shuffle(pool);
 
-      const picked = pool.slice(0, 24); // 24 numbers
+      const picked = pool.slice(0, 24);
       const board = new Array(SIZE * SIZE);
 
       let p = 0;
@@ -192,16 +259,16 @@
 
     function newBoard() {
       let board, key;
-
-      // prevent exact same board as immediately previous one
       do {
         board = generateBoardNumbers();
-        key = board.join(","); // includes FREE so it’s comparable
+        key = board.join(",");
       } while (key === lastBoardKey);
 
       lastBoardKey = key;
+      bingoLocked = false;          // ✅ reset lock
       renderBoard(board);
       setSeedInfo();
+      clearWinHighlight();
     }
 
     function renderBoard(board) {
@@ -214,13 +281,16 @@
         cell.textContent = v;
 
         if (idx === FREE_INDEX) {
-          cell.classList.add("free", "marked"); // optional: free is auto-marked
+          cell.classList.add("free", "marked"); // FREE starts marked
           cell.addEventListener("click", () => {
-            // ถ้าไม่อยากให้กดปิด FREE ได้ ให้คอมเมนต์บรรทัด toggle นี้ทิ้ง
             cell.classList.toggle("marked");
+            maybeBingo();
           });
         } else {
-          cell.addEventListener("click", () => cell.classList.toggle("marked"));
+          cell.addEventListener("click", () => {
+            cell.classList.toggle("marked");
+            maybeBingo();
+          });
         }
 
         grid.appendChild(cell);
@@ -228,13 +298,15 @@
     }
 
     function clearMarks() {
-      document.querySelectorAll(".cell.marked").forEach((el, idx) => {
+      document.querySelectorAll(".cell").forEach((el, idx) => {
         el.classList.remove("marked");
       });
-
-      // optional: keep FREE marked after clearing
+      // keep FREE marked
       const cells = document.querySelectorAll(".cell");
       if (cells[FREE_INDEX]) cells[FREE_INDEX].classList.add("marked");
+
+      bingoLocked = false; // ✅ allow new bingo after clearing
+      clearWinHighlight();
     }
 
     function setSeedInfo() {
@@ -242,13 +314,114 @@
       document.getElementById("seedInfo").textContent = "ID: " + id;
     }
 
+    // -------- Bingo checking --------
+    function getCells() {
+      return Array.from(document.querySelectorAll(".cell"));
+    }
+
+    function isMarked(idx) {
+      const cells = getCells();
+      return cells[idx]?.classList.contains("marked");
+    }
+
+    function lineIndices() {
+      const lines = [];
+
+      // rows
+      for (let r = 0; r < SIZE; r++) {
+        lines.push(Array.from({length: SIZE}, (_, c) => r * SIZE + c));
+      }
+      // cols
+      for (let c = 0; c < SIZE; c++) {
+        lines.push(Array.from({length: SIZE}, (_, r) => r * SIZE + c));
+      }
+      // diagonals
+      lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + i));
+      lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + (SIZE - 1 - i)));
+
+      return lines;
+    }
+
+    function getWinningLine() {
+      const lines = lineIndices();
+      for (const line of lines) {
+        if (line.every(isMarked)) return line; // first winning line
+      }
+      return null;
+    }
+
+    function clearWinHighlight() {
+      getCells().forEach(c => c.classList.remove("win"));
+    }
+
+    function highlightLine(indices) {
+      const cells = getCells();
+      indices.forEach(i => cells[i]?.classList.add("win"));
+    }
+
+    function numbersInLine(indices) {
+      const cells = getCells();
+      return indices.map(i => cells[i]?.textContent).filter(v => v != null);
+    }
+
+    // -------- Modal --------
+    const modal = document.getElementById("bingoModal");
+    const bingoNums = document.getElementById("bingoNums");
+
+    function openModal(nums) {
+      bingoNums.innerHTML = "";
+      nums.forEach(n => {
+        const pill = document.createElement("div");
+        pill.className = "pill";
+        pill.textContent = n;
+        bingoNums.appendChild(pill);
+      });
+      modal.classList.add("show");
+    }
+
+    function closeModal() {
+      modal.classList.remove("show");
+    }
+
+    function maybeBingo() {
+      if (bingoLocked) return;
+
+      const win = getWinningLine();
+      if (!win) return;
+
+      bingoLocked = true;                 // ✅ lock
+      clearWinHighlight();
+      highlightLine(win);
+
+      const nums = numbersInLine(win);    // ✅ show numbers in winning line
+      openModal(nums);
+    }
+
+    // -------- Buttons --------
     document.getElementById("newBtn").addEventListener("click", () => {
+      closeModal();
       newBoard();
       clearMarks();
     });
 
-    document.getElementById("clearMarksBtn").addEventListener("click", clearMarks);
+    document.getElementById("clearMarksBtn").addEventListener("click", () => {
+      closeModal();
+      clearMarks();
+    });
 
+    document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+    document.getElementById("newFromModalBtn").addEventListener("click", () => {
+      closeModal();
+      newBoard();
+      clearMarks();
+    });
+
+    // click outside dialog closes
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // First entry
     newBoard();
   </script>
 </body>
