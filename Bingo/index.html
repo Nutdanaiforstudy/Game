@@ -7,33 +7,24 @@
   <style>
     :root{
       --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", Arial, sans-serif;
-
-      /* responsive sizing */
       --gap: clamp(6px, 1.8vmin, 14px);
       --border: clamp(1px, 0.35vmin, 3px);
       --radius: clamp(10px, 2vmin, 18px);
       --wrap-radius: clamp(14px, 2.4vmin, 22px);
-
-      /* padding that adapts to screen */
       --page-pad: clamp(10px, 3vw, 24px);
       --card-pad: clamp(12px, 3vw, 18px);
     }
-
     *{ box-sizing: border-box; }
-
     body{
       font-family: var(--font);
       background: #f6f7fb;
       margin: 0;
       padding: var(--page-pad);
       color: #111;
-
-      /* center and allow full-height layout on mobile */
       min-height: 100svh;
       display: grid;
       place-items: center;
     }
-
     .wrap{
       width: min(720px, 100%);
       background: #fff;
@@ -44,7 +35,6 @@
       flex-direction: column;
       gap: clamp(10px, 2.2vmin, 16px);
     }
-
     h1{
       font-size: clamp(16px, 3.2vw, 20px);
       margin: 0;
@@ -54,20 +44,13 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-
     .sub{
       font-size: clamp(12px, 2.6vw, 14px);
       color: #444;
       margin: 0;
       line-height: 1.45;
     }
-
-    .controls{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
+    .controls{ display:flex; gap: 10px; flex-wrap: wrap; }
     button{
       border: 0;
       border-radius: 999px;
@@ -82,18 +65,9 @@
       flex: 1 1 160px;
     }
     button:active{ transform: scale(.99); }
-    button.secondary{
-      background: #eef0f7;
-      color: #111;
-      font-weight: 650;
-    }
+    button.secondary{ background: #eef0f7; color: #111; font-weight: 650; }
 
-    /* ✅ Key: board is always a perfect square and scales to screen */
-    .board{
-      width: 100%;
-      aspect-ratio: 1 / 1;
-    }
-
+    .board{ width: 100%; aspect-ratio: 1 / 1; }
     .grid{
       width: 100%;
       height: 100%;
@@ -103,31 +77,29 @@
       gap: var(--gap);
       user-select: none;
     }
-
     .cell{
       border: var(--border) solid #111;
       border-radius: var(--radius);
       display:grid;
       place-items:center;
-
-      /* ✅ Font scales with board size */
       font-size: clamp(16px, 6.2vmin, 34px);
       font-weight: 800;
-
       background: #fff;
       cursor: pointer;
       transition: background .15s ease, transform .05s ease, opacity .2s ease;
-      min-width: 0; /* prevents overflow in grid */
+      min-width: 0;
       min-height: 0;
-
-      /* optional: nicer tap on mobile */
       -webkit-tap-highlight-color: transparent;
     }
     .cell:active{ transform: scale(.99); }
 
-    .cell.marked{
+    .cell.marked{ background: #111; color: #fff; }
+
+    /* ✅ FREE cell style */
+    .cell.free{
       background: #111;
       color: #fff;
+      letter-spacing: .06em;
     }
 
     .footer{
@@ -138,7 +110,6 @@
       gap: 10px;
       flex-wrap: wrap;
     }
-
     .mono{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       font-size: clamp(11px, 2.6vw, 12px);
@@ -155,7 +126,7 @@
     </h1>
 
     <p class="sub">
-      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • เมื่อจบรอบกดปุ่ม <b>“หยิบใบใหม่”</b> เพื่อสุ่มใบใหม่แบบไม่ซ้ำในใบเดิม
+      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • เมื่อจบรอบกดปุ่ม <b>“หยิบใบใหม่”</b>
     </p>
 
     <div class="controls">
@@ -168,12 +139,16 @@
     </div>
 
     <div class="footer">
-      <div>สุ่มตัวเลข 25 ช่องจาก 1–50 (ไม่ซ้ำในใบเดียว)</div>
+      <div>สุ่ม 24 ช่องจาก 1–50 (ไม่ซ้ำ) + ช่องกลาง FREE</div>
       <div>เริ่มใหม่ได้ไม่จำกัด</div>
     </div>
   </div>
 
   <script>
+    const SIZE = 5;
+    const FREE_INDEX = 12; // center of 5x5 (0..24)
+    let lastBoardKey = null;
+
     // --- Helpers: cryptographically-strong randomness when available ---
     function randInt(min, maxInclusive) {
       const range = maxInclusive - min + 1;
@@ -199,41 +174,67 @@
       return array;
     }
 
+    // ✅ generate 24 unique numbers (1..50) and place FREE in the center
     function generateBoardNumbers() {
       const pool = Array.from({ length: 50 }, (_, i) => i + 1);
       shuffle(pool);
-      return pool.slice(0, 25);
+
+      const picked = pool.slice(0, 24); // 24 numbers
+      const board = new Array(SIZE * SIZE);
+
+      let p = 0;
+      for (let i = 0; i < board.length; i++) {
+        if (i === FREE_INDEX) board[i] = "FREE";
+        else board[i] = picked[p++];
+      }
+      return board;
     }
 
-    let lastBoardKey = null;
-
     function newBoard() {
-      let nums, key;
-      do {
-        nums = generateBoardNumbers();
-        key = nums.join(",");
-      } while (key === lastBoardKey);
-      lastBoardKey = key;
+      let board, key;
 
-      renderBoard(nums);
+      // prevent exact same board as immediately previous one
+      do {
+        board = generateBoardNumbers();
+        key = board.join(","); // includes FREE so it’s comparable
+      } while (key === lastBoardKey);
+
+      lastBoardKey = key;
+      renderBoard(board);
       setSeedInfo();
     }
 
-    function renderBoard(nums) {
+    function renderBoard(board) {
       const grid = document.getElementById("grid");
       grid.innerHTML = "";
 
-      nums.forEach((n) => {
+      board.forEach((v, idx) => {
         const cell = document.createElement("div");
         cell.className = "cell";
-        cell.textContent = n;
-        cell.addEventListener("click", () => cell.classList.toggle("marked"));
+        cell.textContent = v;
+
+        if (idx === FREE_INDEX) {
+          cell.classList.add("free", "marked"); // optional: free is auto-marked
+          cell.addEventListener("click", () => {
+            // ถ้าไม่อยากให้กดปิด FREE ได้ ให้คอมเมนต์บรรทัด toggle นี้ทิ้ง
+            cell.classList.toggle("marked");
+          });
+        } else {
+          cell.addEventListener("click", () => cell.classList.toggle("marked"));
+        }
+
         grid.appendChild(cell);
       });
     }
 
     function clearMarks() {
-      document.querySelectorAll(".cell.marked").forEach((el) => el.classList.remove("marked"));
+      document.querySelectorAll(".cell.marked").forEach((el, idx) => {
+        el.classList.remove("marked");
+      });
+
+      // optional: keep FREE marked after clearing
+      const cells = document.querySelectorAll(".cell");
+      if (cells[FREE_INDEX]) cells[FREE_INDEX].classList.add("marked");
     }
 
     function setSeedInfo() {
@@ -248,7 +249,6 @@
 
     document.getElementById("clearMarksBtn").addEventListener("click", clearMarks);
 
-    // First entry -> generate immediately
     newBoard();
   </script>
 </body>
