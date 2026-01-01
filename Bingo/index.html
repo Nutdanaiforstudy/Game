@@ -2,19 +2,38 @@
 <html lang="th">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bingo 1-50 (5x5) - Responsive</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bingo 1-50 (5x5) - Truly Responsive</title>
   <style>
     :root{
       --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Thai", Arial, sans-serif;
+
+      /* Layout */
+      --page-pad: clamp(10px, 3vw, 28px);
+      --card-pad: clamp(12px, 3vw, 20px);
+      --wrap-radius: clamp(14px, 2.4vmin, 22px);
+
+      /* Board + cells */
       --gap: clamp(6px, 1.8vmin, 14px);
       --border: clamp(1px, 0.35vmin, 3px);
       --radius: clamp(10px, 2vmin, 18px);
-      --wrap-radius: clamp(14px, 2.4vmin, 22px);
-      --page-pad: clamp(10px, 3vw, 24px);
-      --card-pad: clamp(12px, 3vw, 18px);
+
+      /* Board size: fits any screen without squeezing */
+      --board-max: 720px;
+      --board-min: 280px;
+
+      /* Cell text (prevents squeeze by scaling smoothly) */
+      --cell-font: clamp(16px, 6.2vmin, 34px);
+
+      /* Button font */
+      --btn-font: clamp(13px, 3vw, 16px);
+      --sub-font: clamp(12px, 2.6vw, 14px);
+      --h1-font: clamp(16px, 3.2vw, 20px);
+      --foot-font: clamp(11px, 2.4vw, 12px);
     }
+
     *{ box-sizing: border-box; }
+
     body{
       font-family: var(--font);
       background: #f6f7fb;
@@ -25,8 +44,9 @@
       display: grid;
       place-items: center;
     }
+
     .wrap{
-      width: min(720px, 100%);
+      width: min(var(--board-max), 100%);
       background: #fff;
       border-radius: var(--wrap-radius);
       padding: var(--card-pad);
@@ -35,8 +55,9 @@
       flex-direction: column;
       gap: clamp(10px, 2.2vmin, 16px);
     }
+
     h1{
-      font-size: clamp(16px, 3.2vw, 20px);
+      font-size: var(--h1-font);
       margin: 0;
       display:flex;
       justify-content: space-between;
@@ -44,62 +65,86 @@
       gap: 10px;
       flex-wrap: wrap;
     }
+
     .sub{
-      font-size: clamp(12px, 2.6vw, 14px);
+      font-size: var(--sub-font);
       color: #444;
       margin: 0;
       line-height: 1.45;
     }
-    .controls{ display:flex; gap: 10px; flex-wrap: wrap; }
+
+    .controls{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     button{
       border: 0;
       border-radius: 999px;
       padding: 12px 14px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       background: #111;
       color: #fff;
       transition: transform .05s ease, opacity .2s ease;
       font-family: var(--font);
-      font-size: clamp(13px, 3vw, 16px);
+      font-size: var(--btn-font);
       flex: 1 1 160px;
+      min-width: 140px;
     }
     button:active{ transform: scale(.99); }
-    button.secondary{ background: #eef0f7; color: #111; font-weight: 650; }
+    button.secondary{ background: #eef0f7; color: #111; font-weight: 750; }
 
-    .board{ width: 100%; aspect-ratio: 1 / 1; }
-    .grid{
+    /* ✅ The key: board always fits viewport and never gets "squeezed" */
+    .board{
       width: 100%;
-      height: 100%;
+      display: grid;
+      place-items: center;
+    }
+
+    .grid{
+      /* square board that fits screen */
+      width: min(100%, var(--board-max));
+      height: min(100vw - (var(--page-pad) * 2) - (var(--card-pad) * 2), var(--board-max));
+      max-height: calc(100svh - 240px); /* keep room for header/buttons on small screens */
+      aspect-ratio: 1 / 1;
+
       display:grid;
       grid-template-columns: repeat(5, 1fr);
       grid-template-rows: repeat(5, 1fr);
       gap: var(--gap);
       user-select: none;
+      touch-action: manipulation;
     }
+
+    /* Ensure board doesn't become too tiny */
+    @media (max-height: 520px){
+      .grid{ max-height: calc(100svh - 190px); }
+    }
+    @media (max-height: 430px){
+      .grid{ max-height: calc(100svh - 150px); }
+    }
+
     .cell{
       border: var(--border) solid #111;
       border-radius: var(--radius);
       display:grid;
       place-items:center;
-      font-size: clamp(16px, 6.2vmin, 34px);
-      font-weight: 800;
+      font-size: var(--cell-font);
+      font-weight: 900;
       background: #fff;
       cursor: pointer;
       transition: background .15s ease, transform .05s ease, opacity .2s ease;
       min-width: 0;
       min-height: 0;
       -webkit-tap-highlight-color: transparent;
+      line-height: 1;
+      padding: 6px;
     }
     .cell:active{ transform: scale(.99); }
-
     .cell.marked{ background: #111; color: #fff; }
-
-    .cell.free{
-      background: #111;
-      color: #fff;
-      letter-spacing: .06em;
-    }
+    .cell.free{ background: #111; color: #fff; letter-spacing: .06em; }
 
     .cell.win{
       outline: clamp(2px, 0.6vmin, 4px) solid #2a63ff;
@@ -107,20 +152,21 @@
     }
 
     .footer{
-      font-size: clamp(11px, 2.4vw, 12px);
+      font-size: var(--foot-font);
       color:#666;
       display:flex;
       justify-content: space-between;
       gap: 10px;
       flex-wrap: wrap;
     }
+
     .mono{
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
       font-size: clamp(11px, 2.6vw, 12px);
       opacity: .85;
     }
 
-    /* ✅ Modal */
+    /* Modal */
     .modal{
       position: fixed;
       inset: 0;
@@ -131,6 +177,7 @@
       padding: 16px;
     }
     .modal.show{ display: flex; }
+
     .dialog{
       width: min(520px, 100%);
       background: #fff;
@@ -138,35 +185,19 @@
       padding: 16px;
       box-shadow: 0 18px 50px rgba(0,0,0,.2);
     }
-    .dialog h2{
-      margin: 0 0 8px;
-      font-size: 22px;
-    }
-    .dialog p{
-      margin: 0 0 12px;
-      color: #333;
-      line-height: 1.5;
-      font-size: 14px;
-    }
-    .pillRow{
-      display:flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+    .dialog h2{ margin: 0 0 8px; font-size: 22px; }
+    .dialog p{ margin: 0 0 12px; color: #333; line-height: 1.5; font-size: 14px; }
+
+    .pillRow{ display:flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
     .pill{
       padding: 8px 10px;
       border-radius: 999px;
       background: #f2f4fa;
       border: 1px solid rgba(0,0,0,.08);
-      font-weight: 800;
+      font-weight: 900;
       font-size: 14px;
     }
-    .dialog .actions{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .dialog .actions{ display:flex; gap: 10px; flex-wrap: wrap; }
   </style>
 </head>
 
@@ -178,13 +209,13 @@
     </h1>
 
     <p class="sub">
-      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • ถ้าได้ Bingo จะมี Pop-up + เสียงแจ้งเตือน
+      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • ถ้าได้ Bingo จะมี Pop-up + เสียงกระดิ่ง
     </p>
 
     <div class="controls">
       <button id="newBtn">หยิบใบใหม่</button>
       <button id="clearMarksBtn" class="secondary">ล้างเครื่องหมาย</button>
-      <button id="soundBtn" class="secondary" aria-pressed="false">🔊 เปิดเสียง</button>
+      <button id="soundBtn" class="secondary" aria-pressed="false">🔊 Mute</button>
     </div>
 
     <div class="board">
@@ -197,7 +228,6 @@
     </div>
   </div>
 
-  <!-- ✅ Bingo Modal -->
   <div class="modal" id="bingoModal" role="dialog" aria-modal="true" aria-labelledby="bingoTitle">
     <div class="dialog">
       <h2 id="bingoTitle">🎉 BINGO!</h2>
@@ -217,10 +247,81 @@
     let lastBoardKey = null;
     let bingoLocked = false;
 
-    // Sound state (must be enabled by user gesture on most browsers)
-    let soundEnabled = false;
+    // Sound starts ON
+    let soundEnabled = true;
 
-    // --- Helpers: cryptographically-strong randomness when available ---
+    // Shared AudioContext
+    let audioCtx = null;
+    function getAudioCtx() {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContext) return null;
+      if (!audioCtx) audioCtx = new AudioContext();
+      return audioCtx;
+    }
+
+    async function bellBeep(totalDurationSec = 1.4) {
+      if (!soundEnabled) return;
+
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+
+      if (ctx.state === "suspended") {
+        try { await ctx.resume(); } catch (_) {}
+      }
+
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      const masterGain = 0.55;
+      master.gain.setValueAtTime(masterGain, now);
+      master.connect(ctx.destination);
+
+      const freqs = [880, 1175, 1760];
+      const attack = 0.01;
+      const decay = totalDurationSec;
+
+      freqs.forEach((f, idx) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(f, now);
+
+        const partialBase = 0.5 / (idx + 1);
+
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(partialBase, now + attack);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+        osc.connect(g);
+        g.connect(master);
+
+        osc.start(now);
+        osc.stop(now + decay + 0.05);
+      });
+
+      // strike click
+      const noiseDur = 0.05;
+      const bufferSize = Math.floor(ctx.sampleRate * noiseDur);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const ng = ctx.createGain();
+      ng.gain.setValueAtTime(0.0001, now);
+      ng.gain.exponentialRampToValueAtTime(0.25, now + 0.005);
+      ng.gain.exponentialRampToValueAtTime(0.0001, now + noiseDur);
+
+      noise.connect(ng);
+      ng.connect(master);
+      noise.start(now);
+      noise.stop(now + noiseDur + 0.01);
+    }
+
+    // Random helpers
     function randInt(min, maxInclusive) {
       const range = maxInclusive - min + 1;
       if (window.crypto && crypto.getRandomValues) {
@@ -283,18 +384,16 @@
         cell.textContent = v;
 
         if (idx === FREE_INDEX) {
-          cell.classList.add("free", "marked"); // FREE starts marked
-          cell.addEventListener("click", () => {
-            // allow toggle free if you want; keep as is:
-            cell.classList.toggle("marked");
-            maybeBingo();
-          });
-        } else {
-          cell.addEventListener("click", () => {
-            cell.classList.toggle("marked");
-            maybeBingo();
-          });
+          cell.classList.add("free", "marked");
         }
+
+        cell.addEventListener("click", async () => {
+          // allow toggling FREE too (your original behavior)
+          cell.classList.toggle("marked");
+          // keep FREE styling
+          if (idx === FREE_INDEX) cell.classList.add("free");
+          await maybeBingo();
+        });
 
         grid.appendChild(cell);
       });
@@ -303,7 +402,7 @@
     function clearMarks() {
       document.querySelectorAll(".cell").forEach((el) => el.classList.remove("marked"));
       const cells = document.querySelectorAll(".cell");
-      if (cells[FREE_INDEX]) cells[FREE_INDEX].classList.add("marked"); // keep FREE marked
+      if (cells[FREE_INDEX]) cells[FREE_INDEX].classList.add("marked");
       bingoLocked = false;
       clearWinHighlight();
     }
@@ -313,7 +412,7 @@
       document.getElementById("seedInfo").textContent = "ID: " + id;
     }
 
-    // -------- Bingo checking --------
+    // Bingo checking
     function getCells() {
       return Array.from(document.querySelectorAll(".cell"));
     }
@@ -325,12 +424,8 @@
 
     function lineIndices() {
       const lines = [];
-      for (let r = 0; r < SIZE; r++) {
-        lines.push(Array.from({length: SIZE}, (_, c) => r * SIZE + c));
-      }
-      for (let c = 0; c < SIZE; c++) {
-        lines.push(Array.from({length: SIZE}, (_, r) => r * SIZE + c));
-      }
+      for (let r = 0; r < SIZE; r++) lines.push(Array.from({length: SIZE}, (_, c) => r * SIZE + c));
+      for (let c = 0; c < SIZE; c++) lines.push(Array.from({length: SIZE}, (_, r) => r * SIZE + c));
       lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + i));
       lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + (SIZE - 1 - i)));
       return lines;
@@ -338,9 +433,7 @@
 
     function getWinningLine() {
       const lines = lineIndices();
-      for (const line of lines) {
-        if (line.every(isMarked)) return line;
-      }
+      for (const line of lines) if (line.every(isMarked)) return line;
       return null;
     }
 
@@ -358,7 +451,7 @@
       return indices.map(i => cells[i]?.textContent).filter(v => v != null);
     }
 
-    // -------- Modal --------
+    // Modal
     const modal = document.getElementById("bingoModal");
     const bingoNums = document.getElementById("bingoNums");
 
@@ -377,45 +470,7 @@
       modal.classList.remove("show");
     }
 
-    // -------- Sound: say "Bingo" --------
-    function sayBingo() {
-      if (!soundEnabled) return;
-
-      // Prefer Web Speech API (text-to-speech)
-      if ("speechSynthesis" in window) {
-        try {
-          // cancel any ongoing speech to avoid overlaps
-          window.speechSynthesis.cancel();
-          const utter = new SpeechSynthesisUtterance("Bingo");
-          utter.lang = "en-US";
-          utter.rate = 1;
-          utter.pitch = 1;
-          window.speechSynthesis.speak(utter);
-          return;
-        } catch (_) {}
-      }
-
-      // Fallback: short beep (Web Audio)
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        const ctx = new AudioCtx();
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.type = "sine";
-        o.frequency.value = 880;
-        g.gain.value = 0.001;
-        o.connect(g); g.connect(ctx.destination);
-        o.start();
-        const now = ctx.currentTime;
-        g.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-        o.stop(now + 0.26);
-        setTimeout(() => ctx.close?.(), 400);
-      } catch (_) {}
-    }
-
-    function maybeBingo() {
+    async function maybeBingo() {
       if (bingoLocked) return;
 
       const win = getWinningLine();
@@ -427,10 +482,11 @@
 
       const nums = numbersInLine(win);
       openModal(nums);
-      sayBingo(); // ✅ play "Bingo" notice sound
+
+      await bellBeep(1.6);
     }
 
-    // -------- Buttons --------
+    // Buttons
     document.getElementById("newBtn").addEventListener("click", () => {
       closeModal();
       newBoard();
@@ -449,25 +505,27 @@
       clearMarks();
     });
 
-    // click outside dialog closes
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
     });
 
-    // ✅ Sound enable button (required gesture)
+    // Sound button
     const soundBtn = document.getElementById("soundBtn");
+    function refreshSoundBtn() {
+      soundBtn.textContent = soundEnabled ? "🔊 Mute" : "🔇 Muted";
+      soundBtn.setAttribute("aria-pressed", String(!soundEnabled));
+    }
+    refreshSoundBtn();
+
     soundBtn.addEventListener("click", async () => {
       soundEnabled = !soundEnabled;
-      soundBtn.setAttribute("aria-pressed", String(soundEnabled));
-      soundBtn.textContent = soundEnabled ? "🔔 เปิดเสียงแล้ว" : "🔊 เปิดเสียง";
+      refreshSoundBtn();
 
-      // Warm up speech/audio with a tiny silent utter/beep attempt (helps some browsers)
-      if (soundEnabled && "speechSynthesis" in window) {
-        try {
-          const u = new SpeechSynthesisUtterance(" ");
-          u.volume = 0;
-          window.speechSynthesis.speak(u);
-        } catch (_) {}
+      if (soundEnabled) {
+        const ctx = getAudioCtx();
+        if (ctx && ctx.state === "suspended") {
+          try { await ctx.resume(); } catch (_) {}
+        }
       }
     });
 
