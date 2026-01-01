@@ -101,7 +101,6 @@
       letter-spacing: .06em;
     }
 
-    /* ✅ highlight winning line cells (optional) */
     .cell.win{
       outline: clamp(2px, 0.6vmin, 4px) solid #2a63ff;
       outline-offset: -2px;
@@ -179,12 +178,13 @@
     </h1>
 
     <p class="sub">
-      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • ถ้าได้ Bingo จะมี Pop-up แจ้งเลขที่ชนะ
+      คลิกช่องเพื่อทำเครื่องหมายระหว่างเล่นได้ • ช่องกลางเป็น <b>FREE</b> ทุกใบ • ถ้าได้ Bingo จะมี Pop-up + เสียงแจ้งเตือน
     </p>
 
     <div class="controls">
       <button id="newBtn">หยิบใบใหม่</button>
       <button id="clearMarksBtn" class="secondary">ล้างเครื่องหมาย</button>
+      <button id="soundBtn" class="secondary" aria-pressed="false">🔊 เปิดเสียง</button>
     </div>
 
     <div class="board">
@@ -212,10 +212,13 @@
 
   <script>
     const SIZE = 5;
-    const FREE_INDEX = 12; // center of 5x5 (0..24)
+    const FREE_INDEX = 12;
 
     let lastBoardKey = null;
-    let bingoLocked = false; // ✅ prevent popup spam until reset
+    let bingoLocked = false;
+
+    // Sound state (must be enabled by user gesture on most browsers)
+    let soundEnabled = false;
 
     // --- Helpers: cryptographically-strong randomness when available ---
     function randInt(min, maxInclusive) {
@@ -251,8 +254,7 @@
 
       let p = 0;
       for (let i = 0; i < board.length; i++) {
-        if (i === FREE_INDEX) board[i] = "FREE";
-        else board[i] = picked[p++];
+        board[i] = (i === FREE_INDEX) ? "FREE" : picked[p++];
       }
       return board;
     }
@@ -265,7 +267,7 @@
       } while (key === lastBoardKey);
 
       lastBoardKey = key;
-      bingoLocked = false;          // ✅ reset lock
+      bingoLocked = false;
       renderBoard(board);
       setSeedInfo();
       clearWinHighlight();
@@ -283,6 +285,7 @@
         if (idx === FREE_INDEX) {
           cell.classList.add("free", "marked"); // FREE starts marked
           cell.addEventListener("click", () => {
+            // allow toggle free if you want; keep as is:
             cell.classList.toggle("marked");
             maybeBingo();
           });
@@ -298,14 +301,10 @@
     }
 
     function clearMarks() {
-      document.querySelectorAll(".cell").forEach((el, idx) => {
-        el.classList.remove("marked");
-      });
-      // keep FREE marked
+      document.querySelectorAll(".cell").forEach((el) => el.classList.remove("marked"));
       const cells = document.querySelectorAll(".cell");
-      if (cells[FREE_INDEX]) cells[FREE_INDEX].classList.add("marked");
-
-      bingoLocked = false; // ✅ allow new bingo after clearing
+      if (cells[FREE_INDEX]) cells[FREE_INDEX].classList.add("marked"); // keep FREE marked
+      bingoLocked = false;
       clearWinHighlight();
     }
 
@@ -326,26 +325,21 @@
 
     function lineIndices() {
       const lines = [];
-
-      // rows
       for (let r = 0; r < SIZE; r++) {
         lines.push(Array.from({length: SIZE}, (_, c) => r * SIZE + c));
       }
-      // cols
       for (let c = 0; c < SIZE; c++) {
         lines.push(Array.from({length: SIZE}, (_, r) => r * SIZE + c));
       }
-      // diagonals
       lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + i));
       lines.push(Array.from({length: SIZE}, (_, i) => i * SIZE + (SIZE - 1 - i)));
-
       return lines;
     }
 
     function getWinningLine() {
       const lines = lineIndices();
       for (const line of lines) {
-        if (line.every(isMarked)) return line; // first winning line
+        if (line.every(isMarked)) return line;
       }
       return null;
     }
@@ -383,18 +377,57 @@
       modal.classList.remove("show");
     }
 
+    // -------- Sound: say "Bingo" --------
+    function sayBingo() {
+      if (!soundEnabled) return;
+
+      // Prefer Web Speech API (text-to-speech)
+      if ("speechSynthesis" in window) {
+        try {
+          // cancel any ongoing speech to avoid overlaps
+          window.speechSynthesis.cancel();
+          const utter = new SpeechSynthesisUtterance("Bingo");
+          utter.lang = "en-US";
+          utter.rate = 1;
+          utter.pitch = 1;
+          window.speechSynthesis.speak(utter);
+          return;
+        } catch (_) {}
+      }
+
+      // Fallback: short beep (Web Audio)
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.value = 880;
+        g.gain.value = 0.001;
+        o.connect(g); g.connect(ctx.destination);
+        o.start();
+        const now = ctx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        o.stop(now + 0.26);
+        setTimeout(() => ctx.close?.(), 400);
+      } catch (_) {}
+    }
+
     function maybeBingo() {
       if (bingoLocked) return;
 
       const win = getWinningLine();
       if (!win) return;
 
-      bingoLocked = true;                 // ✅ lock
+      bingoLocked = true;
       clearWinHighlight();
       highlightLine(win);
 
-      const nums = numbersInLine(win);    // ✅ show numbers in winning line
+      const nums = numbersInLine(win);
       openModal(nums);
+      sayBingo(); // ✅ play "Bingo" notice sound
     }
 
     // -------- Buttons --------
@@ -419,6 +452,23 @@
     // click outside dialog closes
     modal.addEventListener("click", (e) => {
       if (e.target === modal) closeModal();
+    });
+
+    // ✅ Sound enable button (required gesture)
+    const soundBtn = document.getElementById("soundBtn");
+    soundBtn.addEventListener("click", async () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.setAttribute("aria-pressed", String(soundEnabled));
+      soundBtn.textContent = soundEnabled ? "🔔 เปิดเสียงแล้ว" : "🔊 เปิดเสียง";
+
+      // Warm up speech/audio with a tiny silent utter/beep attempt (helps some browsers)
+      if (soundEnabled && "speechSynthesis" in window) {
+        try {
+          const u = new SpeechSynthesisUtterance(" ");
+          u.volume = 0;
+          window.speechSynthesis.speak(u);
+        } catch (_) {}
+      }
     });
 
     // First entry
