@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>เกมจับคู่ภาพองุ่น</title>
+  <style>
+    :root {
+      --bg1: #13071d;
+      --bg2: #2a1140;
+      --panel: rgba(255,255,255,0.10);
+      --panel-border: rgba(255,255,255,0.14);
+      --text: #f8f3ff;
+      --muted: #dacdf1;
+      --accent1: #ff63bb;
+      --accent2: #7d6bff;
+      --success: #66efaa;
+      --shadow: 0 18px 50px rgba(0,0,0,0.30);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,99,187,.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(125,107,255,.18), transparent 32%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    .app {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 26px 16px 40px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .hero-card { padding: 28px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.16);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+
+    .sub {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 60ch;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      padding: 20px;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: .92rem;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .toolbar-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn, select {
+      border: none;
+      outline: none;
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: .96rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: white;
+      transition: .25s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      box-shadow: 0 12px 28px rgba(130,83,228,.30);
+    }
+
+    .btn.secondary, select {
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: var(--text);
+    }
+
+    .btn:hover, select:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card-wrap {
+      perspective: 1000px;
+      aspect-ratio: .95 / 1.14;
+    }
+
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .6s ease;
+      cursor: pointer;
+    }
+
+    .card.flipped,
+    .card.matched {
+      transform: rotateY(180deg);
+    }
+
+    .face {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      overflow: hidden;
+      backface-visibility: hidden;
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: var(--shadow);
+    }
+
+    .front {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.18), transparent 40%),
+        linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.08));
+    }
+
+    .front::before {
+      content: "🎴";
+      font-size: clamp(2.8rem, 6vw, 4.2rem);
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
+    }
+
+    .front::after {
+      content: "Tap to Flip";
+      position: absolute;
+      bottom: 16px;
+      font-size: .82rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.88);
+    }
+
+    .back {
+      transform: rotateY(180deg);
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .image-frame {
+      flex: 1;
+      min-height: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #f5e7d3;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+    }
+
+    .image-frame img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .card-name {
+      font-weight: 800;
+      font-size: .98rem;
+      line-height: 1.2;
+    }
+
+    .card-desc {
+      color: #efe8ff;
+      opacity: .92;
+      font-size: .82rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card.matched .back {
+      outline: 2px solid rgba(102,239,170,.75);
+      box-shadow: 0 0 0 10px rgba(102,239,170,.12);
+    }
+
+    .note {
+      margin-top: 14px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(11,5,18,.72);
+      backdrop-filter: blur(8px);
+      z-index: 30;
+    }
+
+    .modal.show { display: flex; }
+
+    .modal-card {
+      width: min(520px, 100%);
+      padding: 28px;
+      border-radius: 28px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.10));
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: var(--shadow);
+    }
+
+    .modal-card h2 {
+      margin: 0 0 10px;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+    }
+
+    .modal-card p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 920px) {
+      .hero { grid-template-columns: 1fr; }
+      .board { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 16px 12px 28px; }
+      .hero-card, .stats, .toolbar { padding: 16px; }
+      .board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="panel hero-card">
+        <div class="badge">✨ เกมจับคู่ภาพ • ใช้รูปใหม่ที่คุณส่งมา</div>
+        <h1>เกมจับคู่ภาพองุ่น</h1>
+        <p class="sub">
+          เวอร์ชันนี้เปลี่ยนมาใช้รูปแยกขององุ่นแต่ละชนิดตามภาพที่คุณส่งมาแล้ว และใช้การแสดงผลแบบ
+          <strong>object-fit: cover</strong> เพื่อให้รูปเต็มกรอบสวย ๆ ไม่ล้นกล่องเวลาเปิดการ์ด
+        </p>
+      </div>
+
+      <div class="panel stats">
+        <div class="stat">
+          <div class="stat-label">คะแนน</div>
+          <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">จำนวนตา</div>
+          <div class="stat-value" id="moves">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">จับคู่ได้แล้ว</div>
+          <div class="stat-value" id="matchedCount">0/7</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">เวลา</div>
+          <div class="stat-value" id="timer">00:00</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel toolbar">
+      <div class="toolbar-group">
+        <button class="btn primary" id="restartBtn">เริ่มเกมใหม่</button>
+        <button class="btn secondary" id="hintBtn">เฉลย 2 วินาที</button>
+      </div>
+      <div class="toolbar-group">
+        <select id="modeSelect">
+          <option value="7">โหมดเต็ม 7 คู่</option>
+          <option value="6">โหมดกลาง 6 คู่</option>
+          <option value="4">โหมดเร็ว 4 คู่</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="board" id="board"></section>
+    <div class="note">
+      ใช้ไฟล์รูปตามชื่อเดิมที่คุณอัปโหลดไว้ และเอาไฟล์ HTML นี้ไว้ในโฟลเดอร์เดียวกันกับรูปทั้งหมด
+    </div>
+  </div>
+
+  <div class="modal" id="winModal">
+    <div class="modal-card">
+      <h2>🎉 จับคู่ครบแล้ว!</h2>
+      <p id="winText"></p>
+      <button class="btn primary" id="playAgainBtn">เล่นอีกครั้ง</button>
+    </div>
+  </div>
+
+  <script>
+    const imageCards = [
+      {
+        id: 'candy-dreams',
+        name: 'Candy Dreams',
+        desc: 'องุ่นดำไร้เมล็ด หวานนุ่มและมีเอกลักษณ์',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.49.52.png'
+      },
+      {
+        id: 'midnight-beauty',
+        name: 'Midnight Beauty',
+        desc: 'องุ่นดำลูกใหญ่ หวานสดชื่นและกรอบ',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.49.59.png'
+      },
+      {
+        id: 'bebop-1',
+        name: 'Bebop',
+        desc: 'องุ่นแดงเนื้อกรอบ หอมและหวาน',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.50.05.png'
+      },
+      {
+        id: 'bebop-2',
+        name: 'Bebop Pink',
+        desc: 'องุ่นแดงอมชมพู เนื้อแน่นและหวาน',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.50.11.png'
+      },
+      {
+        id: 'autumn-crisp',
+        name: 'Autumn Crisp',
+        desc: 'องุ่นเขียวลูกใหญ่ กรอบ แน่น สดชื่น',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.50.19.png'
+      },
+      {
+        id: 'sweet-globe',
+        name: 'Sweet Globe',
+        desc: 'องุ่นเขียวพรีเมียม เนื้อแน่น หวานฉ่ำ',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.50.25.png'
+      },
+      {
+        id: 'cotton-candy',
+        name: 'Cotton Candy',
+        desc: 'องุ่นเขียวกลิ่นคล้ายสายไหม หวานหอม',
+        image: './ภาพถ่ายหน้าจอ 2569-03-27 เวลา 08.50.29.png'
+      }
+    ];
+
+    const board = document.getElementById('board');
+    const scoreEl = document.getElementById('score');
+    const movesEl = document.getElementById('moves');
+    const matchedCountEl = document.getElementById('matchedCount');
+    const timerEl = document.getElementById('timer');
+    const restartBtn = document.getElementById('restartBtn');
+    const hintBtn = document.getElementById('hintBtn');
+    const modeSelect = document.getElementById('modeSelect');
+    const winModal = document.getElementById('winModal');
+    const winText = document.getElementById('winText');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+
+    let deck = [];
+    let firstCard = null;
+    let secondCard = null;
+    let lockBoard = false;
+    let score = 0;
+    let moves = 0;
+    let matches = 0;
+    let totalPairs = 7;
+    let started = false;
+    let seconds = 0;
+    let timerId = null;
+
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function formatTime(total) {
+      const m = String(Math.floor(total / 60)).padStart(2, '0');
+      const s = String(total % 60).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function startTimer() {
+      clearInterval(timerId);
+      timerId = setInterval(() => {
+        seconds += 1;
+        timerEl.textContent = formatTime(seconds);
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerId);
+    }
+
+    function updateStats() {
+      scoreEl.textContent = score;
+      movesEl.textContent = moves;
+      matchedCountEl.textContent = `${matches}/${totalPairs}`;
+      timerEl.textContent = formatTime(seconds);
+    }
+
+    function buildDeck(pairCount) {
+      totalPairs = pairCount;
+      const selected = imageCards.slice(0, pairCount);
+      const duplicated = selected.flatMap(card => [
+        { ...card, uid: crypto.randomUUID() },
+        { ...card, uid: crypto.randomUUID() }
+      ]);
+      return shuffle(duplicated);
+    }
+
+    function createCard(cardData) {
+      const wrap = document.createElement('div');
+      wrap.className = 'card-wrap';
+      wrap.innerHTML = `
+        <div class="card" data-id="${cardData.id}" data-uid="${cardData.uid}">
+          <div class="face front"></div>
+          <div class="face back">
+            <div class="image-frame">
+              <img src="${cardData.image}" alt="${cardData.name}">
+            </div>
+            <div class="card-name">${cardData.name}</div>
+            <div class="card-desc">${cardData.desc}</div>
+          </div>
+        </div>
+      `;
+      wrap.querySelector('.card').addEventListener('click', handleFlip);
+      return wrap;
+    }
+
+    function renderBoard() {
+      board.innerHTML = '';
+      deck.forEach(item => board.appendChild(createCard(item)));
+    }
+
+    function handleFlip(e) {
+      const card = e.currentTarget;
+      if (lockBoard || card === firstCard || card.classList.contains('matched') || card.classList.contains('flipped')) return;
+
+      if (!started) {
+        started = true;
+        startTimer();
+      }
+
+      card.classList.add('flipped');
+
+      if (!firstCard) {
+        firstCard = card;
+        return;
+      }
+
+      secondCard = card;
+      moves += 1;
+      checkForMatch();
+      updateStats();
+    }
+
+    function checkForMatch() {
+      const isMatch = firstCard.dataset.id === secondCard.dataset.id;
+      lockBoard = true;
+
+      if (isMatch) {
+        firstCard.classList.add('matched');
+        secondCard.classList.add('matched');
+        score += 10;
+        matches += 1;
+        resetTurn();
+
+        if (matches === totalPairs) {
+          stopTimer();
+          setTimeout(showWin, 350);
+        }
+      } else {
+        score = Math.max(0, score - 1);
+        setTimeout(() => {
+          firstCard.classList.remove('flipped');
+          secondCard.classList.remove('flipped');
+          resetTurn();
+        }, 850);
+      }
+    }
+
+    function resetTurn() {
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+      updateStats();
+    }
+
+    function previewAll() {
+      if (lockBoard) return;
+      const cards = [...document.querySelectorAll('.card')];
+      lockBoard = true;
+      cards.forEach(card => {
+        if (!card.classList.contains('matched')) card.classList.add('flipped');
+      });
+      setTimeout(() => {
+        cards.forEach(card => {
+          if (!card.classList.contains('matched')) card.classList.remove('flipped');
+        });
+        lockBoard = false;
+      }, 2000);
+    }
+
+    function showWin() {
+      winText.textContent = `คุณใช้ ${moves} ตา ได้ ${score} คะแนน และใช้เวลา ${formatTime(seconds)} ในการจับคู่ภาพองุ่นครบทั้งหมด`;
+      winModal.classList.add('show');
+    }
+
+    function resetGame() {
+      stopTimer();
+      firstCard = null;
+      secondCard = null;
+      lockBoard = false;
+      score = 0;
+      moves = 0;
+      matches = 0;
+      seconds = 0;
+      started = false;
+      winModal.classList.remove('show');
+      deck = buildDeck(Number(modeSelect.value));
+      updateStats();
+      renderBoard();
+    }
+
+    restartBtn.addEventListener('click', resetGame);
+    playAgainBtn.addEventListener('click', resetGame);
+    hintBtn.addEventListener('click', previewAll);
+    modeSelect.addEventListener('change', resetGame);
+    winModal.addEventListener('click', (e) => {
+      if (e.target === winModal) winModal.classList.remove('show');
+    });
+
+    resetGame();
+  </script>
+</body>
+</html>
