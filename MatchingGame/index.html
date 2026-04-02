@@ -165,6 +165,7 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
     .ui-btn {
@@ -175,7 +176,7 @@
       font: inherit;
       font-weight: 800;
       cursor: pointer;
-      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
     }
 
     .ui-btn:hover {
@@ -194,6 +195,12 @@
 
     .ui-btn.secondary {
       background: rgba(255,255,255,0.75);
+      color: var(--primary);
+      border: 1px solid rgba(42, 45, 95, 0.10);
+    }
+
+    .ui-btn.ghost {
+      background: rgba(255,255,255,0.55);
       color: var(--primary);
       border: 1px solid rgba(42, 45, 95, 0.10);
     }
@@ -465,6 +472,7 @@
         Tap or click two cards. A match is one description card and one image card with the same number.
       </div>
       <div class="button-row">
+        <button class="ui-btn ghost" id="soundToggleBtn" type="button" aria-pressed="true">Sound: On</button>
         <button class="ui-btn secondary" id="previewBtn" type="button">Preview for 4 seconds</button>
         <button class="ui-btn primary" id="restartBtn" type="button">Shuffle & Restart</button>
       </div>
@@ -507,6 +515,7 @@
     const restartBtn = document.getElementById("restartBtn");
     const playAgainBtn = document.getElementById("playAgainBtn");
     const previewBtn = document.getElementById("previewBtn");
+    const soundToggleBtn = document.getElementById("soundToggleBtn");
 
     let cards = [];
     let firstPick = null;
@@ -518,6 +527,73 @@
     let timerId = null;
     let gameStarted = false;
     let previewing = false;
+
+    let soundEnabled = true;
+    let audioContext = null;
+
+    function getAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioContext.state === "suspended") {
+        audioContext.resume();
+      }
+      return audioContext;
+    }
+
+    function playTone(frequency, duration = 0.08, type = "sine", volume = 0.03, startDelay = 0) {
+      if (!soundEnabled) return;
+
+      const ctx = getAudioContext();
+      const now = ctx.currentTime + startDelay;
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, now);
+
+      gainNode.gain.setValueAtTime(0.0001, now);
+      gainNode.gain.exponentialRampToValueAtTime(volume, now + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      oscillator.start(now);
+      oscillator.stop(now + duration);
+    }
+
+    function playClickSound() {
+      playTone(540, 0.05, "square", 0.02);
+    }
+
+    function playMatchSound() {
+      playTone(523.25, 0.12, "triangle", 0.035, 0);
+      playTone(659.25, 0.12, "triangle", 0.035, 0.08);
+      playTone(783.99, 0.16, "triangle", 0.035, 0.16);
+    }
+
+    function playWrongSound() {
+      playTone(260, 0.18, "sawtooth", 0.03, 0);
+      playTone(180, 0.18, "sawtooth", 0.025, 0.08);
+    }
+
+    function playPreviewSound() {
+      playTone(440, 0.06, "sine", 0.02, 0);
+      playTone(660, 0.08, "sine", 0.02, 0.06);
+    }
+
+    function playRestartSound() {
+      playTone(700, 0.05, "square", 0.02, 0);
+      playTone(560, 0.07, "square", 0.02, 0.05);
+    }
+
+    function playWinSound() {
+      playTone(523.25, 0.12, "triangle", 0.04, 0);
+      playTone(659.25, 0.12, "triangle", 0.04, 0.10);
+      playTone(783.99, 0.12, "triangle", 0.04, 0.20);
+      playTone(1046.5, 0.22, "triangle", 0.04, 0.30);
+    }
 
     function shuffle(array) {
       const cloned = [...array];
@@ -592,7 +668,6 @@
       `;
 
       card.addEventListener("click", () => handleCardClick(card));
-
       return card;
     }
 
@@ -630,6 +705,7 @@
         winTextEl.textContent = `Completed in ${moves} moves and ${formatTime(seconds)}.`;
         winBannerEl.classList.add("show");
         showToast("Board completed");
+        playWinSound();
       }
     }
 
@@ -648,6 +724,7 @@
         startTimer();
       }
 
+      playClickSound();
       flipUp(card);
 
       if (!firstPick) {
@@ -665,9 +742,11 @@
         matches += 1;
         updateStats();
         showToast("Match found");
+        playMatchSound();
         resetTurn();
         checkWin();
       } else {
+        playWrongSound();
         setTimeout(() => {
           flipDown(firstPick);
           flipDown(secondPick);
@@ -679,6 +758,7 @@
     function previewAll() {
       if (previewing || gameStarted) return;
       previewing = true;
+      playPreviewSound();
       cards.forEach(card => flipUp(card));
       showToast("Previewing all cards");
 
@@ -689,6 +769,7 @@
     }
 
     function restartGame() {
+      playRestartSound();
       stopTimer();
       firstPick = null;
       secondPick = null;
@@ -703,12 +784,25 @@
       renderBoard();
     }
 
+    function updateSoundButton() {
+      soundToggleBtn.textContent = soundEnabled ? "Sound: On" : "Sound: Off";
+      soundToggleBtn.setAttribute("aria-pressed", String(soundEnabled));
+      soundToggleBtn.style.opacity = soundEnabled ? "1" : "0.7";
+    }
+
     restartBtn.addEventListener("click", restartGame);
     playAgainBtn.addEventListener("click", restartGame);
     previewBtn.addEventListener("click", previewAll);
 
+    soundToggleBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      updateSoundButton();
+      if (soundEnabled) playClickSound();
+    });
+
     window.addEventListener("load", () => {
       updateStats();
+      updateSoundButton();
       renderBoard();
     });
   </script>
