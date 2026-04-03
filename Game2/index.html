@@ -1,19 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#242c68" />
   <title>Australian Table Grapes Matching Game</title>
+
+  <!-- Prevent favicon 404 -->
+  <link rel="icon" href="./BacksideCover.png" type="image/png" />
+
   <style>
     :root {
       --bg: #f4efe8;
-      --panel: rgba(255, 255, 255, 0.92);
+      --panel: rgba(255, 255, 255, 0.94);
       --panel-border: rgba(42, 45, 95, 0.08);
       --ink: #1f2858;
       --muted: #5e6784;
       --primary: #242c68;
       --primary-2: #6f4a92;
       --success: #2f7d57;
+      --danger: #9a3d3d;
       --shadow: 0 14px 34px rgba(42, 33, 58, 0.10);
       --card-shadow: 0 8px 18px rgba(34, 28, 49, 0.12);
       --radius-xl: 24px;
@@ -31,10 +40,12 @@
         radial-gradient(circle at top left, rgba(229, 206, 181, 0.95), transparent 28%),
         linear-gradient(180deg, #f6f1ea 0%, #f1ece4 100%);
       color: var(--ink);
+      -webkit-text-size-adjust: 100%;
     }
 
     body {
       padding: clamp(8px, 1vw, 18px);
+      touch-action: manipulation;
     }
 
     .app {
@@ -53,13 +64,12 @@
     .hero,
     .status-panel,
     .audio-panel,
-    .board-wrap {
+    .board-wrap,
+    .loading-panel {
       background: var(--panel);
       border: 1px solid var(--panel-border);
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
     .hero {
@@ -74,7 +84,7 @@
     .hero-copy h1 {
       margin: 0 0 8px;
       font-size: clamp(1.45rem, 1.6vw + 1rem, 3rem);
-      line-height: 0.98;
+      line-height: 1.02;
       letter-spacing: -0.04em;
       font-weight: 800;
       color: var(--primary);
@@ -150,7 +160,8 @@
       line-height: 1;
     }
 
-    .audio-panel {
+    .audio-panel,
+    .loading-panel {
       padding: clamp(12px, 1vw, 18px);
       display: grid;
       gap: clamp(10px, 0.9vw, 14px);
@@ -185,7 +196,8 @@
       font-size: clamp(0.88rem, 0.25vw + 0.82rem, 1rem);
     }
 
-    .audio-sub {
+    .audio-sub,
+    .loading-sub {
       color: var(--muted);
       font-size: clamp(0.74rem, 0.2vw + 0.7rem, 0.92rem);
       line-height: 1.35;
@@ -253,10 +265,12 @@
       cursor: pointer;
       transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
       white-space: nowrap;
+      -webkit-appearance: none;
     }
 
     .ui-btn:hover { transform: translateY(-1px); }
     .ui-btn:active { transform: translateY(0); }
+    .ui-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
     .ui-btn.primary {
       background: var(--primary);
@@ -300,6 +314,7 @@
       perspective: 1200px;
       -webkit-tap-highlight-color: transparent;
       aspect-ratio: 1 / 1;
+      touch-action: manipulation;
     }
 
     .card[data-kind="DESC"] {
@@ -323,6 +338,7 @@
       height: 100%;
       border-radius: 22px;
       transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
       transition: transform 0.55s cubic-bezier(.2,.7,.2,1), box-shadow 0.25s ease;
       box-shadow: var(--card-shadow);
     }
@@ -334,6 +350,7 @@
     .card.is-flipped .card-inner,
     .card.is-matched .card-inner {
       transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
     }
 
     .card-face {
@@ -368,6 +385,7 @@
 
     .card-front {
       transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
       background: #ffffff;
       display: grid;
       place-items: center;
@@ -379,6 +397,8 @@
       height: 100%;
       display: block;
       border-radius: 14px;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .card-back img {
@@ -395,12 +415,10 @@
     }
 
     .card[data-kind="DESC"] .card-front img {
-      object-fit: contain;
       background: #fbfaf7;
     }
 
     .card[data-kind="IMG"] .card-front img {
-      object-fit: contain;
       background: #f8f5f0;
     }
 
@@ -452,6 +470,45 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    .progress {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(36, 44, 104, 0.08);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), var(--primary-2));
+      transition: width 0.2s ease;
+    }
+
+    .loading-title {
+      font-weight: 800;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    .loading-panel.error {
+      border-color: rgba(154, 61, 61, 0.2);
+      background: rgba(255,255,255,0.96);
+    }
+
+    .error-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--danger);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
     .sr-only {
       position: absolute;
       width: 1px;
@@ -472,16 +529,12 @@
 
     @media (max-width: 1180px) {
       .topbar { grid-template-columns: 1fr; }
-      .board {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
+      .board { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
 
     @media (max-width: 900px) {
       .audio-grid { grid-template-columns: 1fr; }
-      .board {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
+      .board { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     @media (max-width: 640px) {
@@ -522,7 +575,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .card-inner, .toast, .ui-btn { transition: none !important; }
+      .card-inner, .toast, .ui-btn, .progress-bar { transition: none !important; }
     }
   </style>
 </head>
@@ -533,11 +586,11 @@
         <div class="hero-copy">
           <h1>Australian Table Grapes<br>Matching Game</h1>
           <p>
-            Match each picture card with the correct description card. This version is tuned to stay readable and playable across large screens, tablets, phones, and very small screens.
+            Match each picture card with the correct description card. Designed to work across desktop, Android, and iPhone/iPad browsers.
           </p>
         </div>
         <div class="brand-chip" aria-hidden="true">
-          <img src="./BacksideCover.png" alt="" />
+          <img id="heroLogo" src="./BacksideCover.png" alt="" />
         </div>
       </div>
 
@@ -595,13 +648,27 @@
       </div>
     </section>
 
+    <section class="loading-panel" id="loadingPanel">
+      <div class="loading-title" id="loadingTitle">Loading assets...</div>
+      <div class="loading-sub" id="loadingText">Preparing images and audio for all devices.</div>
+      <div class="progress" aria-hidden="true">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div id="errorWrap" class="hidden">
+        <ul class="error-list" id="errorList"></ul>
+      </div>
+      <div class="button-row">
+        <button class="ui-btn secondary hidden" id="retryLoadBtn" type="button">Retry Loading</button>
+      </div>
+    </section>
+
     <section class="controls">
       <div class="instruction">
         Tap or click two cards to find the matching picture and description.
       </div>
       <div class="button-row">
-        <button class="ui-btn secondary" id="previewBtn" type="button">Preview</button>
-        <button class="ui-btn primary" id="restartBtn" type="button">Shuffle &amp; Restart</button>
+        <button class="ui-btn secondary" id="previewBtn" type="button" disabled>Preview</button>
+        <button class="ui-btn primary" id="restartBtn" type="button" disabled>Shuffle &amp; Restart</button>
       </div>
     </section>
 
@@ -625,6 +692,7 @@
   <script>
     const TOTAL_PAIRS = 7;
     const BACK_IMAGE = "./BacksideCover.png";
+    const AUDIO_FILE = "./Song.mp3";
 
     const sourceCards = Array.from({ length: TOTAL_PAIRS }, (_, index) => {
       const id = index + 1;
@@ -633,6 +701,8 @@
         { id, kind: "DESC", src: `./${id}DESC.png`, label: `Grape description ${id}` }
       ];
     }).flat();
+
+    const allImagePaths = [BACK_IMAGE, ...sourceCards.map(card => card.src)];
 
     const boardEl = document.getElementById("board");
     const movesValueEl = document.getElementById("movesValue");
@@ -644,6 +714,7 @@
     const restartBtn = document.getElementById("restartBtn");
     const playAgainBtn = document.getElementById("playAgainBtn");
     const previewBtn = document.getElementById("previewBtn");
+    const retryLoadBtn = document.getElementById("retryLoadBtn");
 
     const musicToggleBtn = document.getElementById("musicToggleBtn");
     const volumeSlider = document.getElementById("volumeSlider");
@@ -655,6 +726,14 @@
     const effectsSlider = document.getElementById("effectsSlider");
     const effectsValueEl = document.getElementById("effectsValue");
 
+    const loadingPanel = document.getElementById("loadingPanel");
+    const loadingTitle = document.getElementById("loadingTitle");
+    const loadingText = document.getElementById("loadingText");
+    const progressBar = document.getElementById("progressBar");
+    const errorWrap = document.getElementById("errorWrap");
+    const errorList = document.getElementById("errorList");
+    const heroLogo = document.getElementById("heroLogo");
+
     let cards = [];
     let firstPick = null;
     let secondPick = null;
@@ -665,6 +744,7 @@
     let timerId = null;
     let gameStarted = false;
     let previewing = false;
+    let assetsReady = false;
 
     let effectsEnabled = true;
     let effectsVolume = 0.055;
@@ -672,9 +752,24 @@
     let bgMusicEnabled = true;
     let userInteracted = false;
 
+    function isLocalFileMode() {
+      return window.location.protocol === "file:";
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
     function getAudioContext() {
       if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return null;
+        audioContext = new Ctx();
       }
       if (audioContext.state === "suspended") {
         audioContext.resume().catch(() => {});
@@ -696,8 +791,9 @@
 
     function playTone(frequency, duration = 0.08, type = "sine", volume = 0.03, startDelay = 0) {
       if (!effectsEnabled) return;
-
       const ctx = getAudioContext();
+      if (!ctx) return;
+
       const now = ctx.currentTime + startDelay;
       const oscillator = ctx.createOscillator();
       const gainNode = ctx.createGain();
@@ -791,7 +887,7 @@
       clearTimeout(showToast._timeout);
       showToast._timeout = setTimeout(() => {
         toastEl.classList.remove("show");
-      }, 1500);
+      }, 1600);
     }
 
     function setMusicStatus(message) {
@@ -810,6 +906,134 @@
       effectsToggleBtn.style.opacity = effectsEnabled ? "1" : "0.7";
     }
 
+    function setControlsEnabled(enabled) {
+      previewBtn.disabled = !enabled;
+      restartBtn.disabled = !enabled;
+      playAgainBtn.disabled = !enabled;
+    }
+
+    function updateProgress(current, total) {
+      const safeTotal = Math.max(total, 1);
+      const percent = Math.round((current / safeTotal) * 100);
+      progressBar.style.width = `${percent}%`;
+      loadingText.textContent = `Loaded ${current} of ${total} asset(s).`;
+    }
+
+    function showLoadError(messages) {
+      loadingPanel.classList.add("error");
+      loadingTitle.textContent = "Some files could not be loaded";
+      errorWrap.classList.remove("hidden");
+      retryLoadBtn.classList.remove("hidden");
+      errorList.innerHTML = messages.map(msg => `<li>${escapeHtml(msg)}</li>`).join("");
+      setControlsEnabled(false);
+    }
+
+    function clearLoadError() {
+      loadingPanel.classList.remove("error");
+      loadingTitle.textContent = "Loading assets...";
+      errorWrap.classList.add("hidden");
+      retryLoadBtn.classList.add("hidden");
+      errorList.innerHTML = "";
+    }
+
+    function finishLoadingSuccess() {
+      assetsReady = true;
+      loadingTitle.textContent = "Ready to play";
+      loadingText.textContent = isLocalFileMode()
+        ? "Game loaded. For best iPhone/iPad support, open this page through a web server."
+        : "All images are ready.";
+      progressBar.style.width = "100%";
+      setControlsEnabled(true);
+      renderBoard();
+    }
+
+    function preloadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.decoding = "async";
+        img.onload = () => resolve(src);
+        img.onerror = () => reject(new Error(`Missing or unreadable image: ${src}`));
+        img.src = src;
+      });
+    }
+
+    function preloadAudio(src) {
+      return new Promise((resolve, reject) => {
+        const audio = new Audio();
+        let settled = false;
+
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          resolve(src);
+        };
+
+        const fail = () => {
+          if (settled) return;
+          settled = true;
+          cleanup();
+          reject(new Error(`Missing or unreadable audio: ${src}`));
+        };
+
+        const cleanup = () => {
+          audio.removeEventListener("canplaythrough", done);
+          audio.removeEventListener("loadeddata", done);
+          audio.removeEventListener("error", fail);
+        };
+
+        audio.preload = "auto";
+        audio.src = src;
+        audio.addEventListener("canplaythrough", done, { once: true });
+        audio.addEventListener("loadeddata", done, { once: true });
+        audio.addEventListener("error", fail, { once: true });
+        audio.load();
+
+        setTimeout(done, 2500);
+      });
+    }
+
+    async function loadAssets() {
+      assetsReady = false;
+      clearLoadError();
+      setControlsEnabled(false);
+      boardEl.innerHTML = "";
+
+      const tasks = [
+        ...allImagePaths.map(path => ({ type: "image", path })),
+        { type: "audio", path: AUDIO_FILE }
+      ];
+
+      let completed = 0;
+      updateProgress(0, tasks.length);
+
+      const failures = [];
+
+      for (const task of tasks) {
+        try {
+          if (task.type === "image") {
+            await preloadImage(task.path);
+          } else {
+            await preloadAudio(task.path);
+          }
+        } catch (error) {
+          failures.push(error.message);
+        } finally {
+          completed += 1;
+          updateProgress(completed, tasks.length);
+        }
+      }
+
+      if (failures.length) {
+        showLoadError(failures);
+        return;
+      }
+
+      heroLogo.src = BACK_IMAGE;
+      bgMusic.src = AUDIO_FILE;
+      finishLoadingSuccess();
+    }
+
     async function tryStartMusic() {
       userInteracted = true;
       updateMusicUI();
@@ -826,7 +1050,7 @@
         await bgMusic.play();
         setMusicStatus("Looping background music is playing.");
       } catch (error) {
-        setMusicStatus("Tap any button or card again to allow music playback.");
+        setMusicStatus("Tap again to allow music playback.");
       }
     }
 
@@ -837,18 +1061,6 @@
         bgMusic.play().catch(() => {});
       });
 
-      bgMusic.addEventListener("pause", () => {
-        if (
-          bgMusicEnabled &&
-          userInteracted &&
-          !document.hidden &&
-          bgMusic.currentTime > 0 &&
-          bgMusic.currentTime < (bgMusic.duration || Infinity)
-        ) {
-          bgMusic.play().catch(() => {});
-        }
-      });
-
       bgMusic.addEventListener("error", () => {
         setMusicStatus("Music file could not be loaded.");
       });
@@ -857,6 +1069,7 @@
     function primeAudioOnFirstInteraction() {
       const once = async () => {
         document.removeEventListener("pointerdown", once);
+        document.removeEventListener("touchstart", once);
         document.removeEventListener("keydown", once);
 
         try {
@@ -867,6 +1080,7 @@
       };
 
       document.addEventListener("pointerdown", once, { once: true });
+      document.addEventListener("touchstart", once, { once: true, passive: true });
       document.addEventListener("keydown", once, { once: true });
     }
 
@@ -880,18 +1094,16 @@
       card.setAttribute("aria-label", "Hidden card");
 
       card.innerHTML = `
-        <span class="sr-only">${cardData.label}</span>
+        <span class="sr-only">${escapeHtml(cardData.label)}</span>
         <div class="card-inner">
           <div class="card-face card-back" aria-hidden="true">
-            <img src="${BACK_IMAGE}" alt="" onerror="this.style.display='none'" />
+            <img src="${BACK_IMAGE}" alt="" draggable="false" />
           </div>
           <div class="card-face card-front">
             <img
               src="${cardData.src}"
-              alt="${cardData.label}"
-              loading="lazy"
+              alt="${escapeHtml(cardData.label)}"
               draggable="false"
-              onerror="this.alt='Image failed to load'; this.style.objectFit='contain'; this.style.padding='10px'; this.style.background='#fff';"
             />
           </div>
         </div>
@@ -902,6 +1114,7 @@
     }
 
     function renderBoard() {
+      if (!assetsReady) return;
       boardEl.innerHTML = "";
       const shuffled = shuffle(sourceCards);
       cards = shuffled.map((cardData, index) => makeCard(cardData, index));
@@ -946,7 +1159,7 @@
     }
 
     function handleCardClick(card) {
-      if (locked || previewing) return;
+      if (!assetsReady || locked || previewing) return;
       if (card.classList.contains("is-flipped") || card.classList.contains("is-matched")) return;
 
       if (!gameStarted) {
@@ -986,7 +1199,7 @@
     }
 
     function previewAll() {
-      if (previewing || gameStarted) return;
+      if (!assetsReady || previewing || gameStarted) return;
       previewing = true;
       playPreviewSound();
       cards.forEach(card => flipUp(card));
@@ -995,10 +1208,11 @@
       setTimeout(() => {
         cards.forEach(card => flipDown(card));
         previewing = false;
-      }, 3000);
+      }, 2500);
     }
 
     function restartGame() {
+      if (!assetsReady) return;
       playRestartSound();
       stopTimer();
       firstPick = null;
@@ -1017,6 +1231,7 @@
     previewBtn.addEventListener("click", previewAll);
     restartBtn.addEventListener("click", restartGame);
     playAgainBtn.addEventListener("click", restartGame);
+    retryLoadBtn.addEventListener("click", loadAssets);
 
     musicToggleBtn.addEventListener("click", async () => {
       bgMusicEnabled = !bgMusicEnabled;
@@ -1056,7 +1271,7 @@
       }
     });
 
-    window.addEventListener("load", () => {
+    window.addEventListener("load", async () => {
       updateStats();
       updateMusicButton();
       updateEffectsButton();
@@ -1064,7 +1279,12 @@
       updateEffectsUI();
       attachLoopProtection();
       primeAudioOnFirstInteraction();
-      renderBoard();
+
+      if (isLocalFileMode()) {
+        loadingText.textContent = "You opened this as a local file. Desktop may work, but iPhone/iPad support is best through a web server.";
+      }
+
+      await loadAssets();
     });
   </script>
 </body>
