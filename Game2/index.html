@@ -1,280 +1,715 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Matching Game</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Australian Grapes Matching Game</title>
 
-<style>
-html, body {
-  margin: 0;
-  height: 100%;
-  overflow: hidden;
-  font-family: sans-serif;
-  background: #f4efe8;
-}
+  <style>
+    :root {
+      --bg: #f4efe8;
+      --panel: rgba(255, 255, 255, 0.96);
+      --panel-border: rgba(42, 45, 95, 0.08);
+      --ink: #1f2858;
+      --muted: #5e6784;
+      --primary: #242c68;
+      --primary-2: #6f4a92;
+      --shadow: 0 8px 20px rgba(42, 33, 58, 0.10);
+      --card-shadow: 0 8px 18px rgba(34, 28, 49, 0.12);
+      --radius-xl: 16px;
+      --radius-lg: 14px;
+      --gap: 12px;
+      --page-pad: 12px;
 
-/* MAIN LAYOUT */
-.app {
-  height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 8px;
-  padding: 8px;
-}
+      --dock-pad: 6px;
+      --dock-gap: 6px;
+      --btn-pad-y: 7px;
+      --btn-pad-x: 9px;
+      --btn-font: 0.68rem;
 
-/* TOP CONTROLS */
-.controls {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  gap: 10px;
-  align-items: center;
-}
+      --slider-pad-y: 5px;
+      --slider-pad-x: 7px;
+      --slider-font: 0.62rem;
+      --slider-value-font: 0.62rem;
+      --slider-value-width: 28px;
 
-/* BUTTON */
-button {
-  padding: 10px 16px;
-  border-radius: 20px;
-  border: none;
-  background: #242c68;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
+      --progress-pad-y: 6px;
+      --progress-pad-x: 7px;
+      --progress-font: 0.66rem;
+      --progress-height: 8px;
+    }
 
-/* SLIDER */
-.slider {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-}
+    * {
+      box-sizing: border-box;
+      min-width: 0;
+      min-height: 0;
+    }
 
-/* BOARD */
-.board {
-  height: 100%;
-  display: grid;
-  gap: 10px;
-}
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(229, 206, 181, 0.95), transparent 28%),
+        linear-gradient(180deg, #f6f1ea 0%, #f1ece4 100%);
+      color: var(--ink);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
 
-/* responsive grid */
-@media (min-width: 900px) {
-  .board { grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(2, 1fr); }
-}
-@media (max-width: 899px) {
-  .board { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); }
-}
-@media (max-width: 600px) {
-  .board { grid-template-columns: repeat(3, 1fr); }
-}
+    body {
+      padding: var(--page-pad);
+    }
 
-/* CARD */
-.card {
-  perspective: 1000px;
-  width: 100%;
-  height: 100%;
-}
+    .app {
+      width: min(1900px, 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: var(--gap);
+    }
 
-.card-inner {
-  width: 100%;
-  height: 100%;
-  transition: 0.5s;
-  transform-style: preserve-3d;
-}
+    .stage-wrap,
+    .win-banner {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
 
-.card.is-flipped .card-inner {
-  transform: rotateY(180deg);
-}
+    .stage-wrap {
+      padding: 12px;
+    }
 
-.card-face {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  backface-visibility: hidden;
-  overflow: hidden;
-}
+    .stage {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+      grid-auto-flow: row;
+    }
 
-/* FRONT IMAGE (HIGH QUALITY) */
-.card-front {
-  transform: rotateY(180deg);
-  background: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    .card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      border-radius: var(--radius-lg);
+      perspective: 1200px;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* ⭐ KEY: FULL IMAGE + HIGH RES */
-.card img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 8px;
-  image-rendering: auto;
-}
+    .card.is-matched {
+      cursor: default;
+    }
 
-/* BACK */
-.card-back {
-  background: #6f4a92;
-}
-</style>
+    .card:focus-visible {
+      outline: 3px solid rgba(76, 115, 255, 0.4);
+      outline-offset: 3px;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-lg);
+      transform-style: preserve-3d;
+      transition: transform 0.45s ease, box-shadow 0.2s ease;
+      box-shadow: var(--card-shadow);
+    }
+
+    .card:hover .card-inner {
+      box-shadow: 0 12px 22px rgba(34, 28, 49, 0.16);
+    }
+
+    .card.is-flipped .card-inner,
+    .card.is-matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border: 1px solid rgba(42, 45, 95, 0.08);
+      display: grid;
+      place-items: center;
+    }
+
+    .card-back {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04)),
+        var(--primary-2);
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+      background: #fff;
+      padding: 4px;
+    }
+
+    .card-face img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 10px;
+      object-fit: contain;
+      object-position: center center;
+      background: #fff;
+      image-rendering: auto;
+      -ms-interpolation-mode: bicubic;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card-back img {
+      padding: 6px;
+      background: linear-gradient(180deg, var(--primary-2), #5a397b);
+    }
+
+    .card.is-matched .card-front {
+      box-shadow: inset 0 0 0 3px rgba(47, 125, 87, 0.24);
+    }
+
+    .control-dock {
+      width: 100%;
+      background: rgba(255,255,255,0.90);
+      border: 1px solid rgba(42, 45, 95, 0.08);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: var(--dock-pad);
+      display: grid;
+      gap: var(--dock-gap);
+      align-self: start;
+    }
+
+    .dock-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .ui-btn {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: var(--btn-pad-y) var(--btn-pad-x);
+      font: inherit;
+      font-size: var(--btn-font);
+      font-weight: 800;
+      cursor: pointer;
+      line-height: 1;
+      white-space: nowrap;
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 8px 18px rgba(36, 44, 104, 0.16);
+    }
+
+    .ui-btn.secondary {
+      background: rgba(255,255,255,0.92);
+      color: var(--primary);
+      border: 1px solid rgba(42,45,95,0.10);
+      box-shadow: none;
+    }
+
+    .slider-stack {
+      display: grid;
+      gap: 6px;
+    }
+
+    .slider-box {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 6px;
+      padding: var(--slider-pad-y) var(--slider-pad-x);
+      font-size: var(--slider-font);
+      font-weight: 700;
+      color: var(--muted);
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(42, 45, 95, 0.08);
+      border-radius: 10px;
+    }
+
+    .slider-box input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary-2);
+      cursor: pointer;
+    }
+
+    .slider-value {
+      min-width: var(--slider-value-width);
+      text-align: right;
+      font-weight: 800;
+      color: var(--primary);
+      font-size: var(--slider-value-font);
+    }
+
+    .progress-panel {
+      display: grid;
+      gap: 5px;
+      padding: var(--progress-pad-y) var(--progress-pad-x);
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(42,45,95,0.08);
+      border-radius: 10px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: var(--progress-font);
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: var(--progress-height);
+      background: #ddd7cf;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, #6f4a92, #242c68);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .win-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      flex-wrap: wrap;
+      color: #1d4c35;
+      background: linear-gradient(180deg, rgba(47,125,87,0.12), rgba(47,125,87,0.06));
+      border-color: rgba(47,125,87,0.18);
+    }
+
+    .win-banner.show {
+      display: flex;
+    }
+
+    .win-banner strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 0.95rem;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 12px;
+      transform: translateX(-50%) translateY(16px);
+      background: rgba(31, 37, 82, 0.96);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 30;
+      max-width: calc(100vw - 20px);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* force same-row layout on wide screens */
+    .row3-card-1 { grid-column: 1; grid-row: 3; }
+    .row3-card-2 { grid-column: 2; grid-row: 3; }
+    .row3-dock   { grid-column: 3 / 7; grid-row: 3; }
+
+    /* 5-column layout */
+    @media (max-width: 1500px) {
+      .stage {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+      .row3-card-1 { grid-column: 1; grid-row: 3; }
+      .row3-card-2 { grid-column: 2; grid-row: 3; }
+      .row3-dock   { grid-column: 3 / 6; grid-row: 3; }
+    }
+
+    /* smaller screens: normal stacking */
+    @media (max-width: 1180px) {
+      .stage {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .row3-card-1,
+      .row3-card-2,
+      .row3-dock {
+        grid-column: auto;
+        grid-row: auto;
+      }
+      .row3-dock {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .stage {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stage {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .dock-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner,
+      .progress-fill,
+      .toast {
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="app">
+    <section class="stage-wrap">
+      <div class="stage" id="stage"></div>
+    </section>
 
-<div class="app">
-
-  <div class="controls">
-    <button onclick="preview()">Preview</button>
-    <button onclick="restart()">Restart</button>
-
-    <div class="slider">
-      🎵
-      <input type="range" id="musicVol" min="0" max="100" value="50">
-    </div>
-
-    <div class="slider">
-      🔊
-      <input type="range" id="effectVol" min="0" max="100" value="50">
-    </div>
-  </div>
-
-  <div class="board" id="board"></div>
-
-</div>
-
-<audio id="music" src="./Song.mp3" loop></audio>
-
-<script>
-const TOTAL = 7;
-const BACK = "./BacksideCover.png";
-
-let cards = [];
-let first = null;
-let lock = false;
-let effectVolume = 0.05;
-
-/* CREATE DATA */
-const data = [];
-for (let i = 1; i <= TOTAL; i++) {
-  data.push(
-    { id: i, type: "IMG", src: `./${i}IMG.png` },
-    { id: i, type: "DESC", src: `./${i}DESC.png` }
-  );
-}
-
-/* SHUFFLE */
-function shuffle(arr) {
-  return arr.sort(() => Math.random() - 0.5);
-}
-
-/* CREATE CARD */
-function createCard(d) {
-  const el = document.createElement("div");
-  el.className = "card";
-
-  el.innerHTML = `
-    <div class="card-inner">
-      <div class="card-face card-back">
-        <img src="${BACK}">
+    <section class="win-banner" id="winBanner">
+      <div>
+        <strong>Well done — all pairs matched.</strong>
+        <span id="winText">You finished the board.</span>
       </div>
-      <div class="card-face card-front">
-        <img src="${d.src}">
+      <button class="ui-btn" id="playAgainBtn" type="button">Play Again</button>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+  <audio id="music" src="./Song.mp3" loop></audio>
+
+  <template id="dockTemplate">
+    <aside class="control-dock row3-dock">
+      <div class="dock-buttons">
+        <button class="ui-btn secondary" id="previewBtn" type="button">Preview 4s</button>
+        <button class="ui-btn" id="restartBtn" type="button">Restart</button>
       </div>
-    </div>
-  `;
 
-  el.onclick = () => clickCard(el, d);
-  return el;
-}
+      <div class="slider-stack">
+        <div class="slider-box">
+          <span>🎵</span>
+          <input id="musicVol" type="range" min="0" max="100" value="50" aria-label="Music volume">
+          <span class="slider-value" id="musicVolValue">50%</span>
+        </div>
 
-/* CLICK */
-function clickCard(el, d) {
-  if (lock || el.classList.contains("is-flipped")) return;
+        <div class="slider-box">
+          <span>🔊</span>
+          <input id="effectVol" type="range" min="0" max="100" value="50" aria-label="Effects volume">
+          <span class="slider-value" id="effectVolValue">50%</span>
+        </div>
+      </div>
 
-  playClick();
+      <section class="progress-panel">
+        <div class="progress-meta">
+          <span id="pairText">Pairs: 0 / 7</span>
+          <span id="moveText">Moves: 0</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </section>
+    </aside>
+  </template>
 
-  el.classList.add("is-flipped");
+  <script>
+    const TOTAL = 7;
+    const BACK = "./BacksideCover.png";
 
-  if (!first) {
-    first = { el, d };
-    return;
-  }
+    let cards = [];
+    let first = null;
+    let lock = false;
+    let effectVolume = 0.05;
+    let matches = 0;
+    let moves = 0;
 
-  if (first.d.id === d.id && first.d.type !== d.type) {
-    playMatch();
-    first = null;
-  } else {
-    playWrong();
-    lock = true;
-    setTimeout(() => {
-      el.classList.remove("is-flipped");
-      first.el.classList.remove("is-flipped");
+    const stage = document.getElementById("stage");
+    const toast = document.getElementById("toast");
+    const winBanner = document.getElementById("winBanner");
+    const winText = document.getElementById("winText");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+
+    let pairText, moveText, progressFill, music, musicVol, musicVolValue, effectVol, effectVolValue, previewBtn, restartBtn;
+
+    const data = [];
+    for (let i = 1; i <= TOTAL; i++) {
+      data.push(
+        { id: i, type: "IMG", src: `./${i}IMG.png` },
+        { id: i, type: "DESC", src: `./${i}DESC.png` }
+      );
+    }
+
+    function shuffle(arr) {
+      const cloned = [...arr];
+      for (let i = cloned.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cloned[i], cloned[j]] = [cloned[j], cloned[i]];
+      }
+      return cloned;
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+
+    function updateProgress() {
+      if (!pairText) return;
+      pairText.textContent = `Pairs: ${matches} / ${TOTAL}`;
+      moveText.textContent = `Moves: ${moves}`;
+      progressFill.style.width = `${(matches / TOTAL) * 100}%`;
+    }
+
+    function createCard(d, extraClass = "") {
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = `card ${extraClass}`.trim();
+      el.setAttribute("aria-label", `Hidden card ${d.id}`);
+
+      el.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-back">
+            <img src="${BACK}" alt="">
+          </div>
+          <div class="card-face card-front">
+            <img src="${d.src}" alt="" loading="lazy" decoding="async">
+          </div>
+        </div>
+      `;
+
+      el.addEventListener("click", () => clickCard(el, d));
+      return el;
+    }
+
+    function createDock() {
+      const frag = document.getElementById("dockTemplate").content.cloneNode(true);
+      const wrap = document.createElement("div");
+      wrap.appendChild(frag);
+
+      pairText = wrap.querySelector("#pairText");
+      moveText = wrap.querySelector("#moveText");
+      progressFill = wrap.querySelector("#progressFill");
+      musicVol = wrap.querySelector("#musicVol");
+      musicVolValue = wrap.querySelector("#musicVolValue");
+      effectVol = wrap.querySelector("#effectVol");
+      effectVolValue = wrap.querySelector("#effectVolValue");
+      previewBtn = wrap.querySelector("#previewBtn");
+      restartBtn = wrap.querySelector("#restartBtn");
+
+      previewBtn.addEventListener("click", preview);
+      restartBtn.addEventListener("click", restart);
+
+      musicVol.addEventListener("input", e => {
+        music.volume = e.target.value / 100;
+        musicVolValue.textContent = `${e.target.value}%`;
+      });
+
+      effectVol.addEventListener("input", e => {
+        effectVolume = e.target.value / 1000;
+        effectVolValue.textContent = `${e.target.value}%`;
+      });
+
+      musicVolValue.textContent = "50%";
+      effectVolValue.textContent = "50%";
+      updateProgress();
+
+      return wrap.firstElementChild;
+    }
+
+    function clickCard(el, d) {
+      if (lock || el.classList.contains("is-flipped") || el.classList.contains("is-matched")) return;
+
+      playClick();
+      el.classList.add("is-flipped");
+
+      if (!first) {
+        first = { el, d };
+        return;
+      }
+
+      moves += 1;
+      updateProgress();
+
+      if (first.d.id === d.id && first.d.type !== d.type) {
+        first.el.classList.add("is-matched");
+        el.classList.add("is-matched");
+        matches += 1;
+        updateProgress();
+        playMatch();
+        showToast("Match found");
+        first = null;
+
+        if (matches === TOTAL) {
+          winText.textContent = `Completed in ${moves} moves.`;
+          winBanner.classList.add("show");
+          showToast("All pairs matched");
+        }
+      } else {
+        playWrong();
+        lock = true;
+        setTimeout(() => {
+          el.classList.remove("is-flipped");
+          first.el.classList.remove("is-flipped");
+          first = null;
+          lock = false;
+        }, 700);
+      }
+    }
+
+    function preview() {
+      if (lock) return;
+      lock = true;
+      cards.forEach(c => c.classList.add("is-flipped"));
+      setTimeout(() => {
+        cards.forEach(c => {
+          if (!c.classList.contains("is-matched")) c.classList.remove("is-flipped");
+        });
+        lock = false;
+      }, 4000);
+    }
+
+    function getColumns() {
+      const width = window.innerWidth;
+      if (width <= 520) return 2;
+      if (width <= 760) return 3;
+      if (width <= 1180) return 4;
+      if (width <= 1500) return 5;
+      return 6;
+    }
+
+    function render() {
+      stage.innerHTML = "";
+      const shuffled = shuffle(data);
+      const cols = getColumns();
+      cards = [];
+
+      if (cols >= 6) {
+        // First 12 cards fill rows 1-2.
+        shuffled.slice(0, 12).forEach(d => {
+          const card = createCard(d);
+          cards.push(card);
+          stage.appendChild(card);
+        });
+
+        // Third row: 2 cards + dock, all forced to same row.
+        const card1 = createCard(shuffled[12], "row3-card-1");
+        const card2 = createCard(shuffled[13], "row3-card-2");
+        cards.push(card1, card2);
+
+        stage.appendChild(card1);
+        stage.appendChild(card2);
+        stage.appendChild(createDock());
+      } else if (cols === 5) {
+        shuffled.slice(0, 10).forEach(d => {
+          const card = createCard(d);
+          cards.push(card);
+          stage.appendChild(card);
+        });
+
+        const card1 = createCard(shuffled[10], "row3-card-1");
+        const card2 = createCard(shuffled[11], "row3-card-2");
+        const card3 = createCard(shuffled[12]);
+        const card4 = createCard(shuffled[13]);
+        cards.push(card1, card2, card3, card4);
+
+        stage.appendChild(card1);
+        stage.appendChild(card2);
+        stage.appendChild(createDock());
+        stage.appendChild(card3);
+        stage.appendChild(card4);
+      } else {
+        shuffled.forEach(d => {
+          const card = createCard(d);
+          cards.push(card);
+          stage.appendChild(card);
+        });
+        stage.appendChild(createDock());
+      }
+
+      updateProgress();
+    }
+
+    function restart() {
       first = null;
       lock = false;
-    }, 700);
-  }
-}
+      matches = 0;
+      moves = 0;
+      winBanner.classList.remove("show");
+      updateProgress();
+      render();
+    }
 
-/* PREVIEW */
-function preview() {
-  cards.forEach(c => c.classList.add("is-flipped"));
-  setTimeout(() => {
-    cards.forEach(c => c.classList.remove("is-flipped"));
-  }, 4000);
-}
+    music = document.getElementById("music");
 
-/* RENDER */
-function render() {
-  const board = document.getElementById("board");
-  board.innerHTML = "";
+    document.body.addEventListener("click", () => {
+      music.play().catch(() => {});
+    }, { once: true });
 
-  cards = shuffle([...data]).map(d => createCard(d));
-  cards.forEach(c => board.appendChild(c));
-}
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-/* RESTART */
-function restart() {
-  first = null;
-  lock = false;
-  render();
-}
+    function beep(freq, dur = 0.1, type = "sine", vol = 1) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.value = effectVolume * vol;
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + dur);
+    }
 
-/* MUSIC */
-const music = document.getElementById("music");
-document.body.addEventListener("click", () => {
-  music.play().catch(()=>{});
-}, { once: true });
+    function playClick() { beep(500, 0.05, "square", 0.8); }
+    function playMatch() {
+      beep(700, 0.08, "triangle", 1);
+      setTimeout(() => beep(860, 0.10, "triangle", 1), 80);
+    }
+    function playWrong() { beep(200, 0.10, "sawtooth", 0.9); }
 
-document.getElementById("musicVol").oninput = e => {
-  music.volume = e.target.value / 100;
-};
+    playAgainBtn.addEventListener("click", restart);
+    window.addEventListener("resize", render);
 
-/* EFFECT SOUND */
-const ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-document.getElementById("effectVol").oninput = e => {
-  effectVolume = e.target.value / 1000;
-};
-
-function beep(freq, dur=0.1) {
-  const o = ctx.createOscillator();
-  const g = ctx.createGain();
-  o.frequency.value = freq;
-  g.gain.value = effectVolume;
-  o.connect(g);
-  g.connect(ctx.destination);
-  o.start();
-  o.stop(ctx.currentTime + dur);
-}
-
-function playClick(){ beep(500,0.05); }
-function playMatch(){ beep(700); }
-function playWrong(){ beep(200); }
-
-/* START */
-render();
-</script>
-
+    music.volume = 0.5;
+    render();
+  </script>
 </body>
 </html>
