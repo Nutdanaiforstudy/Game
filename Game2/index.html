@@ -198,8 +198,9 @@
 
     .dock-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr auto;
       gap: 6px;
+      align-items: center;
     }
 
     .ui-btn {
@@ -223,6 +224,22 @@
       color: var(--primary);
       border: 1px solid rgba(42,45,95,0.10);
       box-shadow: none;
+    }
+
+    .timer-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 78px;
+      padding: var(--btn-pad-y) var(--btn-pad-x);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.92);
+      color: var(--primary);
+      border: 1px solid rgba(42,45,95,0.10);
+      font-size: var(--btn-font);
+      font-weight: 800;
+      line-height: 1;
+      white-space: nowrap;
     }
 
     .slider-stack {
@@ -342,12 +359,10 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* force same-row layout on wide screens */
     .row3-card-1 { grid-column: 1; grid-row: 3; }
     .row3-card-2 { grid-column: 2; grid-row: 3; }
     .row3-dock   { grid-column: 3 / 7; grid-row: 3; }
 
-    /* 5-column layout */
     @media (max-width: 1500px) {
       .stage {
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -357,7 +372,6 @@
       .row3-dock   { grid-column: 3 / 6; grid-row: 3; }
     }
 
-    /* smaller screens: normal stacking */
     @media (max-width: 1180px) {
       .stage {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -421,6 +435,7 @@
       <div class="dock-buttons">
         <button class="ui-btn secondary" id="previewBtn" type="button">Preview 4s</button>
         <button class="ui-btn" id="restartBtn" type="button">Restart</button>
+        <div class="timer-box" id="timerText">00:00</div>
       </div>
 
       <div class="slider-stack">
@@ -460,13 +475,17 @@
     let matches = 0;
     let moves = 0;
 
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let timerStarted = false;
+
     const stage = document.getElementById("stage");
     const toast = document.getElementById("toast");
     const winBanner = document.getElementById("winBanner");
     const winText = document.getElementById("winText");
     const playAgainBtn = document.getElementById("playAgainBtn");
 
-    let pairText, moveText, progressFill, music, musicVol, musicVolValue, effectVol, effectVolValue, previewBtn, restartBtn;
+    let pairText, moveText, progressFill, music, musicVol, musicVolValue, effectVol, effectVolValue, previewBtn, restartBtn, timerText;
 
     const data = [];
     for (let i = 1; i <= TOTAL; i++) {
@@ -490,6 +509,39 @@
       toast.classList.add("show");
       clearTimeout(showToast._timer);
       showToast._timer = setTimeout(() => toast.classList.remove("show"), 1400);
+    }
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    }
+
+    function updateTimer() {
+      if (timerText) {
+        timerText.textContent = formatTime(timerSeconds);
+      }
+    }
+
+    function startTimer() {
+      if (timerStarted) return;
+      timerStarted = true;
+      timerInterval = setInterval(() => {
+        timerSeconds += 1;
+        updateTimer();
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerStarted = false;
+    }
+
+    function resetTimer() {
+      stopTimer();
+      timerSeconds = 0;
+      updateTimer();
     }
 
     function updateProgress() {
@@ -534,6 +586,7 @@
       effectVolValue = wrap.querySelector("#effectVolValue");
       previewBtn = wrap.querySelector("#previewBtn");
       restartBtn = wrap.querySelector("#restartBtn");
+      timerText = wrap.querySelector("#timerText");
 
       previewBtn.addEventListener("click", preview);
       restartBtn.addEventListener("click", restart);
@@ -551,6 +604,7 @@
       musicVolValue.textContent = "50%";
       effectVolValue.textContent = "50%";
       updateProgress();
+      updateTimer();
 
       return wrap.firstElementChild;
     }
@@ -558,6 +612,7 @@
     function clickCard(el, d) {
       if (lock || el.classList.contains("is-flipped") || el.classList.contains("is-matched")) return;
 
+      startTimer();
       playClick();
       el.classList.add("is-flipped");
 
@@ -579,7 +634,8 @@
         first = null;
 
         if (matches === TOTAL) {
-          winText.textContent = `Completed in ${moves} moves.`;
+          stopTimer();
+          winText.textContent = `Completed in ${moves} moves in ${formatTime(timerSeconds)}.`;
           winBanner.classList.add("show");
           showToast("All pairs matched");
         }
@@ -597,6 +653,7 @@
 
     function preview() {
       if (lock) return;
+      startTimer();
       lock = true;
       cards.forEach(c => c.classList.add("is-flipped"));
       setTimeout(() => {
@@ -623,14 +680,12 @@
       cards = [];
 
       if (cols >= 6) {
-        // First 12 cards fill rows 1-2.
         shuffled.slice(0, 12).forEach(d => {
           const card = createCard(d);
           cards.push(card);
           stage.appendChild(card);
         });
 
-        // Third row: 2 cards + dock, all forced to same row.
         const card1 = createCard(shuffled[12], "row3-card-1");
         const card2 = createCard(shuffled[13], "row3-card-2");
         cards.push(card1, card2);
@@ -666,6 +721,7 @@
       }
 
       updateProgress();
+      updateTimer();
     }
 
     function restart() {
@@ -674,6 +730,7 @@
       matches = 0;
       moves = 0;
       winBanner.classList.remove("show");
+      resetTimer();
       updateProgress();
       render();
     }
@@ -709,6 +766,7 @@
     window.addEventListener("resize", render);
 
     music.volume = 0.5;
+    resetTimer();
     render();
   </script>
 </body>
