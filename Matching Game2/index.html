@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>2026 FUKUSHIMA PEACH - Matching Game</title>
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon.png">
+  <link rel="shortcut icon" type="image/png" href="./favicon.png">
+
+  <style>
+    :root {
+      --bg: #fdf2f7;
+      --bg-soft: #fff8fb;
+      --bg-deep: #fce7f0;
+      --panel: rgba(255, 250, 252, 0.96);
+      --panel-solid: #fffafd;
+      --panel-border: rgba(236, 12, 110, 0.13);
+      --ink: #8f244d;
+      --ink-dark: #681b38;
+      --muted: #a75a77;
+      --primary: #ec0c6e;
+      --primary-hover: #d80b64;
+      --primary-2: #e673a1;
+      --primary-3: #f397b9;
+      --pink-light: #f9cad7;
+      --pink-soft: #fce1eb;
+      --deep-red: #b20838;
+      --success: #b20838;
+      --success-soft: rgba(178, 8, 56, 0.08);
+      --shadow: 0 10px 30px rgba(178, 8, 56, 0.09);
+      --card-shadow: 0 8px 20px rgba(178, 8, 56, 0.14);
+      --radius-xl: 20px;
+      --radius-lg: 15px;
+      --page-pad: 14px;
+      --gap: 12px;
+      --dock-height: 92px;
+    }
+
+    * {
+      box-sizing: border-box;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family:
+        Inter,
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      color: var(--ink);
+
+      background:
+        radial-gradient(
+          circle at 0% 0%,
+          rgba(249, 202, 215, 0.65),
+          transparent 30%
+        ),
+        radial-gradient(
+          circle at 100% 100%,
+          rgba(243, 151, 185, 0.20),
+          transparent 34%
+        ),
+        linear-gradient(
+          180deg,
+          #fdf2f7 0%,
+          #fdf4f8 48%,
+          #fcebf2 100%
+        );
+
+      overflow: hidden;
+      padding: var(--page-pad);
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    .app {
+      width: 100%;
+      height: calc(100vh - (var(--page-pad) * 2));
+
+      display: grid;
+
+      grid-template-rows:
+        minmax(0, 1fr)
+        auto;
+
+      gap: var(--gap);
+
+      margin: 0 auto;
+    }
+
+    .stage-wrap {
+      width: 100%;
+      height: 100%;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 250, 253, 0.98),
+          rgba(253, 242, 247, 0.98)
+        );
+
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      overflow: hidden;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stage {
+      width: 100%;
+      height: 100%;
+
+      display: grid;
+
+      gap: 14px;
+
+      align-content: center;
+      justify-content: center;
+      place-items: center;
+    }
+
+    .card {
+      position: relative;
+
+      width: var(--card-size, 300px);
+      height: var(--card-size, 300px);
+
+      border: 0;
+      background: transparent;
+
+      padding: 0;
+      margin: 0;
+
+      cursor: pointer;
+
+      border-radius: var(--radius-lg);
+
+      perspective: 1200px;
+
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card.is-matched {
+      cursor: default;
+    }
+
+    .card:focus-visible {
+      outline: 3px solid rgba(236, 12, 110, 0.35);
+      outline-offset: 4px;
+    }
+
+    .card-inner {
+      position: relative;
+
+      width: 100%;
+      height: 100%;
+
+      border-radius: var(--radius-lg);
+
+      transform-style: preserve-3d;
+
+      transition:
+        transform 0.45s ease,
+        box-shadow 0.2s ease;
+
+      box-shadow: var(--card-shadow);
+    }
+
+    .card:hover .card-inner {
+      box-shadow:
+        0 13px 28px rgba(178, 8, 56, 0.18);
+    }
+
+    .card.is-flipped .card-inner,
+    .card.is-matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      border-radius: var(--radius-lg);
+
+      overflow: hidden;
+
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+
+      border:
+        2px solid rgba(236, 12, 110, 0.20);
+
+      display: grid;
+      place-items: center;
+    }
+
+    .card-back {
+      background:
+        linear-gradient(
+          145deg,
+          #e673a1 0%,
+          #ec0c6e 55%,
+          #b20838 100%
+        );
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+      background: #fdf2f7;
+      padding: 4px;
+    }
+
+    .card-face img {
+      width: 100%;
+      height: 100%;
+
+      display: block;
+
+      border-radius: 10px;
+
+      object-fit: contain;
+      object-position: center;
+
+      background: #fdf2f7;
+
+      image-rendering: auto;
+
+      transform: translateZ(0);
+
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .card-back img {
+      padding: 7px;
+
+      background:
+        linear-gradient(
+          145deg,
+          #f397b9,
+          #e673a1 45%,
+          #ec0c6e
+        );
+    }
+
+    .card.is-matched .card-front {
+      border-color:
+        rgba(178, 8, 56, 0.40);
+
+      box-shadow:
+        inset 0 0 0 3px rgba(236, 12, 110, 0.15),
+        0 0 18px rgba(236, 12, 110, 0.08);
+    }
+
+    .control-dock {
+      width: 100%;
+
+      min-height: var(--dock-height);
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 250, 253, 0.98),
+          rgba(253, 242, 247, 0.98)
+        );
+
+      border: 1px solid var(--panel-border);
+
+      border-radius: var(--radius-xl);
+
+      box-shadow: var(--shadow);
+
+      padding: 9px 12px;
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(370px, 1.15fr)
+        minmax(500px, 1.6fr)
+        minmax(320px, 1fr);
+
+      gap: 12px;
+
+      align-items: center;
+    }
+
+    .dock-buttons {
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        1fr
+        100px;
+
+      gap: 9px;
+
+      align-items: center;
+    }
+
+    .ui-btn {
+      appearance: none;
+
+      border: none;
+
+      border-radius: 999px;
+
+      min-height: 42px;
+
+      padding: 9px 16px;
+
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+
+      cursor: pointer;
+
+      line-height: 1;
+
+      white-space: nowrap;
+
+      background:
+        linear-gradient(
+          135deg,
+          #ec0c6e,
+          #d70b61
+        );
+
+      color: #fff;
+
+      box-shadow:
+        0 8px 20px rgba(236, 12, 110, 0.20);
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        filter 0.15s ease;
+    }
+
+    .ui-btn:hover {
+      filter: brightness(1.04);
+
+      transform: translateY(-1px);
+
+      box-shadow:
+        0 10px 23px rgba(236, 12, 110, 0.28);
+    }
+
+    .ui-btn:active {
+      transform: translateY(0);
+    }
+
+    .ui-btn.secondary {
+      background:
+        linear-gradient(
+          180deg,
+          #fffafd,
+          #fdf2f7
+        );
+
+      color: var(--primary);
+
+      border:
+        1px solid rgba(236, 12, 110, 0.20);
+
+      box-shadow: none;
+    }
+
+    .ui-btn.secondary:hover {
+      background: #fce7f0;
+
+      box-shadow:
+        0 6px 16px rgba(236, 12, 110, 0.10);
+    }
+
+    .timer-box {
+      min-height: 42px;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 999px;
+
+      background:
+        linear-gradient(
+          180deg,
+          #fffafd,
+          #fdf2f7
+        );
+
+      color: var(--primary);
+
+      border:
+        1px solid rgba(236, 12, 110, 0.18);
+
+      font-size: 0.82rem;
+
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+    .slider-stack {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 9px;
+
+      align-items: stretch;
+    }
+
+    .slider-box {
+      min-height: 42px;
+
+      display: grid;
+
+      grid-template-columns:
+        auto
+        minmax(100px, 1fr)
+        42px;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 7px 10px;
+
+      font-size: 0.76rem;
+      font-weight: 700;
+
+      color: var(--muted);
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 250, 253, 0.96),
+          rgba(253, 242, 247, 0.96)
+        );
+
+      border:
+        1px solid rgba(236, 12, 110, 0.12);
+
+      border-radius: 12px;
+    }
+
+    .slider-box input[type="range"] {
+      width: 100%;
+
+      accent-color: var(--primary);
+
+      cursor: pointer;
+    }
+
+    .slider-value {
+      text-align: right;
+
+      font-weight: 800;
+
+      color: var(--primary);
+
+      font-size: 0.72rem;
+    }
+
+    .progress-panel {
+      min-height: 60px;
+
+      display: grid;
+
+      align-content: center;
+
+      gap: 8px;
+
+      padding: 8px 12px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 250, 253, 0.96),
+          rgba(253, 242, 247, 0.96)
+        );
+
+      border:
+        1px solid rgba(236, 12, 110, 0.12);
+
+      border-radius: 12px;
+    }
+
+    .progress-meta {
+      display: flex;
+
+      justify-content: space-between;
+      align-items: center;
+
+      gap: 10px;
+
+      font-size: 0.78rem;
+
+      font-weight: 800;
+
+      color: var(--ink);
+    }
+
+    .progress-track {
+      width: 100%;
+
+      height: 10px;
+
+      background: #f9cad7;
+
+      border-radius: 999px;
+
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+
+      height: 100%;
+
+      background:
+        linear-gradient(
+          90deg,
+          #f397b9 0%,
+          #ec0c6e 55%,
+          #b20838 100%
+        );
+
+      border-radius: 999px;
+
+      transition:
+        width 0.25s ease;
+    }
+
+    .win-modal {
+      position: fixed;
+
+      inset: 0;
+
+      z-index: 100;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      background:
+        rgba(71, 20, 41, 0.44);
+
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      pointer-events: none;
+
+      transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+    }
+
+    .win-modal.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .win-popup {
+      width: min(460px, 100%);
+
+      background:
+        linear-gradient(
+          180deg,
+          #fffafd 0%,
+          #fdf2f7 100%
+        );
+
+      border:
+        1px solid rgba(236, 12, 110, 0.18);
+
+      border-radius: 28px;
+
+      box-shadow:
+        0 24px 70px rgba(104, 27, 56, 0.26);
+
+      padding: 34px 32px 30px;
+
+      text-align: center;
+
+      transform:
+        translateY(18px)
+        scale(0.96);
+
+      transition:
+        transform 0.28s ease;
+    }
+
+    .win-modal.show .win-popup {
+      transform:
+        translateY(0)
+        scale(1);
+    }
+
+    .win-icon {
+      width: 78px;
+      height: 78px;
+
+      margin: 0 auto 18px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 50%;
+
+      background:
+        linear-gradient(
+          135deg,
+          #f397b9,
+          #ec0c6e
+        );
+
+      color: #fff;
+
+      font-size: 2.4rem;
+
+      box-shadow:
+        0 12px 28px rgba(236, 12, 110, 0.24);
+    }
+
+    .win-popup h2 {
+      margin: 0 0 10px;
+
+      color: var(--deep-red);
+
+      font-size:
+        clamp(1.5rem, 3vw, 2rem);
+
+      line-height: 1.15;
+    }
+
+    .win-popup p {
+      margin: 0 0 24px;
+
+      color: var(--ink);
+
+      font-size: 0.96rem;
+
+      line-height: 1.6;
+    }
+
+    .win-popup .ui-btn {
+      width: 100%;
+
+      min-height: 48px;
+
+      font-size: 0.9rem;
+    }
+
+    .toast {
+      position: fixed;
+
+      left: 50%;
+      bottom: 118px;
+
+      transform:
+        translateX(-50%)
+        translateY(16px);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(178, 8, 56, 0.97),
+          rgba(236, 12, 110, 0.97)
+        );
+
+      color: #fff;
+
+      padding: 10px 18px;
+
+      border-radius: 999px;
+
+      font-size: 0.82rem;
+
+      font-weight: 800;
+
+      opacity: 0;
+
+      pointer-events: none;
+
+      transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+
+      z-index: 120;
+
+      box-shadow:
+        0 10px 28px rgba(178, 8, 56, 0.25);
+
+      max-width:
+        calc(100vw - 20px);
+
+      white-space: nowrap;
+
+      overflow: hidden;
+
+      text-overflow: ellipsis;
+    }
+
+    .toast.show {
+      opacity: 1;
+
+      transform:
+        translateX(-50%)
+        translateY(0);
+    }
+
+    @media (max-width: 1250px) {
+      body {
+        overflow-y: auto;
+      }
+
+      .app {
+        height: auto;
+
+        min-height:
+          calc(
+            100vh -
+            (var(--page-pad) * 2)
+          );
+      }
+
+      .stage-wrap {
+        min-height: 600px;
+      }
+
+      .control-dock {
+        grid-template-columns:
+          1fr
+          1fr;
+      }
+
+      .progress-panel {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --page-pad: 8px;
+      }
+
+      body {
+        overflow-y: auto;
+      }
+
+      .stage-wrap {
+        min-height: auto;
+      }
+
+      .control-dock {
+        grid-template-columns: 1fr;
+      }
+
+      .dock-buttons {
+        grid-template-columns:
+          1fr
+          1fr
+          82px;
+      }
+
+      .slider-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-panel {
+        grid-column: auto;
+      }
+
+      .toast {
+        bottom: 20px;
+      }
+
+      .win-popup {
+        padding: 28px 22px 24px;
+
+        border-radius: 22px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .dock-buttons {
+        grid-template-columns:
+          1fr
+          1fr;
+      }
+
+      .timer-box {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner,
+      .progress-fill,
+      .toast,
+      .ui-btn,
+      .win-modal,
+      .win-popup {
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <section class="stage-wrap">
+      <div
+        class="stage"
+        id="stage"
+      ></div>
+    </section>
+
+    <template id="dockTemplate">
+
+      <aside class="control-dock">
+
+        <div class="dock-buttons">
+
+          <button
+            class="ui-btn secondary"
+            id="previewBtn"
+            type="button"
+          >
+            Preview 2s
+          </button>
+
+          <button
+            class="ui-btn"
+            id="restartBtn"
+            type="button"
+          >
+            Restart
+          </button>
+
+          <div
+            class="timer-box"
+            id="timerText"
+          >
+            00:00
+          </div>
+
+        </div>
+
+        <div class="slider-stack">
+
+          <div class="slider-box">
+
+            <span>🎵</span>
+
+            <input
+              id="musicVol"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              aria-label="Music volume"
+            >
+
+            <span
+              class="slider-value"
+              id="musicVolValue"
+            >
+              50%
+            </span>
+
+          </div>
+
+          <div class="slider-box">
+
+            <span>🔊</span>
+
+            <input
+              id="effectVol"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              aria-label="Effects volume"
+            >
+
+            <span
+              class="slider-value"
+              id="effectVolValue"
+            >
+              50%
+            </span>
+
+          </div>
+
+        </div>
+
+        <section class="progress-panel">
+
+          <div class="progress-meta">
+
+            <span id="pairText">
+              Pairs: 0 / 0
+            </span>
+
+            <span id="moveText">
+              Moves: 0
+            </span>
+
+          </div>
+
+          <div class="progress-track">
+
+            <div
+              class="progress-fill"
+              id="progressFill"
+            ></div>
+
+          </div>
+
+        </section>
+
+      </aside>
+
+    </template>
+
+  </main>
+
+  <div
+    class="win-modal"
+    id="winModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="winTitle"
+    aria-describedby="winText"
+  >
+
+    <div class="win-popup">
+
+      <div class="win-icon">
+        ✓
+      </div>
+
+      <h2 id="winTitle">
+        Well done!
+      </h2>
+
+      <p id="winText">
+        You matched all pairs.
+      </p>
+
+      <button
+        class="ui-btn"
+        id="playAgainBtn"
+        type="button"
+      >
+        Play Again
+      </button>
+
+    </div>
+
+  </div>
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
+  <audio
+    id="music"
+    src="./Song.mp3"
+    loop
+  ></audio>
+
+  <script>
+
+    const TOTAL = 3;
+
+    const BACK =
+      "./BacksideCover.png";
+
+    let cards = [];
+    let first = null;
+    let lock = false;
+
+    let matches = 0;
+    let moves = 0;
+
+    let effectVolume = 0.5;
+
+    let timerSeconds = 0;
+    let timerInterval = null;
+    let timerStarted = false;
+
+    const stage =
+      document.getElementById("stage");
+
+    const stageWrap =
+      document.querySelector(".stage-wrap");
+
+    const toast =
+      document.getElementById("toast");
+
+    const winModal =
+      document.getElementById("winModal");
+
+    const winText =
+      document.getElementById("winText");
+
+    const playAgainBtn =
+      document.getElementById("playAgainBtn");
+
+    const music =
+      document.getElementById("music");
+
+    let pairText;
+    let moveText;
+    let progressFill;
+
+    let musicVol;
+    let musicVolValue;
+
+    let effectVol;
+    let effectVolValue;
+
+    let previewBtn;
+    let restartBtn;
+
+    let timerText;
+
+    const data = [];
+
+    for (
+      let i = 1;
+      i <= TOTAL;
+      i++
+    ) {
+
+      data.push(
+        {
+          id: i,
+          type: "IMG",
+          src: `./${i}IMG.png`
+        },
+
+        {
+          id: i,
+          type: "DESC",
+          src: `./${i}DESC.png`
+        }
+      );
+
+    }
+
+    function shuffle(arr) {
+
+      const cloned =
+        [...arr];
+
+      for (
+        let i = cloned.length - 1;
+        i > 0;
+        i--
+      ) {
+
+        const j =
+          Math.floor(
+            Math.random() *
+            (i + 1)
+          );
+
+        [
+          cloned[i],
+          cloned[j]
+        ] =
+        [
+          cloned[j],
+          cloned[i]
+        ];
+
+      }
+
+      return cloned;
+    }
+
+    function showToast(message) {
+
+      toast.textContent =
+        message;
+
+      toast.classList.add(
+        "show"
+      );
+
+      clearTimeout(
+        showToast._timer
+      );
+
+      showToast._timer =
+        setTimeout(
+          () => {
+
+            toast.classList.remove(
+              "show"
+            );
+
+          },
+          1400
+        );
+    }
+
+    function formatTime(seconds) {
+
+      const mins =
+        Math.floor(
+          seconds / 60
+        );
+
+      const secs =
+        seconds % 60;
+
+      return (
+        String(mins).padStart(
+          2,
+          "0"
+        )
+        +
+        ":"
+        +
+        String(secs).padStart(
+          2,
+          "0"
+        )
+      );
+    }
+
+    function updateTimer() {
+
+      if (!timerText) {
+        return;
+      }
+
+      timerText.textContent =
+        formatTime(
+          timerSeconds
+        );
+    }
+
+    function startTimer() {
+
+      if (timerStarted) {
+        return;
+      }
+
+      timerStarted = true;
+
+      timerInterval =
+        setInterval(
+          () => {
+
+            timerSeconds += 1;
+
+            updateTimer();
+
+          },
+          1000
+        );
+    }
+
+    function stopTimer() {
+
+      clearInterval(
+        timerInterval
+      );
+
+      timerInterval = null;
+
+      timerStarted = false;
+    }
+
+    function resetTimer() {
+
+      stopTimer();
+
+      timerSeconds = 0;
+
+      updateTimer();
+    }
+
+    function updateProgress() {
+
+      if (!pairText) {
+        return;
+      }
+
+      pairText.textContent =
+        `Pairs: ${matches} / ${TOTAL}`;
+
+      moveText.textContent =
+        `Moves: ${moves}`;
+
+      progressFill.style.width =
+        `${(matches / TOTAL) * 100}%`;
+    }
+
+    function getGridDimensions() {
+
+      const cardCount =
+        TOTAL * 2;
+
+      let columns;
+
+      if (cardCount <= 4) {
+
+        columns = 2;
+
+      }
+
+      else if (cardCount <= 6) {
+
+        columns = 3;
+
+      }
+
+      else if (cardCount <= 8) {
+
+        columns = 4;
+
+      }
+
+      else if (cardCount <= 10) {
+
+        columns = 5;
+
+      }
+
+      else {
+
+        columns = 6;
+
+      }
+
+      if (window.innerWidth <= 430) {
+
+        columns =
+          Math.min(
+            columns,
+            2
+          );
+
+      }
+
+      else if (window.innerWidth <= 700) {
+
+        columns =
+          Math.min(
+            columns,
+            3
+          );
+
+      }
+
+      else if (window.innerWidth <= 1100) {
+
+        columns =
+          Math.min(
+            columns,
+            4
+          );
+
+      }
+
+      const rows =
+        Math.ceil(
+          cardCount /
+          columns
+        );
+
+      return {
+        columns,
+        rows
+      };
+    }
+
+    function updateGridLayout() {
+
+      const {
+        columns,
+        rows
+      } =
+        getGridDimensions();
+
+      const gap = 14;
+
+      const rect =
+        stage.getBoundingClientRect();
+
+      const availableWidth =
+        rect.width;
+
+      const availableHeight =
+        rect.height;
+
+      const widthSize =
+        (
+          availableWidth -
+          gap * (columns - 1)
+        )
+        /
+        columns;
+
+      const heightSize =
+        (
+          availableHeight -
+          gap * (rows - 1)
+        )
+        /
+        rows;
+
+      let cardSize =
+        Math.min(
+          widthSize,
+          heightSize
+        );
+
+      cardSize =
+        Math.min(
+          cardSize,
+          440
+        );
+
+      cardSize =
+        Math.max(
+          100,
+          cardSize
+        );
+
+      stage.style.setProperty(
+        "--card-size",
+        `${cardSize}px`
+      );
+
+      stage.style.gridTemplateColumns =
+        `repeat(${columns}, ${cardSize}px)`;
+
+      stage.style.gridTemplateRows =
+        `repeat(${rows}, ${cardSize}px)`;
+    }
+
+    function createCard(d) {
+
+      const el =
+        document.createElement(
+          "button"
+        );
+
+      el.type =
+        "button";
+
+      el.className =
+        "card";
+
+      el.setAttribute(
+        "aria-label",
+        `Hidden card ${d.id}`
+      );
+
+      el.innerHTML =
+      `
+        <div class="card-inner">
+
+          <div class="card-face card-back">
+
+            <img
+              src="${BACK}"
+              alt=""
+              draggable="false"
+            >
+
+          </div>
+
+          <div class="card-face card-front">
+
+            <img
+              src="${d.src}"
+              alt=""
+              draggable="false"
+              loading="eager"
+              decoding="async"
+            >
+
+          </div>
+
+        </div>
+      `;
+
+      el.addEventListener(
+        "click",
+        () => {
+
+          clickCard(
+            el,
+            d
+          );
+
+        }
+      );
+
+      return el;
+    }
+
+    function createDock() {
+
+      const template =
+        document.getElementById(
+          "dockTemplate"
+        );
+
+      const fragment =
+        template.content.cloneNode(
+          true
+        );
+
+      const wrapper =
+        document.createElement(
+          "div"
+        );
+
+      wrapper.appendChild(
+        fragment
+      );
+
+      pairText =
+        wrapper.querySelector(
+          "#pairText"
+        );
+
+      moveText =
+        wrapper.querySelector(
+          "#moveText"
+        );
+
+      progressFill =
+        wrapper.querySelector(
+          "#progressFill"
+        );
+
+      musicVol =
+        wrapper.querySelector(
+          "#musicVol"
+        );
+
+      musicVolValue =
+        wrapper.querySelector(
+          "#musicVolValue"
+        );
+
+      effectVol =
+        wrapper.querySelector(
+          "#effectVol"
+        );
+
+      effectVolValue =
+        wrapper.querySelector(
+          "#effectVolValue"
+        );
+
+      previewBtn =
+        wrapper.querySelector(
+          "#previewBtn"
+        );
+
+      restartBtn =
+        wrapper.querySelector(
+          "#restartBtn"
+        );
+
+      timerText =
+        wrapper.querySelector(
+          "#timerText"
+        );
+
+      previewBtn.addEventListener(
+        "click",
+        preview
+      );
+
+      restartBtn.addEventListener(
+        "click",
+        restart
+      );
+
+      musicVol.value =
+        Math.round(
+          music.volume * 100
+        );
+
+      musicVolValue.textContent =
+        `${musicVol.value}%`;
+
+      musicVol.addEventListener(
+        "input",
+        e => {
+
+          music.volume =
+            Number(
+              e.target.value
+            )
+            /
+            100;
+
+          musicVolValue.textContent =
+            `${e.target.value}%`;
+
+        }
+      );
+
+      effectVol.value =
+        Math.round(
+          effectVolume * 100
+        );
+
+      effectVolValue.textContent =
+        `${effectVol.value}%`;
+
+      effectVol.addEventListener(
+        "input",
+        e => {
+
+          effectVolume =
+            Number(
+              e.target.value
+            )
+            /
+            100;
+
+          effectVolValue.textContent =
+            `${e.target.value}%`;
+
+        }
+      );
+
+      updateProgress();
+      updateTimer();
+
+      return wrapper.firstElementChild;
+    }
+
+    function clickCard(
+      el,
+      d
+    ) {
+
+      if (
+        lock
+        ||
+        el.classList.contains(
+          "is-flipped"
+        )
+        ||
+        el.classList.contains(
+          "is-matched"
+        )
+      ) {
+
+        return;
+
+      }
+
+      startAudio();
+      startTimer();
+      playClick();
+
+      el.classList.add(
+        "is-flipped"
+      );
+
+      if (!first) {
+
+        first = {
+          el,
+          d
+        };
+
+        return;
+      }
+
+      moves += 1;
+
+      updateProgress();
+
+      if (
+        first.d.id === d.id
+        &&
+        first.d.type !== d.type
+      ) {
+
+        first.el.classList.add(
+          "is-matched"
+        );
+
+        el.classList.add(
+          "is-matched"
+        );
+
+        matches += 1;
+
+        updateProgress();
+
+        playMatch();
+
+        showToast(
+          "Match found"
+        );
+
+        first = null;
+
+        if (
+          matches === TOTAL
+        ) {
+
+          stopTimer();
+
+          lock = true;
+
+          winText.textContent =
+            `Completed in ${moves} moves in ${formatTime(timerSeconds)}.`;
+
+          setTimeout(
+            () => {
+
+              winModal.classList.add(
+                "show"
+              );
+
+              playAgainBtn.focus();
+
+            },
+            350
+          );
+
+        }
+
+      }
+
+      else {
+
+        playWrong();
+
+        lock = true;
+
+        const previousCard =
+          first.el;
+
+        setTimeout(
+          () => {
+
+            el.classList.remove(
+              "is-flipped"
+            );
+
+            previousCard.classList.remove(
+              "is-flipped"
+            );
+
+            first = null;
+
+            lock = false;
+
+          },
+          700
+        );
+
+      }
+    }
+
+    function preview() {
+
+      if (lock) {
+        return;
+      }
+
+      startAudio();
+      startTimer();
+
+      lock = true;
+
+      cards.forEach(
+        card => {
+
+          if (
+            !card.classList.contains(
+              "is-matched"
+            )
+          ) {
+
+            card.classList.add(
+              "is-flipped"
+            );
+
+          }
+
+        }
+      );
+
+      setTimeout(
+        () => {
+
+          cards.forEach(
+            card => {
+
+              if (
+                !card.classList.contains(
+                  "is-matched"
+                )
+              ) {
+
+                card.classList.remove(
+                  "is-flipped"
+                );
+
+              }
+
+            }
+          );
+
+          lock = false;
+
+        },
+        2000
+      );
+    }
+
+    function render() {
+
+      stage.innerHTML =
+        "";
+
+      const shuffled =
+        shuffle(
+          data
+        );
+
+      cards = [];
+
+      shuffled.forEach(
+        d => {
+
+          const card =
+            createCard(
+              d
+            );
+
+          cards.push(
+            card
+          );
+
+          stage.appendChild(
+            card
+          );
+
+        }
+      );
+
+      const oldDock =
+        document.querySelector(
+          ".control-dock"
+        );
+
+      if (oldDock) {
+        oldDock.remove();
+      }
+
+      const dock =
+        createDock();
+
+      stageWrap.insertAdjacentElement(
+        "afterend",
+        dock
+      );
+
+      updateProgress();
+      updateTimer();
+
+      requestAnimationFrame(
+        () => {
+
+          requestAnimationFrame(
+            updateGridLayout
+          );
+
+        }
+      );
+    }
+
+    function restart() {
+
+      first = null;
+
+      lock = false;
+
+      matches = 0;
+
+      moves = 0;
+
+      winModal.classList.remove(
+        "show"
+      );
+
+      resetTimer();
+
+      render();
+    }
+
+    music.volume = 0.5;
+
+    const AudioContextClass =
+      window.AudioContext
+      ||
+      window.webkitAudioContext;
+
+    const ctx =
+      new AudioContextClass();
+
+    function startAudio() {
+
+      if (
+        ctx.state ===
+        "suspended"
+      ) {
+
+        ctx.resume()
+          .catch(
+            () => {}
+          );
+
+      }
+
+      if (music.paused) {
+
+        music.play()
+          .catch(
+            () => {}
+          );
+
+      }
+    }
+
+    document.body.addEventListener(
+      "pointerdown",
+      startAudio,
+      {
+        once: true
+      }
+    );
+
+    function beep(
+      freq,
+      dur = 0.1,
+      type = "sine",
+      vol = 1
+    ) {
+
+      if (
+        ctx.state ===
+        "suspended"
+      ) {
+
+        ctx.resume()
+          .catch(
+            () => {}
+          );
+
+      }
+
+      const oscillator =
+        ctx.createOscillator();
+
+      const gain =
+        ctx.createGain();
+
+      oscillator.type =
+        type;
+
+      oscillator.frequency.value =
+        freq;
+
+      gain.gain.value =
+        effectVolume *
+        vol;
+
+      oscillator.connect(
+        gain
+      );
+
+      gain.connect(
+        ctx.destination
+      );
+
+      oscillator.start();
+
+      oscillator.stop(
+        ctx.currentTime +
+        dur
+      );
+    }
+
+    function playClick() {
+
+      beep(
+        500,
+        0.05,
+        "square",
+        0.25
+      );
+
+    }
+
+    function playMatch() {
+
+      beep(
+        700,
+        0.08,
+        "triangle",
+        0.4
+      );
+
+      setTimeout(
+        () => {
+
+          beep(
+            860,
+            0.10,
+            "triangle",
+            0.4
+          );
+
+        },
+        80
+      );
+    }
+
+    function playWrong() {
+
+      beep(
+        200,
+        0.10,
+        "sawtooth",
+        0.25
+      );
+
+    }
+
+    playAgainBtn.addEventListener(
+      "click",
+      restart
+    );
+
+    winModal.addEventListener(
+      "click",
+      e => {
+
+        if (
+          e.target === winModal
+        ) {
+
+          restart();
+
+        }
+
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      e => {
+
+        if (
+          e.key === "Escape"
+          &&
+          winModal.classList.contains(
+            "show"
+          )
+        ) {
+
+          restart();
+
+        }
+
+      }
+    );
+
+    let resizeTimer;
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        clearTimeout(
+          resizeTimer
+        );
+
+        resizeTimer =
+          setTimeout(
+            updateGridLayout,
+            80
+          );
+
+      }
+    );
+
+    resetTimer();
+
+    render();
+
+  </script>
+
+</body>
+</html>
