@@ -1,0 +1,3036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Juliet Apple Matching Game</title>
+
+  <style>
+    :root {
+      --green: #7fc241;
+      --green-light: #97d45d;
+      --green-dark: #449f43;
+      --green-deep: #327e36;
+
+      --green-soft: #eaf6de;
+      --green-pale: #f6fbea;
+
+      --red: #f42629;
+      --red-dark: #d91f25;
+
+      --blue: #1766a5;
+
+      --white: #ffffff;
+      --cream: #fffefa;
+
+      --ink: #284026;
+      --muted: #67825d;
+
+      --border: rgba(68, 159, 67, 0.18);
+
+      --shadow:
+        0 14px 40px rgba(54, 111, 42, 0.13);
+
+      --card-shadow:
+        0 10px 25px rgba(54, 111, 42, 0.18);
+
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+
+      --page-pad: 14px;
+      --gap: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+      color: var(--ink);
+
+      background:
+        radial-gradient(
+          circle at 8% 8%,
+          rgba(127, 194, 65, 0.22),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 92% 90%,
+          rgba(244, 38, 41, 0.08),
+          transparent 28%
+        ),
+        linear-gradient(
+          180deg,
+          #f8fceb 0%,
+          #f2f9e8 50%,
+          #ecf6dc 100%
+        );
+
+      padding: var(--page-pad);
+      overflow: hidden;
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+
+      position: fixed;
+      pointer-events: none;
+      z-index: -1;
+
+      width: 270px;
+      height: 270px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(127, 194, 65, 0.12),
+          transparent 70%
+        );
+    }
+
+    body::before {
+      left: -110px;
+      top: -100px;
+    }
+
+    body::after {
+      right: -120px;
+      bottom: -120px;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      width: 100%;
+
+      height:
+        calc(
+          100vh -
+          (var(--page-pad) * 2)
+        );
+
+      display: grid;
+
+      grid-template-rows:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+      gap: var(--gap);
+    }
+
+    /* ======================================================
+       HEADER
+       ====================================================== */
+
+    .game-header {
+      position: relative;
+
+      width: 100%;
+      min-height: 80px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 10px 80px 10px 24px;
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(246, 251, 234, 0.98)
+        );
+
+      border:
+        1px solid rgba(127, 194, 65, 0.25);
+
+      border-radius: var(--radius-xl);
+
+      box-shadow: var(--shadow);
+
+      overflow: hidden;
+    }
+
+    .game-header::before {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      top: 0;
+      bottom: 0;
+
+      width: 9px;
+
+      background:
+        linear-gradient(
+          180deg,
+          var(--green-light),
+          var(--green-dark)
+        );
+    }
+
+    .header-apple {
+      position: absolute;
+
+      right: 25px;
+      top: 50%;
+
+      transform:
+        translateY(-50%)
+        rotate(6deg);
+
+      width: 42px;
+      height: 42px;
+    }
+
+    .header-apple::before {
+      content: "";
+
+      position: absolute;
+
+      left: 7px;
+      top: 9px;
+
+      width: 28px;
+      height: 30px;
+
+      background: var(--red);
+
+      border-radius:
+        48% 52% 50% 50% /
+        42% 42% 58% 58%;
+    }
+
+    .header-apple::after {
+      content: "";
+
+      position: absolute;
+
+      left: 23px;
+      top: 1px;
+
+      width: 15px;
+      height: 9px;
+
+      border-radius:
+        100% 0 100% 0;
+
+      background: var(--green-dark);
+
+      transform: rotate(-25deg);
+    }
+
+    .header-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+
+      gap: 10px;
+
+      margin: 0;
+
+      text-align: center;
+
+      line-height: 1;
+    }
+
+    .header-best {
+      color: var(--green-deep);
+
+      font-size:
+        clamp(
+          1.7rem,
+          3vw,
+          2.8rem
+        );
+
+      font-weight: 700;
+
+      letter-spacing: -0.035em;
+
+      white-space: nowrap;
+    }
+
+    .header-fukushima {
+      color: var(--red);
+
+      font-size:
+        clamp(
+          2.15rem,
+          4vw,
+          3.8rem
+        );
+
+      font-weight: 900;
+
+      letter-spacing: -0.055em;
+
+      white-space: nowrap;
+
+      text-shadow:
+        0 3px 0
+        rgba(244, 38, 41, 0.08);
+    }
+
+    /* ======================================================
+       GAME AREA
+       ====================================================== */
+
+    .stage-wrap {
+      position: relative;
+
+      width: 100%;
+      height: 100%;
+
+      overflow: hidden;
+
+      padding: 15px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.96),
+          rgba(247, 252, 239, 0.98)
+        );
+
+      border:
+        1px solid rgba(127, 194, 65, 0.23);
+
+      border-radius: var(--radius-xl);
+
+      box-shadow: var(--shadow);
+    }
+
+    .stage-wrap::before {
+      content: "";
+
+      position: absolute;
+
+      left: -130px;
+      bottom: -150px;
+
+      width: 320px;
+      height: 320px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(127, 194, 65, 0.16),
+          transparent 68%
+        );
+    }
+
+    .stage-wrap::after {
+      content: "";
+
+      position: absolute;
+
+      right: -110px;
+      top: -110px;
+
+      width: 250px;
+      height: 250px;
+
+      border-radius: 50%;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(244, 38, 41, 0.07),
+          transparent 68%
+        );
+    }
+
+    .stage {
+      position: relative;
+      z-index: 1;
+
+      width: 100%;
+      height: 100%;
+
+      display: grid;
+
+      gap: 14px;
+
+      align-content: center;
+      justify-content: center;
+      place-items: center;
+    }
+
+    /* ======================================================
+       CARDS
+       ====================================================== */
+
+    .card {
+      position: relative;
+
+      width: var(--card-size, 280px);
+      height: var(--card-size, 280px);
+
+      border: 0;
+      padding: 0;
+      margin: 0;
+
+      background: transparent;
+
+      cursor: pointer;
+
+      border-radius: var(--radius-lg);
+
+      perspective: 1200px;
+    }
+
+    .card:focus-visible {
+      outline:
+        4px solid
+        rgba(127, 194, 65, 0.4);
+
+      outline-offset: 4px;
+    }
+
+    .card.is-matched {
+      cursor: default;
+    }
+
+    .card-inner {
+      position: relative;
+
+      width: 100%;
+      height: 100%;
+
+      border-radius: var(--radius-lg);
+
+      transform-style: preserve-3d;
+
+      transition:
+        transform 0.45s cubic-bezier(
+          0.22,
+          0.76,
+          0.25,
+          1
+        ),
+        box-shadow 0.18s ease,
+        scale 0.18s ease;
+
+      box-shadow: var(--card-shadow);
+    }
+
+    .card:hover .card-inner {
+      scale: 1.018;
+
+      box-shadow:
+        0 17px 32px
+        rgba(54, 111, 42, 0.22);
+    }
+
+    .card.is-flipped .card-inner,
+    .card.is-matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      overflow: hidden;
+
+      border-radius: var(--radius-lg);
+
+      border:
+        3px solid
+        rgba(127, 194, 65, 0.24);
+
+      display: grid;
+      place-items: center;
+
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card-back {
+      position: relative;
+
+      background:
+        linear-gradient(
+          145deg,
+          #98d45c 0%,
+          var(--green) 53%,
+          var(--green-dark) 100%
+        );
+
+      box-shadow:
+        inset 0 0 0 5px
+        rgba(255, 255, 255, 0.12);
+    }
+
+    .card-back::before {
+      content: "";
+
+      position: absolute;
+      inset: 9px;
+
+      border:
+        2px solid
+        rgba(255, 255, 255, 0.28);
+
+      border-radius: 15px;
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+
+      background: var(--white);
+
+      padding: 5px;
+    }
+
+    .card-face img {
+      width: 100%;
+      height: 100%;
+
+      display: block;
+
+      object-fit: contain;
+      object-position: center;
+
+      border-radius: 14px;
+
+      background: var(--white);
+
+      user-select: none;
+      pointer-events: none;
+
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .card-back img {
+      position: relative;
+      z-index: 1;
+
+      padding: 8px;
+
+      background: transparent;
+    }
+
+    .card.is-matched .card-front {
+      border-color:
+        rgba(68, 159, 67, 0.72);
+
+      box-shadow:
+        inset 0 0 0 4px
+        rgba(127, 194, 65, 0.15),
+        0 0 22px
+        rgba(127, 194, 65, 0.22);
+    }
+
+    .card.is-matched .card-inner {
+      animation:
+        matchedPulse
+        0.42s ease;
+    }
+
+    @keyframes matchedPulse {
+      0% {
+        scale: 1;
+      }
+
+      45% {
+        scale: 1.055;
+      }
+
+      100% {
+        scale: 1;
+      }
+    }
+
+    /* ======================================================
+       CONTROL DOCK
+       ====================================================== */
+
+    .control-dock {
+      width: 100%;
+
+      min-height: 94px;
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(470px, 1.35fr)
+        minmax(430px, 1.35fr)
+        minmax(320px, 1fr);
+
+      gap: 12px;
+
+      align-items: center;
+
+      padding: 10px 12px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.98),
+          rgba(246, 251, 234, 0.98)
+        );
+
+      border:
+        1px solid rgba(127, 194, 65, 0.23);
+
+      border-radius: var(--radius-xl);
+
+      box-shadow: var(--shadow);
+    }
+
+    .dock-buttons {
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        1fr
+        1fr
+        105px;
+
+      gap: 9px;
+
+      align-items: center;
+    }
+
+    .ui-btn {
+      appearance: none;
+
+      min-height: 44px;
+
+      border: 0;
+
+      border-radius: 999px;
+
+      padding: 10px 18px;
+
+      color: #fff;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--green-light),
+          var(--green) 50%,
+          var(--green-dark)
+        );
+
+      box-shadow:
+        0 8px 18px
+        rgba(68, 159, 67, 0.22);
+
+      cursor: pointer;
+
+      font-size: 0.84rem;
+
+      font-weight: 900;
+
+      white-space: nowrap;
+
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        filter 0.15s ease;
+    }
+
+    .ui-btn:hover {
+      transform: translateY(-2px);
+
+      filter: brightness(1.035);
+
+      box-shadow:
+        0 11px 24px
+        rgba(68, 159, 67, 0.28);
+    }
+
+    .ui-btn:active {
+      transform: translateY(0);
+    }
+
+    .ui-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .ui-btn.secondary {
+      color: var(--green-dark);
+
+      background:
+        linear-gradient(
+          180deg,
+          #fff,
+          var(--green-pale)
+        );
+
+      border:
+        1px solid
+        rgba(68, 159, 67, 0.24);
+
+      box-shadow: none;
+    }
+
+    .ui-btn.secondary:hover {
+      background: var(--green-soft);
+
+      box-shadow:
+        0 6px 16px
+        rgba(68, 159, 67, 0.12);
+    }
+
+    .ui-btn.answer-btn {
+      background:
+        linear-gradient(
+          135deg,
+          #f64b4d,
+          var(--red) 55%,
+          var(--red-dark)
+        );
+
+      box-shadow:
+        0 8px 18px
+        rgba(244, 38, 41, 0.2);
+    }
+
+    .ui-btn.answer-btn:hover {
+      box-shadow:
+        0 11px 24px
+        rgba(244, 38, 41, 0.28);
+    }
+
+    .timer-box {
+      min-height: 44px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 0 8px;
+
+      border-radius: 999px;
+
+      color: var(--green-dark);
+
+      background:
+        linear-gradient(
+          180deg,
+          #fff,
+          var(--green-pale)
+        );
+
+      border:
+        1px solid
+        rgba(68, 159, 67, 0.2);
+
+      font-size: 0.83rem;
+      font-weight: 900;
+
+      letter-spacing: 0.03em;
+
+      white-space: nowrap;
+    }
+
+    .timer-box::before {
+      content: "⏱";
+      margin-right: 5px;
+    }
+
+    /* ======================================================
+       VOLUME
+       ====================================================== */
+
+    .slider-stack {
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          2,
+          minmax(0, 1fr)
+        );
+
+      gap: 9px;
+    }
+
+    .slider-box {
+      min-height: 44px;
+
+      display: grid;
+
+      grid-template-columns:
+        auto
+        minmax(90px, 1fr)
+        42px;
+
+      align-items: center;
+
+      gap: 8px;
+
+      padding: 7px 11px;
+
+      color: var(--muted);
+
+      background:
+        linear-gradient(
+          180deg,
+          #fff,
+          #f7fced
+        );
+
+      border:
+        1px solid
+        rgba(68, 159, 67, 0.15);
+
+      border-radius: 14px;
+
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .slider-box input[type="range"] {
+      width: 100%;
+
+      cursor: pointer;
+
+      accent-color: var(--green-dark);
+    }
+
+    .slider-value {
+      text-align: right;
+
+      color: var(--green-dark);
+
+      font-size: 0.72rem;
+
+      font-weight: 900;
+    }
+
+    /* ======================================================
+       PROGRESS
+       ====================================================== */
+
+    .progress-panel {
+      min-height: 62px;
+
+      display: grid;
+
+      align-content: center;
+
+      gap: 8px;
+
+      padding: 9px 13px;
+
+      background:
+        linear-gradient(
+          180deg,
+          #fff,
+          var(--green-pale)
+        );
+
+      border:
+        1px solid
+        rgba(68, 159, 67, 0.15);
+
+      border-radius: 14px;
+    }
+
+    .progress-meta {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 10px;
+
+      color: var(--green-deep);
+
+      font-size: 0.78rem;
+      font-weight: 900;
+    }
+
+    .progress-track {
+      width: 100%;
+
+      height: 11px;
+
+      overflow: hidden;
+
+      border-radius: 999px;
+
+      background:
+        rgba(127, 194, 65, 0.18);
+
+      box-shadow:
+        inset 0 1px 3px
+        rgba(41, 88, 34, 0.08);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+
+      border-radius: inherit;
+
+      background:
+        linear-gradient(
+          90deg,
+          #9bd460 0%,
+          var(--green) 45%,
+          var(--green-dark) 100%
+        );
+
+      box-shadow:
+        0 0 8px
+        rgba(127, 194, 65, 0.3);
+
+      transition:
+        width 0.25s ease;
+    }
+
+    /* ======================================================
+       ANSWER POPUP
+       ====================================================== */
+
+    .answer-modal {
+      position: fixed;
+      inset: 0;
+
+      z-index: 200;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      background:
+        rgba(24, 58, 25, 0.62);
+
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+
+      transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+    }
+
+    .answer-modal.show {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .answer-popup {
+      position: relative;
+
+      width: min(900px, 95vw);
+
+      max-height: 88vh;
+
+      padding: 12px;
+
+      border-radius: 24px;
+
+      background: #fff;
+
+      border:
+        3px solid
+        rgba(127, 194, 65, 0.72);
+
+      box-shadow:
+        0 28px 80px
+        rgba(0, 0, 0, 0.35);
+
+      transform:
+        scale(0.94)
+        translateY(14px);
+
+      transition:
+        transform 0.25s ease;
+    }
+
+    .answer-modal.show .answer-popup {
+      transform:
+        scale(1)
+        translateY(0);
+    }
+
+    .answer-image {
+      width: 100%;
+      max-height: calc(88vh - 24px);
+
+      display: block;
+
+      object-fit: contain;
+
+      border-radius: 14px;
+
+      background: #fff;
+    }
+
+    .answer-countdown {
+      position: absolute;
+
+      top: 20px;
+      right: 20px;
+
+      min-width: 46px;
+      height: 46px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 50%;
+
+      background:
+        rgba(50, 126, 54, 0.92);
+
+      color: #fff;
+
+      font-weight: 900;
+
+      box-shadow:
+        0 6px 20px
+        rgba(0, 0, 0, 0.2);
+    }
+
+    /* ======================================================
+       WIN MODAL
+       ====================================================== */
+
+    .win-modal {
+      position: fixed;
+      inset: 0;
+
+      z-index: 100;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+
+      background:
+        rgba(31, 67, 28, 0.46);
+
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+
+      opacity: 0;
+      visibility: hidden;
+
+      pointer-events: none;
+
+      transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+    }
+
+    .win-modal.show {
+      opacity: 1;
+      visibility: visible;
+
+      pointer-events: auto;
+    }
+
+    .win-popup {
+      position: relative;
+
+      width: min(470px, 100%);
+
+      overflow: hidden;
+
+      padding: 38px 32px 30px;
+
+      text-align: center;
+
+      background:
+        linear-gradient(
+          180deg,
+          #fff 0%,
+          var(--green-pale) 100%
+        );
+
+      border:
+        1px solid
+        rgba(127, 194, 65, 0.25);
+
+      border-radius: 30px;
+
+      box-shadow:
+        0 28px 75px
+        rgba(32, 81, 28, 0.28);
+
+      transform:
+        translateY(18px)
+        scale(0.96);
+
+      transition:
+        transform 0.28s ease;
+    }
+
+    .win-modal.show .win-popup {
+      transform:
+        translateY(0)
+        scale(1);
+    }
+
+    .win-popup::before {
+      content: "";
+
+      position: absolute;
+
+      left: -90px;
+      top: -95px;
+
+      width: 180px;
+      height: 180px;
+
+      border-radius: 50%;
+
+      background:
+        rgba(127, 194, 65, 0.09);
+    }
+
+    .win-popup::after {
+      content: "🍎";
+
+      position: absolute;
+
+      right: 20px;
+      top: 17px;
+
+      font-size: 2rem;
+
+      transform: rotate(8deg);
+    }
+
+    .win-icon {
+      width: 84px;
+      height: 84px;
+
+      margin: 0 auto 18px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 50%;
+
+      color: #fff;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--green-light),
+          var(--green-dark)
+        );
+
+      box-shadow:
+        0 13px 28px
+        rgba(68, 159, 67, 0.25);
+
+      font-size: 2.5rem;
+      font-weight: 900;
+    }
+
+    .win-popup h2 {
+      margin: 0 0 10px;
+
+      color: var(--green-deep);
+
+      font-size:
+        clamp(
+          1.6rem,
+          3vw,
+          2.15rem
+        );
+    }
+
+    .win-popup p {
+      margin: 0 0 24px;
+
+      color: var(--muted);
+
+      font-size: 0.96rem;
+
+      line-height: 1.6;
+    }
+
+    .win-popup .ui-btn {
+      width: 100%;
+
+      min-height: 50px;
+    }
+
+    /* ======================================================
+       TOAST
+       ====================================================== */
+
+    .toast {
+      position: fixed;
+
+      left: 50%;
+      bottom: 118px;
+
+      z-index: 120;
+
+      max-width:
+        calc(
+          100vw -
+          20px
+        );
+
+      overflow: hidden;
+
+      padding: 11px 20px;
+
+      border-radius: 999px;
+
+      color: #fff;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--green-dark),
+          var(--green-deep)
+        );
+
+      box-shadow:
+        0 11px 28px
+        rgba(41, 98, 36, 0.25);
+
+      font-size: 0.82rem;
+      font-weight: 900;
+
+      white-space: nowrap;
+
+      text-overflow: ellipsis;
+
+      opacity: 0;
+
+      pointer-events: none;
+
+      transform:
+        translateX(-50%)
+        translateY(16px);
+
+      transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+
+      transform:
+        translateX(-50%)
+        translateY(0);
+    }
+
+    /* ======================================================
+       RESPONSIVE
+       ====================================================== */
+
+    @media (max-width: 1250px) {
+      body {
+        overflow-y: auto;
+      }
+
+      .app {
+        height: auto;
+
+        min-height:
+          calc(
+            100vh -
+            (var(--page-pad) * 2)
+          );
+      }
+
+      .stage-wrap {
+        min-height: 600px;
+      }
+
+      .control-dock {
+        grid-template-columns:
+          1fr
+          1fr;
+      }
+
+      .progress-panel {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .dock-buttons {
+        grid-template-columns:
+          1fr
+          1fr;
+      }
+
+      .timer-box {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --page-pad: 8px;
+      }
+
+      body {
+        overflow-y: auto;
+      }
+
+      .game-header {
+        min-height: 65px;
+
+        padding:
+          8px
+          54px
+          8px
+          14px;
+      }
+
+      .header-apple {
+        right: 12px;
+
+        width: 34px;
+        height: 34px;
+
+        scale: 0.82;
+      }
+
+      .header-title {
+        gap: 7px;
+      }
+
+      .header-best {
+        font-size:
+          clamp(
+            1.3rem,
+            5.5vw,
+            2.1rem
+          );
+      }
+
+      .header-fukushima {
+        font-size:
+          clamp(
+            1.7rem,
+            7.5vw,
+            2.7rem
+          );
+      }
+
+      .stage-wrap {
+        min-height: auto;
+
+        padding: 9px;
+      }
+
+      .control-dock {
+        grid-template-columns: 1fr;
+      }
+
+      .dock-buttons {
+        grid-template-columns:
+          1fr
+          1fr;
+      }
+
+      .slider-stack {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-panel {
+        grid-column: auto;
+      }
+
+      .toast {
+        bottom: 20px;
+      }
+
+      .win-popup {
+        padding:
+          30px
+          22px
+          24px;
+
+        border-radius: 24px;
+      }
+
+      .answer-popup {
+        padding: 8px;
+        border-radius: 18px;
+      }
+
+      .answer-countdown {
+        top: 14px;
+        right: 14px;
+
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .dock-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .timer-box {
+        grid-column: auto;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner,
+      .progress-fill,
+      .toast,
+      .ui-btn,
+      .win-modal,
+      .win-popup,
+      .answer-modal,
+      .answer-popup {
+        transition: none !important;
+      }
+
+      .card.is-matched .card-inner {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- HEADER -->
+    <header class="game-header">
+
+      <h1 class="header-title">
+        <span class="header-best">
+          2026
+        </span>
+
+        <span class="header-fukushima">
+          Juliet
+        </span>
+      </h1>
+
+      <span
+        class="header-apple"
+        aria-hidden="true"
+      ></span>
+
+    </header>
+
+    <!-- GAME BOARD -->
+    <section class="stage-wrap">
+
+      <div
+        class="stage"
+        id="stage"
+      ></div>
+
+    </section>
+
+    <!-- CONTROL TEMPLATE -->
+    <template id="dockTemplate">
+
+      <aside class="control-dock">
+
+        <div class="dock-buttons">
+
+          <button
+            class="ui-btn secondary"
+            id="previewBtn"
+            type="button"
+          >
+            Preview 5s
+          </button>
+
+          <button
+            class="ui-btn answer-btn"
+            id="answerBtn"
+            type="button"
+          >
+            Show Answer
+          </button>
+
+          <button
+            class="ui-btn"
+            id="restartBtn"
+            type="button"
+          >
+            Restart
+          </button>
+
+          <div
+            class="timer-box"
+            id="timerText"
+          >
+            00:00
+          </div>
+
+        </div>
+
+        <div class="slider-stack">
+
+          <div class="slider-box">
+
+            <span aria-hidden="true">
+              🎵
+            </span>
+
+            <input
+              id="musicVol"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              aria-label="Music volume"
+            >
+
+            <span
+              class="slider-value"
+              id="musicVolValue"
+            >
+              50%
+            </span>
+
+          </div>
+
+          <div class="slider-box">
+
+            <span aria-hidden="true">
+              🔊
+            </span>
+
+            <input
+              id="effectVol"
+              type="range"
+              min="0"
+              max="100"
+              value="50"
+              aria-label="Sound effect volume"
+            >
+
+            <span
+              class="slider-value"
+              id="effectVolValue"
+            >
+              50%
+            </span>
+
+          </div>
+
+        </div>
+
+        <section class="progress-panel">
+
+          <div class="progress-meta">
+
+            <span id="pairText">
+              Pairs: 0 / 6
+            </span>
+
+            <span id="moveText">
+              Moves: 0
+            </span>
+
+          </div>
+
+          <div class="progress-track">
+
+            <div
+              class="progress-fill"
+              id="progressFill"
+            ></div>
+
+          </div>
+
+        </section>
+
+      </aside>
+
+    </template>
+
+  </main>
+
+  <!-- ANSWER POPUP -->
+  <div
+    class="answer-modal"
+    id="answerModal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Correct answer"
+  >
+
+    <div class="answer-popup">
+
+      <img
+        src="./Key.png"
+        alt="Correct answers"
+        class="answer-image"
+        draggable="false"
+      >
+
+      <div
+        class="answer-countdown"
+        id="answerCountdown"
+      >
+        4
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- WIN POPUP -->
+  <div
+    class="win-modal"
+    id="winModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="winTitle"
+    aria-describedby="winText"
+  >
+
+    <div class="win-popup">
+
+      <div class="win-icon">
+        ✓
+      </div>
+
+      <h2 id="winTitle">
+        Well done!
+      </h2>
+
+      <p id="winText">
+        You matched all pairs.
+      </p>
+
+      <button
+        class="ui-btn"
+        id="playAgainBtn"
+        type="button"
+      >
+        Play Again
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div
+    class="toast"
+    id="toast"
+    aria-live="polite"
+  ></div>
+
+  <!-- BACKGROUND MUSIC -->
+  <audio
+    id="music"
+    src="./Song.mp3"
+    loop
+  ></audio>
+
+  <script>
+    /* ======================================================
+       CONFIG
+       ====================================================== */
+
+    const TOTAL = 6;
+
+    const BACK =
+      "./BacksideCover.png";
+
+    const ANSWER_DURATION =
+      4000;
+
+    /* ======================================================
+       STATE
+       ====================================================== */
+
+    let cards = [];
+
+    let first = null;
+
+    let lock = false;
+
+    let matches = 0;
+
+    let moves = 0;
+
+    let effectVolume = 0.5;
+
+    let timerSeconds = 0;
+
+    let timerInterval = null;
+
+    let timerStarted = false;
+
+    let answerTimeout = null;
+
+    let answerCountdownInterval = null;
+
+    /* ======================================================
+       ELEMENTS
+       ====================================================== */
+
+    const stage =
+      document.getElementById(
+        "stage"
+      );
+
+    const stageWrap =
+      document.querySelector(
+        ".stage-wrap"
+      );
+
+    const toast =
+      document.getElementById(
+        "toast"
+      );
+
+    const winModal =
+      document.getElementById(
+        "winModal"
+      );
+
+    const winText =
+      document.getElementById(
+        "winText"
+      );
+
+    const playAgainBtn =
+      document.getElementById(
+        "playAgainBtn"
+      );
+
+    const music =
+      document.getElementById(
+        "music"
+      );
+
+    const answerModal =
+      document.getElementById(
+        "answerModal"
+      );
+
+    const answerCountdown =
+      document.getElementById(
+        "answerCountdown"
+      );
+
+    let pairText;
+
+    let moveText;
+
+    let progressFill;
+
+    let musicVol;
+
+    let musicVolValue;
+
+    let effectVol;
+
+    let effectVolValue;
+
+    let previewBtn;
+
+    let answerBtn;
+
+    let restartBtn;
+
+    let timerText;
+
+    /* ======================================================
+       CARD DATA
+       ====================================================== */
+
+    const data = [];
+
+    for (
+      let i = 1;
+      i <= TOTAL;
+      i++
+    ) {
+
+      data.push(
+        {
+          id: i,
+          type: "IMG",
+          src: `./${i}IMG.png`
+        },
+        {
+          id: i,
+          type: "DESC",
+          src: `./${i}DESC.png`
+        }
+      );
+
+    }
+
+    /* ======================================================
+       UTILITIES
+       ====================================================== */
+
+    function shuffle(arr) {
+
+      const cloned =
+        [...arr];
+
+      for (
+        let i = cloned.length - 1;
+        i > 0;
+        i--
+      ) {
+
+        const j =
+          Math.floor(
+            Math.random() *
+            (i + 1)
+          );
+
+        [
+          cloned[i],
+          cloned[j]
+        ] =
+        [
+          cloned[j],
+          cloned[i]
+        ];
+
+      }
+
+      return cloned;
+
+    }
+
+    function showToast(message) {
+
+      toast.textContent =
+        message;
+
+      toast.classList.add(
+        "show"
+      );
+
+      clearTimeout(
+        showToast.timer
+      );
+
+      showToast.timer =
+        setTimeout(
+          () => {
+
+            toast.classList.remove(
+              "show"
+            );
+
+          },
+          1400
+        );
+
+    }
+
+    function formatTime(seconds) {
+
+      const mins =
+        Math.floor(
+          seconds / 60
+        );
+
+      const secs =
+        seconds % 60;
+
+      return (
+        String(mins).padStart(
+          2,
+          "0"
+        )
+        +
+        ":"
+        +
+        String(secs).padStart(
+          2,
+          "0"
+        )
+      );
+
+    }
+
+    /* ======================================================
+       TIMER
+       ====================================================== */
+
+    function updateTimer() {
+
+      if (!timerText) {
+        return;
+      }
+
+      timerText.textContent =
+        formatTime(
+          timerSeconds
+        );
+
+    }
+
+    function startTimer() {
+
+      if (timerStarted) {
+        return;
+      }
+
+      timerStarted = true;
+
+      timerInterval =
+        setInterval(
+          () => {
+
+            timerSeconds += 1;
+
+            updateTimer();
+
+          },
+          1000
+        );
+
+    }
+
+    function stopTimer() {
+
+      clearInterval(
+        timerInterval
+      );
+
+      timerInterval = null;
+
+      timerStarted = false;
+
+    }
+
+    function resetTimer() {
+
+      stopTimer();
+
+      timerSeconds = 0;
+
+      updateTimer();
+
+    }
+
+    /* ======================================================
+       PROGRESS
+       ====================================================== */
+
+    function updateProgress() {
+
+      if (!pairText) {
+        return;
+      }
+
+      pairText.textContent =
+        `Pairs: ${matches} / ${TOTAL}`;
+
+      moveText.textContent =
+        `Moves: ${moves}`;
+
+      progressFill.style.width =
+        `${
+          (matches / TOTAL) *
+          100
+        }%`;
+
+    }
+
+    /* ======================================================
+       ANSWER POPUP
+       ====================================================== */
+
+    function showAnswer() {
+
+      startAudio();
+      startTimer();
+
+      clearTimeout(
+        answerTimeout
+      );
+
+      clearInterval(
+        answerCountdownInterval
+      );
+
+      answerModal.classList.add(
+        "show"
+      );
+
+      answerCountdown.textContent =
+        "4";
+
+      let secondsLeft = 4;
+
+      answerCountdownInterval =
+        setInterval(
+          () => {
+
+            secondsLeft -= 1;
+
+            if (secondsLeft > 0) {
+
+              answerCountdown.textContent =
+                String(secondsLeft);
+
+            }
+
+          },
+          1000
+        );
+
+      answerTimeout =
+        setTimeout(
+          closeAnswer,
+          ANSWER_DURATION
+        );
+
+    }
+
+    function closeAnswer() {
+
+      answerModal.classList.remove(
+        "show"
+      );
+
+      clearTimeout(
+        answerTimeout
+      );
+
+      clearInterval(
+        answerCountdownInterval
+      );
+
+      answerTimeout = null;
+
+      answerCountdownInterval = null;
+
+    }
+
+    /* ======================================================
+       GRID
+       ====================================================== */
+
+    function getGridDimensions() {
+
+      const cardCount =
+        TOTAL * 2;
+
+      let columns;
+
+      if (cardCount <= 4) {
+
+        columns = 2;
+
+      }
+
+      else if (cardCount <= 6) {
+
+        columns = 3;
+
+      }
+
+      else if (cardCount <= 8) {
+
+        columns = 4;
+
+      }
+
+      else if (cardCount <= 10) {
+
+        columns = 5;
+
+      }
+
+      else {
+
+        columns = 6;
+
+      }
+
+      if (
+        window.innerWidth <=
+        430
+      ) {
+
+        columns =
+          Math.min(
+            columns,
+            2
+          );
+
+      }
+
+      else if (
+        window.innerWidth <=
+        700
+      ) {
+
+        columns =
+          Math.min(
+            columns,
+            3
+          );
+
+      }
+
+      else if (
+        window.innerWidth <=
+        1100
+      ) {
+
+        columns =
+          Math.min(
+            columns,
+            4
+          );
+
+      }
+
+      const rows =
+        Math.ceil(
+          cardCount /
+          columns
+        );
+
+      return {
+        columns,
+        rows
+      };
+
+    }
+
+    function updateGridLayout() {
+
+      const {
+        columns,
+        rows
+      } =
+        getGridDimensions();
+
+      const gap = 14;
+
+      const rect =
+        stage.getBoundingClientRect();
+
+      const availableWidth =
+        rect.width;
+
+      const availableHeight =
+        rect.height;
+
+      const widthSize =
+        (
+          availableWidth -
+          gap *
+          (columns - 1)
+        )
+        /
+        columns;
+
+      const heightSize =
+        (
+          availableHeight -
+          gap *
+          (rows - 1)
+        )
+        /
+        rows;
+
+      let cardSize =
+        Math.min(
+          widthSize,
+          heightSize
+        );
+
+      cardSize =
+        Math.min(
+          cardSize,
+          440
+        );
+
+      cardSize =
+        Math.max(
+          100,
+          cardSize
+        );
+
+      stage.style.setProperty(
+        "--card-size",
+        `${cardSize}px`
+      );
+
+      stage.style.gridTemplateColumns =
+        `repeat(${columns}, ${cardSize}px)`;
+
+      stage.style.gridTemplateRows =
+        `repeat(${rows}, ${cardSize}px)`;
+
+    }
+
+    /* ======================================================
+       CREATE CARD
+       ====================================================== */
+
+    function createCard(d) {
+
+      const el =
+        document.createElement(
+          "button"
+        );
+
+      el.type =
+        "button";
+
+      el.className =
+        "card";
+
+      el.setAttribute(
+        "aria-label",
+        `Hidden matching card ${d.id}`
+      );
+
+      el.innerHTML =
+      `
+        <div class="card-inner">
+
+          <div class="card-face card-back">
+
+            <img
+              src="${BACK}"
+              alt=""
+              draggable="false"
+            >
+
+          </div>
+
+          <div class="card-face card-front">
+
+            <img
+              src="${d.src}"
+              alt=""
+              draggable="false"
+              loading="eager"
+              decoding="async"
+            >
+
+          </div>
+
+        </div>
+      `;
+
+      el.addEventListener(
+        "click",
+        () => {
+
+          clickCard(
+            el,
+            d
+          );
+
+        }
+      );
+
+      return el;
+
+    }
+
+    /* ======================================================
+       CREATE CONTROL DOCK
+       ====================================================== */
+
+    function createDock() {
+
+      const template =
+        document.getElementById(
+          "dockTemplate"
+        );
+
+      const fragment =
+        template.content.cloneNode(
+          true
+        );
+
+      const wrapper =
+        document.createElement(
+          "div"
+        );
+
+      wrapper.appendChild(
+        fragment
+      );
+
+      pairText =
+        wrapper.querySelector(
+          "#pairText"
+        );
+
+      moveText =
+        wrapper.querySelector(
+          "#moveText"
+        );
+
+      progressFill =
+        wrapper.querySelector(
+          "#progressFill"
+        );
+
+      musicVol =
+        wrapper.querySelector(
+          "#musicVol"
+        );
+
+      musicVolValue =
+        wrapper.querySelector(
+          "#musicVolValue"
+        );
+
+      effectVol =
+        wrapper.querySelector(
+          "#effectVol"
+        );
+
+      effectVolValue =
+        wrapper.querySelector(
+          "#effectVolValue"
+        );
+
+      previewBtn =
+        wrapper.querySelector(
+          "#previewBtn"
+        );
+
+      answerBtn =
+        wrapper.querySelector(
+          "#answerBtn"
+        );
+
+      restartBtn =
+        wrapper.querySelector(
+          "#restartBtn"
+        );
+
+      timerText =
+        wrapper.querySelector(
+          "#timerText"
+        );
+
+      previewBtn.addEventListener(
+        "click",
+        preview
+      );
+
+      answerBtn.addEventListener(
+        "click",
+        showAnswer
+      );
+
+      restartBtn.addEventListener(
+        "click",
+        restart
+      );
+
+      musicVol.value =
+        Math.round(
+          music.volume *
+          100
+        );
+
+      musicVolValue.textContent =
+        `${musicVol.value}%`;
+
+      musicVol.addEventListener(
+        "input",
+        e => {
+
+          music.volume =
+            Number(
+              e.target.value
+            )
+            /
+            100;
+
+          musicVolValue.textContent =
+            `${e.target.value}%`;
+
+        }
+      );
+
+      effectVol.value =
+        Math.round(
+          effectVolume *
+          100
+        );
+
+      effectVolValue.textContent =
+        `${effectVol.value}%`;
+
+      effectVol.addEventListener(
+        "input",
+        e => {
+
+          effectVolume =
+            Number(
+              e.target.value
+            )
+            /
+            100;
+
+          effectVolValue.textContent =
+            `${e.target.value}%`;
+
+        }
+      );
+
+      updateProgress();
+
+      updateTimer();
+
+      return wrapper.firstElementChild;
+
+    }
+
+    /* ======================================================
+       GAME LOGIC
+       ====================================================== */
+
+    function clickCard(
+      el,
+      d
+    ) {
+
+      if (
+        lock
+        ||
+        answerModal.classList.contains(
+          "show"
+        )
+        ||
+        el.classList.contains(
+          "is-flipped"
+        )
+        ||
+        el.classList.contains(
+          "is-matched"
+        )
+      ) {
+
+        return;
+
+      }
+
+      startAudio();
+
+      startTimer();
+
+      playClick();
+
+      el.classList.add(
+        "is-flipped"
+      );
+
+      if (!first) {
+
+        first = {
+          el,
+          d
+        };
+
+        return;
+
+      }
+
+      moves += 1;
+
+      updateProgress();
+
+      const isMatch =
+        first.d.id === d.id
+        &&
+        first.d.type !== d.type;
+
+      if (isMatch) {
+
+        first.el.classList.add(
+          "is-matched"
+        );
+
+        el.classList.add(
+          "is-matched"
+        );
+
+        matches += 1;
+
+        updateProgress();
+
+        playMatch();
+
+        showToast(
+          "Great! Match found 🍎"
+        );
+
+        first = null;
+
+        if (
+          matches === TOTAL
+        ) {
+
+          stopTimer();
+
+          lock = true;
+
+          winText.textContent =
+            `You completed all ${TOTAL} pairs in ${moves} moves and ${formatTime(timerSeconds)}.`;
+
+          setTimeout(
+            () => {
+
+              winModal.classList.add(
+                "show"
+              );
+
+              playAgainBtn.focus();
+
+            },
+            350
+          );
+
+        }
+
+      }
+
+      else {
+
+        playWrong();
+
+        lock = true;
+
+        const previousCard =
+          first.el;
+
+        setTimeout(
+          () => {
+
+            el.classList.remove(
+              "is-flipped"
+            );
+
+            previousCard.classList.remove(
+              "is-flipped"
+            );
+
+            first = null;
+
+            lock = false;
+
+          },
+          700
+        );
+
+      }
+
+    }
+
+    /* ======================================================
+       PREVIEW
+       ====================================================== */
+
+    function preview() {
+
+      if (
+        lock
+        ||
+        answerModal.classList.contains(
+          "show"
+        )
+      ) {
+        return;
+      }
+
+      startAudio();
+
+      startTimer();
+
+      lock = true;
+
+      previewBtn.disabled = true;
+
+      cards.forEach(
+        card => {
+
+          if (
+            !card.classList.contains(
+              "is-matched"
+            )
+          ) {
+
+            card.classList.add(
+              "is-flipped"
+            );
+
+          }
+
+        }
+      );
+
+      showToast(
+        "Memorize the cards!"
+      );
+
+      setTimeout(
+        () => {
+
+          cards.forEach(
+            card => {
+
+              if (
+                !card.classList.contains(
+                  "is-matched"
+                )
+              ) {
+
+                card.classList.remove(
+                  "is-flipped"
+                );
+
+              }
+
+            }
+          );
+
+          lock = false;
+
+          if (previewBtn) {
+            previewBtn.disabled = false;
+          }
+
+        },
+        5000
+      );
+
+    }
+
+    /* ======================================================
+       RENDER
+       ====================================================== */
+
+    function render() {
+
+      stage.innerHTML =
+        "";
+
+      const shuffled =
+        shuffle(
+          data
+        );
+
+      cards = [];
+
+      shuffled.forEach(
+        d => {
+
+          const card =
+            createCard(
+              d
+            );
+
+          cards.push(
+            card
+          );
+
+          stage.appendChild(
+            card
+          );
+
+        }
+      );
+
+      const oldDock =
+        document.querySelector(
+          ".control-dock"
+        );
+
+      if (oldDock) {
+
+        oldDock.remove();
+
+      }
+
+      const dock =
+        createDock();
+
+      stageWrap.insertAdjacentElement(
+        "afterend",
+        dock
+      );
+
+      updateProgress();
+
+      updateTimer();
+
+      requestAnimationFrame(
+        () => {
+
+          requestAnimationFrame(
+            updateGridLayout
+          );
+
+        }
+      );
+
+    }
+
+    /* ======================================================
+       RESTART
+       ====================================================== */
+
+    function restart() {
+
+      first = null;
+
+      lock = false;
+
+      matches = 0;
+
+      moves = 0;
+
+      closeAnswer();
+
+      winModal.classList.remove(
+        "show"
+      );
+
+      resetTimer();
+
+      render();
+
+    }
+
+    /* ======================================================
+       AUDIO
+       ====================================================== */
+
+    music.volume = 0.5;
+
+    const AudioContextClass =
+      window.AudioContext
+      ||
+      window.webkitAudioContext;
+
+    let ctx = null;
+
+    if (AudioContextClass) {
+
+      ctx =
+        new AudioContextClass();
+
+    }
+
+    function startAudio() {
+
+      if (ctx) {
+
+        if (
+          ctx.state ===
+          "suspended"
+        ) {
+
+          ctx.resume()
+            .catch(
+              () => {}
+            );
+
+        }
+
+      }
+
+      if (
+        music.paused
+      ) {
+
+        music.play()
+          .catch(
+            () => {}
+          );
+
+      }
+
+    }
+
+    document.body.addEventListener(
+      "pointerdown",
+      startAudio,
+      {
+        once: true
+      }
+    );
+
+    function beep(
+      freq,
+      dur = 0.1,
+      type = "sine",
+      vol = 1
+    ) {
+
+      if (!ctx) {
+        return;
+      }
+
+      if (
+        ctx.state ===
+        "suspended"
+      ) {
+
+        ctx.resume()
+          .catch(
+            () => {}
+          );
+
+      }
+
+      const oscillator =
+        ctx.createOscillator();
+
+      const gain =
+        ctx.createGain();
+
+      oscillator.type =
+        type;
+
+      oscillator.frequency.value =
+        freq;
+
+      gain.gain.value =
+        effectVolume *
+        vol;
+
+      oscillator.connect(
+        gain
+      );
+
+      gain.connect(
+        ctx.destination
+      );
+
+      oscillator.start();
+
+      oscillator.stop(
+        ctx.currentTime +
+        dur
+      );
+
+    }
+
+    function playClick() {
+
+      beep(
+        500,
+        0.05,
+        "square",
+        0.25
+      );
+
+    }
+
+    function playMatch() {
+
+      beep(
+        700,
+        0.08,
+        "triangle",
+        0.4
+      );
+
+      setTimeout(
+        () => {
+
+          beep(
+            860,
+            0.10,
+            "triangle",
+            0.4
+          );
+
+        },
+        80
+      );
+
+    }
+
+    function playWrong() {
+
+      beep(
+        200,
+        0.10,
+        "sawtooth",
+        0.25
+      );
+
+    }
+
+    /* ======================================================
+       EVENTS
+       ====================================================== */
+
+    playAgainBtn.addEventListener(
+      "click",
+      restart
+    );
+
+    answerModal.addEventListener(
+      "click",
+      e => {
+
+        if (
+          e.target ===
+          answerModal
+        ) {
+
+          closeAnswer();
+
+        }
+
+      }
+    );
+
+    winModal.addEventListener(
+      "click",
+      e => {
+
+        if (
+          e.target ===
+          winModal
+        ) {
+
+          restart();
+
+        }
+
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      e => {
+
+        if (
+          e.key === "Escape"
+          &&
+          answerModal.classList.contains(
+            "show"
+          )
+        ) {
+
+          closeAnswer();
+
+          return;
+
+        }
+
+        if (
+          e.key === "Escape"
+          &&
+          winModal.classList.contains(
+            "show"
+          )
+        ) {
+
+          restart();
+
+        }
+
+      }
+    );
+
+    let resizeTimer;
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        clearTimeout(
+          resizeTimer
+        );
+
+        resizeTimer =
+          setTimeout(
+            updateGridLayout,
+            80
+          );
+
+      }
+    );
+
+    /* ======================================================
+       START
+       ====================================================== */
+
+    resetTimer();
+
+    render();
+  </script>
+
+</body>
+</html>
