@@ -160,8 +160,8 @@
       position: absolute;
       inset: 0;
 
-      width: 1600px;
-      height: 900px;
+      width: var(--design-width);
+      height: var(--design-height);
 
       padding: 14px;
 
@@ -1311,6 +1311,120 @@
     }
 
     /* =========================================================
+       PORTRAIT MODE
+       ---------------------------------------------------------
+       Landscape keeps the original layout exactly as supplied:
+       1600 x 900 logical canvas, 6 columns x 2 rows.
+
+       On a portrait screen we switch to a 900 x 1340 logical
+       canvas (same proportion as approximately 629 x 936) and
+       arrange the 12 cards as 4 columns x 3 rows.
+       ========================================================= */
+
+    .design-scaler.is-portrait {
+      --design-width: 900px;
+      --design-height: 1340px;
+    }
+
+    .design-scaler.is-portrait .app {
+      width: 900px;
+      height: 1340px;
+
+      /* Use almost the full portrait width so the 4 cards in
+         each row can be as large as possible. */
+      padding: 5px;
+
+      grid-template-rows:
+        82px
+        minmax(0, 1fr)
+        184px;
+
+      gap: 7px;
+    }
+
+    .design-scaler.is-portrait .game-header {
+      height: 82px;
+      padding: 8px 70px 8px 18px;
+      border-radius: 20px;
+    }
+
+    .design-scaler.is-portrait .header-best {
+      font-size: 34px;
+    }
+
+    .design-scaler.is-portrait .header-fukushima {
+      font-size: 48px;
+    }
+
+    .design-scaler.is-portrait .header-apple {
+      right: 22px;
+      width: 42px;
+      height: 42px;
+    }
+
+    .design-scaler.is-portrait .stage-wrap {
+      /* Minimal outer padding gives the 4 x 3 board more width. */
+      padding: 5px;
+      border-radius: 20px;
+    }
+
+    .design-scaler.is-portrait .stage {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .design-scaler.is-portrait .control-dock {
+      height: 184px;
+      grid-template-columns: 1fr;
+      grid-template-rows: 48px 54px 62px;
+      gap: 6px;
+      padding: 6px 8px;
+      border-radius: 20px;
+    }
+
+    .design-scaler.is-portrait .dock-buttons {
+      grid-template-columns: 1fr 1fr 1fr 112px;
+      gap: 6px;
+    }
+
+    .design-scaler.is-portrait .ui-btn,
+    .design-scaler.is-portrait .timer-box {
+      min-height: 42px;
+      font-size: 12px;
+    }
+
+    .design-scaler.is-portrait .slider-stack {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .design-scaler.is-portrait .slider-box {
+      min-height: 48px;
+      grid-template-columns: auto minmax(70px, 1fr) 38px;
+      padding: 5px 8px;
+    }
+
+    .design-scaler.is-portrait .progress-panel {
+      min-height: 56px;
+      padding: 7px 10px;
+    }
+
+    .design-scaler.is-portrait .answer-popup {
+      width: 790px;
+      max-height: 1160px;
+    }
+
+    .design-scaler.is-portrait .answer-image {
+      max-height: 1120px;
+    }
+
+    .design-scaler.is-portrait .toast {
+      bottom: 202px;
+      max-width: 800px;
+    }
+
+    /* =========================================================
        REDUCED MOTION
        ========================================================= */
 
@@ -1364,11 +1478,11 @@
           <h1 class="header-title">
 
             <span class="header-best">
-              2026
+              <!-- Juilet -->
             </span>
 
             <span class="header-fukushima">
-              Juliet
+              Juilet Apple
             </span>
 
           </h1>
@@ -1636,42 +1750,67 @@
       Nothing moves into different rows.
     */
 
-    const DESIGN_WIDTH = 1600;
-    const DESIGN_HEIGHT = 900;
+    const LANDSCAPE_DESIGN_WIDTH = 1600;
+    const LANDSCAPE_DESIGN_HEIGHT = 900;
+
+    // Portrait logical canvas uses nearly the same aspect ratio
+    // as a 629 x 936 screen.
+    const PORTRAIT_DESIGN_WIDTH = 900;
+    const PORTRAIT_DESIGN_HEIGHT = 1340;
 
     const designScaler =
       document.getElementById(
         "designScaler"
       );
 
+    function isPortraitScreen() {
+      return window.innerHeight > window.innerWidth;
+    }
+
+    function applyOrientationLayout() {
+      const portrait = isPortraitScreen();
+
+      designScaler.classList.toggle(
+        "is-portrait",
+        portrait
+      );
+
+      if (portrait) {
+        designScaler.style.width =
+          `${PORTRAIT_DESIGN_WIDTH}px`;
+
+        designScaler.style.height =
+          `${PORTRAIT_DESIGN_HEIGHT}px`;
+      } else {
+        designScaler.style.width =
+          `${LANDSCAPE_DESIGN_WIDTH}px`;
+
+        designScaler.style.height =
+          `${LANDSCAPE_DESIGN_HEIGHT}px`;
+      }
+    }
+
     function scaleGameToScreen() {
+      applyOrientationLayout();
 
-      const screenWidth =
-        window.innerWidth;
+      const portrait = isPortraitScreen();
 
-      const screenHeight =
-        window.innerHeight;
+      const designWidth = portrait
+        ? PORTRAIT_DESIGN_WIDTH
+        : LANDSCAPE_DESIGN_WIDTH;
 
-      const scaleX =
-        screenWidth /
-        DESIGN_WIDTH;
+      const designHeight = portrait
+        ? PORTRAIT_DESIGN_HEIGHT
+        : LANDSCAPE_DESIGN_HEIGHT;
 
-      const scaleY =
-        screenHeight /
-        DESIGN_HEIGHT;
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
 
-      /*
-        contain behavior:
+      const scaleX = screenWidth / designWidth;
+      const scaleY = screenHeight / designHeight;
 
-        The whole interface remains visible
-        without cropping.
-      */
-
-      const scale =
-        Math.min(
-          scaleX,
-          scaleY
-        );
+      // contain: keep the complete game visible without cropping.
+      const scale = Math.min(scaleX, scaleY);
 
       designScaler.style.transform =
         `scale(${scale})`;
@@ -2089,70 +2228,43 @@
        ========================================================= */
 
     function updateGridLayout() {
+      const portrait = isPortraitScreen();
 
-      /*
-        Layout does NOT depend on the actual device width.
+      // Landscape: preserve original 6 x 2 layout.
+      // Portrait: 4 cards per row, 3 rows.
+      const columns = portrait ? 4 : 6;
+      const rows = portrait ? 3 : 2;
+      const gap = portrait ? 7 : 14;
 
-        It always calculates cards inside the
-        fixed 1600 x 900 design.
-      */
+      stage.style.gridTemplateColumns =
+        `repeat(${columns}, 1fr)`;
 
-      const columns = 6;
-      const rows = 2;
+      stage.style.gridTemplateRows =
+        `repeat(${rows}, 1fr)`;
 
-      const gap = 14;
+      stage.style.gap = `${gap}px`;
 
-      const rect =
-        stage.getBoundingClientRect();
-
-      /*
-        getBoundingClientRect is affected by transform scale.
-
-        Instead use clientWidth/clientHeight, because they
-        represent the original fixed design dimensions.
-      */
-
-      const availableWidth =
-        stage.clientWidth;
-
-      const availableHeight =
-        stage.clientHeight;
+      const availableWidth = stage.clientWidth;
+      const availableHeight = stage.clientHeight;
 
       const widthSize =
-        (
-          availableWidth -
-          gap *
-          (columns - 1)
-        )
-        /
+        (availableWidth - gap * (columns - 1)) /
         columns;
 
       const heightSize =
-        (
-          availableHeight -
-          gap *
-          (rows - 1)
-        )
-        /
+        (availableHeight - gap * (rows - 1)) /
         rows;
 
-      let cardSize =
-        Math.min(
-          widthSize,
-          heightSize
-        );
+      let cardSize = Math.min(
+        widthSize,
+        heightSize
+      );
 
-      /*
-        Slight breathing space.
-      */
+      // In portrait, keep only a tiny breathing margin so cards
+      // occupy almost all available board width.
+      cardSize -= portrait ? 1 : 4;
 
-      cardSize -= 4;
-
-      cardSize =
-        Math.max(
-          80,
-          cardSize
-        );
+      cardSize = Math.max(80, cardSize);
 
       stage.style.setProperty(
         "--card-size",
@@ -2861,6 +2973,7 @@
             */
 
             scaleGameToScreen();
+            updateGridLayout();
 
           },
           50
@@ -2877,7 +2990,10 @@
       () => {
 
         setTimeout(
-          scaleGameToScreen,
+          () => {
+            scaleGameToScreen();
+            updateGridLayout();
+          },
           100
         );
 
@@ -2893,7 +3009,10 @@
 
       window.visualViewport.addEventListener(
         "resize",
-        scaleGameToScreen
+        () => {
+          scaleGameToScreen();
+          updateGridLayout();
+        }
       );
     }
 
