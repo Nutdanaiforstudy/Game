@@ -2,11 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
 
   <title>Juliet Apple Matching Game</title>
 
   <style>
+    /* =========================================================
+       ROOT
+       ========================================================= */
+
     :root {
       --green: #7fc241;
       --green-light: #97d45d;
@@ -19,15 +27,10 @@
       --red: #f42629;
       --red-dark: #d91f25;
 
-      --blue: #1766a5;
-
       --white: #ffffff;
-      --cream: #fffefa;
 
       --ink: #284026;
       --muted: #67825d;
-
-      --border: rgba(68, 159, 67, 0.18);
 
       --shadow:
         0 14px 40px rgba(54, 111, 42, 0.13);
@@ -38,21 +41,34 @@
       --radius-xl: 28px;
       --radius-lg: 20px;
 
-      --page-pad: 14px;
-      --gap: 12px;
+      /*
+        IMPORTANT:
+        This is the fixed design resolution.
+
+        The complete interface will always use this size,
+        then JavaScript scales the whole page proportionally
+        to fit any browser/device.
+      */
+      --design-width: 1600px;
+      --design-height: 900px;
     }
+
+    /* =========================================================
+       RESET
+       ========================================================= */
 
     * {
       box-sizing: border-box;
-      min-width: 0;
-      min-height: 0;
     }
 
     html,
     body {
       margin: 0;
+
       width: 100%;
-      min-height: 100%;
+      height: 100%;
+
+      overflow: hidden;
     }
 
     body {
@@ -82,43 +98,13 @@
           #ecf6dc 100%
         );
 
-      padding: var(--page-pad);
-      overflow: hidden;
-
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+
       text-rendering: optimizeLegibility;
-    }
 
-    body::before,
-    body::after {
-      content: "";
-
-      position: fixed;
-      pointer-events: none;
-      z-index: -1;
-
-      width: 270px;
-      height: 270px;
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(127, 194, 65, 0.12),
-          transparent 70%
-        );
-    }
-
-    body::before {
-      left: -110px;
-      top: -100px;
-    }
-
-    body::after {
-      right: -120px;
-      bottom: -120px;
+      overscroll-behavior: none;
+      touch-action: manipulation;
     }
 
     button,
@@ -130,34 +116,74 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    .app {
-      width: 100%;
+    /* =========================================================
+       FIXED DESIGN VIEWPORT
+       ========================================================= */
 
-      height:
-        calc(
-          100vh -
-          (var(--page-pad) * 2)
-        );
+    /*
+      viewport-shell always fills the real browser.
+
+      design-scaler is the scaling container.
+
+      game-app itself always remains 1600 x 900.
+    */
+
+    .viewport-shell {
+      position: fixed;
+      inset: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      overflow: hidden;
+    }
+
+    .design-scaler {
+      position: relative;
+
+      width: var(--design-width);
+      height: var(--design-height);
+
+      flex: 0 0 auto;
+
+      transform-origin: center center;
+
+      will-change: transform;
+    }
+
+    /* =========================================================
+       APP
+       ========================================================= */
+
+    .app {
+      position: absolute;
+      inset: 0;
+
+      width: 1600px;
+      height: 900px;
+
+      padding: 14px;
 
       display: grid;
 
       grid-template-rows:
-        auto
+        82px
         minmax(0, 1fr)
-        auto;
+        96px;
 
-      gap: var(--gap);
+      gap: 12px;
     }
 
-    /* ======================================================
+    /* =========================================================
        HEADER
-       ====================================================== */
+       ========================================================= */
 
     .game-header {
       position: relative;
 
       width: 100%;
-      min-height: 80px;
+      height: 82px;
 
       display: flex;
       align-items: center;
@@ -200,6 +226,49 @@
           var(--green-dark)
         );
     }
+
+    .header-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+
+      gap: 10px;
+
+      margin: 0;
+
+      text-align: center;
+
+      line-height: 1;
+    }
+
+    .header-best {
+      color: var(--green-deep);
+
+      font-size: 42px;
+      font-weight: 700;
+
+      letter-spacing: -0.035em;
+
+      white-space: nowrap;
+    }
+
+    .header-fukushima {
+      color: var(--red);
+
+      font-size: 58px;
+      font-weight: 900;
+
+      letter-spacing: -0.055em;
+
+      white-space: nowrap;
+
+      text-shadow:
+        0 3px 0 rgba(244, 38, 41, 0.08);
+    }
+
+    /* =========================================================
+       APPLE LOGO
+       ========================================================= */
 
     .header-apple {
       position: absolute;
@@ -252,61 +321,9 @@
       transform: rotate(-25deg);
     }
 
-    .header-title {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-
-      gap: 10px;
-
-      margin: 0;
-
-      text-align: center;
-
-      line-height: 1;
-    }
-
-    .header-best {
-      color: var(--green-deep);
-
-      font-size:
-        clamp(
-          1.7rem,
-          3vw,
-          2.8rem
-        );
-
-      font-weight: 700;
-
-      letter-spacing: -0.035em;
-
-      white-space: nowrap;
-    }
-
-    .header-fukushima {
-      color: var(--red);
-
-      font-size:
-        clamp(
-          2.15rem,
-          4vw,
-          3.8rem
-        );
-
-      font-weight: 900;
-
-      letter-spacing: -0.055em;
-
-      white-space: nowrap;
-
-      text-shadow:
-        0 3px 0
-        rgba(244, 38, 41, 0.08);
-    }
-
-    /* ======================================================
+    /* =========================================================
        GAME AREA
-       ====================================================== */
+       ========================================================= */
 
     .stage-wrap {
       position: relative;
@@ -388,22 +405,37 @@
 
       display: grid;
 
+      /*
+        ALWAYS 6 columns and 2 rows.
+
+        Because the entire game scales instead of
+        rearranging on smaller screens.
+      */
+      grid-template-columns:
+        repeat(6, 1fr);
+
+      grid-template-rows:
+        repeat(2, 1fr);
+
       gap: 14px;
 
-      align-content: center;
-      justify-content: center;
-      place-items: center;
+      align-items: center;
+      justify-items: center;
     }
 
-    /* ======================================================
+    /* =========================================================
        CARDS
-       ====================================================== */
+       ========================================================= */
 
     .card {
       position: relative;
 
-      width: var(--card-size, 280px);
-      height: var(--card-size, 280px);
+      /*
+        JavaScript calculates the largest square card
+        that fits inside the fixed 6 x 2 board.
+      */
+      width: var(--card-size, 285px);
+      height: var(--card-size, 285px);
 
       border: 0;
       padding: 0;
@@ -441,7 +473,8 @@
       transform-style: preserve-3d;
 
       transition:
-        transform 0.45s cubic-bezier(
+        transform 0.45s
+        cubic-bezier(
           0.22,
           0.76,
           0.25,
@@ -585,21 +618,20 @@
       }
     }
 
-    /* ======================================================
+    /* =========================================================
        CONTROL DOCK
-       ====================================================== */
+       ========================================================= */
 
     .control-dock {
       width: 100%;
-
-      min-height: 94px;
+      height: 96px;
 
       display: grid;
 
       grid-template-columns:
-        minmax(470px, 1.35fr)
-        minmax(430px, 1.35fr)
-        minmax(320px, 1fr);
+        1.3fr
+        1.25fr
+        1fr;
 
       gap: 12px;
 
@@ -615,12 +647,17 @@
         );
 
       border:
-        1px solid rgba(127, 194, 65, 0.23);
+        1px solid
+        rgba(127, 194, 65, 0.23);
 
       border-radius: var(--radius-xl);
 
       box-shadow: var(--shadow);
     }
+
+    /* =========================================================
+       DOCK BUTTONS
+       ========================================================= */
 
     .dock-buttons {
       display: grid;
@@ -647,7 +684,7 @@
 
       padding: 10px 18px;
 
-      color: #fff;
+      color: #ffffff;
 
       background:
         linear-gradient(
@@ -663,8 +700,7 @@
 
       cursor: pointer;
 
-      font-size: 0.84rem;
-
+      font-size: 13px;
       font-weight: 900;
 
       white-space: nowrap;
@@ -691,7 +727,9 @@
 
     .ui-btn:disabled {
       opacity: 0.55;
+
       cursor: not-allowed;
+
       transform: none;
     }
 
@@ -701,7 +739,7 @@
       background:
         linear-gradient(
           180deg,
-          #fff,
+          #ffffff,
           var(--green-pale)
         );
 
@@ -740,6 +778,10 @@
         rgba(244, 38, 41, 0.28);
     }
 
+    /* =========================================================
+       TIMER
+       ========================================================= */
+
     .timer-box {
       min-height: 44px;
 
@@ -756,7 +798,7 @@
       background:
         linear-gradient(
           180deg,
-          #fff,
+          #ffffff,
           var(--green-pale)
         );
 
@@ -764,7 +806,7 @@
         1px solid
         rgba(68, 159, 67, 0.2);
 
-      font-size: 0.83rem;
+      font-size: 13px;
       font-weight: 900;
 
       letter-spacing: 0.03em;
@@ -774,12 +816,13 @@
 
     .timer-box::before {
       content: "⏱";
+
       margin-right: 5px;
     }
 
-    /* ======================================================
+    /* =========================================================
        VOLUME
-       ====================================================== */
+       ========================================================= */
 
     .slider-stack {
       display: grid;
@@ -800,7 +843,7 @@
 
       grid-template-columns:
         auto
-        minmax(90px, 1fr)
+        minmax(80px, 1fr)
         42px;
 
       align-items: center;
@@ -814,7 +857,7 @@
       background:
         linear-gradient(
           180deg,
-          #fff,
+          #ffffff,
           #f7fced
         );
 
@@ -824,7 +867,7 @@
 
       border-radius: 14px;
 
-      font-size: 0.76rem;
+      font-size: 12px;
       font-weight: 700;
     }
 
@@ -841,20 +884,18 @@
 
       color: var(--green-dark);
 
-      font-size: 0.72rem;
-
+      font-size: 11px;
       font-weight: 900;
     }
 
-    /* ======================================================
+    /* =========================================================
        PROGRESS
-       ====================================================== */
+       ========================================================= */
 
     .progress-panel {
       min-height: 62px;
 
       display: grid;
-
       align-content: center;
 
       gap: 8px;
@@ -864,7 +905,7 @@
       background:
         linear-gradient(
           180deg,
-          #fff,
+          #ffffff,
           var(--green-pale)
         );
 
@@ -879,20 +920,18 @@
       display: flex;
 
       justify-content: space-between;
-
       align-items: center;
 
       gap: 10px;
 
       color: var(--green-deep);
 
-      font-size: 0.78rem;
+      font-size: 12px;
       font-weight: 900;
     }
 
     .progress-track {
       width: 100%;
-
       height: 11px;
 
       overflow: hidden;
@@ -929,12 +968,17 @@
         width 0.25s ease;
     }
 
-    /* ======================================================
-       ANSWER POPUP
-       ====================================================== */
+    /* =========================================================
+       ANSWER MODAL
+       ========================================================= */
+
+    /*
+      Modal is inside the 1600 x 900 design so it gets scaled
+      together with everything else.
+    */
 
     .answer-modal {
-      position: fixed;
+      position: absolute;
       inset: 0;
 
       z-index: 200;
@@ -969,15 +1013,14 @@
     .answer-popup {
       position: relative;
 
-      width: min(900px, 95vw);
-
-      max-height: 88vh;
+      width: 900px;
+      max-height: 790px;
 
       padding: 12px;
 
       border-radius: 24px;
 
-      background: #fff;
+      background: #ffffff;
 
       border:
         3px solid
@@ -1003,7 +1046,7 @@
 
     .answer-image {
       width: 100%;
-      max-height: calc(88vh - 24px);
+      max-height: 760px;
 
       display: block;
 
@@ -1011,7 +1054,7 @@
 
       border-radius: 14px;
 
-      background: #fff;
+      background: #ffffff;
     }
 
     .answer-countdown {
@@ -1031,7 +1074,7 @@
       background:
         rgba(50, 126, 54, 0.92);
 
-      color: #fff;
+      color: #ffffff;
 
       font-weight: 900;
 
@@ -1040,18 +1083,17 @@
         rgba(0, 0, 0, 0.2);
     }
 
-    /* ======================================================
+    /* =========================================================
        WIN MODAL
-       ====================================================== */
+       ========================================================= */
 
     .win-modal {
-      position: fixed;
+      position: absolute;
       inset: 0;
 
-      z-index: 100;
+      z-index: 210;
 
       display: flex;
-
       align-items: center;
       justify-content: center;
 
@@ -1083,18 +1125,21 @@
     .win-popup {
       position: relative;
 
-      width: min(470px, 100%);
+      width: 470px;
 
       overflow: hidden;
 
-      padding: 38px 32px 30px;
+      padding:
+        38px
+        32px
+        30px;
 
       text-align: center;
 
       background:
         linear-gradient(
           180deg,
-          #fff 0%,
+          #ffffff 0%,
           var(--green-pale) 100%
         );
 
@@ -1147,7 +1192,7 @@
       right: 20px;
       top: 17px;
 
-      font-size: 2rem;
+      font-size: 32px;
 
       transform: rotate(8deg);
     }
@@ -1163,7 +1208,7 @@
 
       border-radius: 50%;
 
-      color: #fff;
+      color: #ffffff;
 
       background:
         linear-gradient(
@@ -1176,7 +1221,7 @@
         0 13px 28px
         rgba(68, 159, 67, 0.25);
 
-      font-size: 2.5rem;
+      font-size: 40px;
       font-weight: 900;
     }
 
@@ -1185,12 +1230,7 @@
 
       color: var(--green-deep);
 
-      font-size:
-        clamp(
-          1.6rem,
-          3vw,
-          2.15rem
-        );
+      font-size: 34px;
     }
 
     .win-popup p {
@@ -1198,7 +1238,7 @@
 
       color: var(--muted);
 
-      font-size: 0.96rem;
+      font-size: 15px;
 
       line-height: 1.6;
     }
@@ -1209,23 +1249,19 @@
       min-height: 50px;
     }
 
-    /* ======================================================
+    /* =========================================================
        TOAST
-       ====================================================== */
+       ========================================================= */
 
     .toast {
-      position: fixed;
+      position: absolute;
 
       left: 50%;
       bottom: 118px;
 
-      z-index: 120;
+      z-index: 220;
 
-      max-width:
-        calc(
-          100vw -
-          20px
-        );
+      max-width: 1000px;
 
       overflow: hidden;
 
@@ -1233,7 +1269,7 @@
 
       border-radius: 999px;
 
-      color: #fff;
+      color: #ffffff;
 
       background:
         linear-gradient(
@@ -1246,7 +1282,7 @@
         0 11px 28px
         rgba(41, 98, 36, 0.25);
 
-      font-size: 0.82rem;
+      font-size: 13px;
       font-weight: 900;
 
       white-space: nowrap;
@@ -1274,163 +1310,9 @@
         translateY(0);
     }
 
-    /* ======================================================
-       RESPONSIVE
-       ====================================================== */
-
-    @media (max-width: 1250px) {
-      body {
-        overflow-y: auto;
-      }
-
-      .app {
-        height: auto;
-
-        min-height:
-          calc(
-            100vh -
-            (var(--page-pad) * 2)
-          );
-      }
-
-      .stage-wrap {
-        min-height: 600px;
-      }
-
-      .control-dock {
-        grid-template-columns:
-          1fr
-          1fr;
-      }
-
-      .progress-panel {
-        grid-column: 1 / -1;
-      }
-    }
-
-    @media (max-width: 900px) {
-      .dock-buttons {
-        grid-template-columns:
-          1fr
-          1fr;
-      }
-
-      .timer-box {
-        grid-column: 1 / -1;
-      }
-    }
-
-    @media (max-width: 700px) {
-      :root {
-        --page-pad: 8px;
-      }
-
-      body {
-        overflow-y: auto;
-      }
-
-      .game-header {
-        min-height: 65px;
-
-        padding:
-          8px
-          54px
-          8px
-          14px;
-      }
-
-      .header-apple {
-        right: 12px;
-
-        width: 34px;
-        height: 34px;
-
-        scale: 0.82;
-      }
-
-      .header-title {
-        gap: 7px;
-      }
-
-      .header-best {
-        font-size:
-          clamp(
-            1.3rem,
-            5.5vw,
-            2.1rem
-          );
-      }
-
-      .header-fukushima {
-        font-size:
-          clamp(
-            1.7rem,
-            7.5vw,
-            2.7rem
-          );
-      }
-
-      .stage-wrap {
-        min-height: auto;
-
-        padding: 9px;
-      }
-
-      .control-dock {
-        grid-template-columns: 1fr;
-      }
-
-      .dock-buttons {
-        grid-template-columns:
-          1fr
-          1fr;
-      }
-
-      .slider-stack {
-        grid-template-columns: 1fr;
-      }
-
-      .progress-panel {
-        grid-column: auto;
-      }
-
-      .toast {
-        bottom: 20px;
-      }
-
-      .win-popup {
-        padding:
-          30px
-          22px
-          24px;
-
-        border-radius: 24px;
-      }
-
-      .answer-popup {
-        padding: 8px;
-        border-radius: 18px;
-      }
-
-      .answer-countdown {
-        top: 14px;
-        right: 14px;
-
-        width: 40px;
-        min-width: 40px;
-        height: 40px;
-      }
-    }
-
-    @media (max-width: 430px) {
-      .dock-buttons {
-        grid-template-columns: 1fr;
-      }
-
-      .timer-box {
-        grid-column: auto;
-      }
-    }
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
 
     @media (prefers-reduced-motion: reduce) {
       .card-inner,
@@ -1453,244 +1335,351 @@
 
 <body>
 
-  <main class="app">
+  <!-- =======================================================
+       REAL BROWSER VIEWPORT
+       ======================================================= -->
 
-    <!-- HEADER -->
-    <header class="game-header">
+  <div class="viewport-shell">
 
-      <h1 class="header-title">
-        <span class="header-best">
-          2026
-        </span>
+    <!--
+      This complete 1600 x 900 object is scaled proportionally
+      by JavaScript.
+    -->
 
-        <span class="header-fukushima">
-          Juliet
-        </span>
-      </h1>
+    <div
+      class="design-scaler"
+      id="designScaler"
+    >
 
-      <span
-        class="header-apple"
-        aria-hidden="true"
-      ></span>
+      <!-- ===================================================
+           MAIN APP
+           =================================================== -->
 
-    </header>
+      <main class="app">
 
-    <!-- GAME BOARD -->
-    <section class="stage-wrap">
+        <!-- HEADER -->
 
-      <div
-        class="stage"
-        id="stage"
-      ></div>
+        <header class="game-header">
 
-    </section>
+          <h1 class="header-title">
 
-    <!-- CONTROL TEMPLATE -->
-    <template id="dockTemplate">
+            <span class="header-best">
+              2026
+            </span>
 
-      <aside class="control-dock">
+            <span class="header-fukushima">
+              Juliet
+            </span>
 
-        <div class="dock-buttons">
+          </h1>
 
-          <button
-            class="ui-btn secondary"
-            id="previewBtn"
-            type="button"
-          >
-            Preview 5s
-          </button>
+          <span
+            class="header-apple"
+            aria-hidden="true"
+          ></span>
 
-          <button
-            class="ui-btn answer-btn"
-            id="answerBtn"
-            type="button"
-          >
-            Show Answer
-          </button>
+        </header>
 
-          <button
-            class="ui-btn"
-            id="restartBtn"
-            type="button"
-          >
-            Restart
-          </button>
+        <!-- GAME BOARD -->
+
+        <section class="stage-wrap">
 
           <div
-            class="timer-box"
-            id="timerText"
-          >
-            00:00
-          </div>
-
-        </div>
-
-        <div class="slider-stack">
-
-          <div class="slider-box">
-
-            <span aria-hidden="true">
-              🎵
-            </span>
-
-            <input
-              id="musicVol"
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              aria-label="Music volume"
-            >
-
-            <span
-              class="slider-value"
-              id="musicVolValue"
-            >
-              50%
-            </span>
-
-          </div>
-
-          <div class="slider-box">
-
-            <span aria-hidden="true">
-              🔊
-            </span>
-
-            <input
-              id="effectVol"
-              type="range"
-              min="0"
-              max="100"
-              value="50"
-              aria-label="Sound effect volume"
-            >
-
-            <span
-              class="slider-value"
-              id="effectVolValue"
-            >
-              50%
-            </span>
-
-          </div>
-
-        </div>
-
-        <section class="progress-panel">
-
-          <div class="progress-meta">
-
-            <span id="pairText">
-              Pairs: 0 / 6
-            </span>
-
-            <span id="moveText">
-              Moves: 0
-            </span>
-
-          </div>
-
-          <div class="progress-track">
-
-            <div
-              class="progress-fill"
-              id="progressFill"
-            ></div>
-
-          </div>
+            class="stage"
+            id="stage"
+          ></div>
 
         </section>
 
-      </aside>
+        <!-- CONTROL DOCK -->
 
-    </template>
+        <aside class="control-dock">
 
-  </main>
+          <!-- BUTTONS -->
 
-  <!-- ANSWER POPUP -->
-  <div
-    class="answer-modal"
-    id="answerModal"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Correct answer"
-  >
+          <div class="dock-buttons">
 
-    <div class="answer-popup">
+            <button
+              class="ui-btn secondary"
+              id="previewBtn"
+              type="button"
+            >
+              Preview 5s
+            </button>
 
-      <img
-        src="./Key.png"
-        alt="Correct answers"
-        class="answer-image"
-        draggable="false"
-      >
+            <button
+              class="ui-btn answer-btn"
+              id="answerBtn"
+              type="button"
+            >
+              Show Answer
+            </button>
+
+            <button
+              class="ui-btn"
+              id="restartBtn"
+              type="button"
+            >
+              Restart
+            </button>
+
+            <div
+              class="timer-box"
+              id="timerText"
+            >
+              00:00
+            </div>
+
+          </div>
+
+          <!-- VOLUME -->
+
+          <div class="slider-stack">
+
+            <div class="slider-box">
+
+              <span aria-hidden="true">
+                🎵
+              </span>
+
+              <input
+                id="musicVol"
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                aria-label="Music volume"
+              >
+
+              <span
+                class="slider-value"
+                id="musicVolValue"
+              >
+                50%
+              </span>
+
+            </div>
+
+            <div class="slider-box">
+
+              <span aria-hidden="true">
+                🔊
+              </span>
+
+              <input
+                id="effectVol"
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+                aria-label="Sound effect volume"
+              >
+
+              <span
+                class="slider-value"
+                id="effectVolValue"
+              >
+                50%
+              </span>
+
+            </div>
+
+          </div>
+
+          <!-- PROGRESS -->
+
+          <section class="progress-panel">
+
+            <div class="progress-meta">
+
+              <span id="pairText">
+                Pairs: 0 / 6
+              </span>
+
+              <span id="moveText">
+                Moves: 0
+              </span>
+
+            </div>
+
+            <div class="progress-track">
+
+              <div
+                class="progress-fill"
+                id="progressFill"
+              ></div>
+
+            </div>
+
+          </section>
+
+        </aside>
+
+      </main>
+
+      <!-- ===================================================
+           ANSWER POPUP
+           =================================================== -->
 
       <div
-        class="answer-countdown"
-        id="answerCountdown"
+        class="answer-modal"
+        id="answerModal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Correct answer"
       >
-        4
+
+        <div class="answer-popup">
+
+          <img
+            src="./Key.png"
+            alt="Correct answers"
+            class="answer-image"
+            draggable="false"
+          >
+
+          <div
+            class="answer-countdown"
+            id="answerCountdown"
+          >
+            4
+          </div>
+
+        </div>
+
       </div>
+
+      <!-- ===================================================
+           WIN POPUP
+           =================================================== -->
+
+      <div
+        class="win-modal"
+        id="winModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="winTitle"
+        aria-describedby="winText"
+      >
+
+        <div class="win-popup">
+
+          <div class="win-icon">
+            ✓
+          </div>
+
+          <h2 id="winTitle">
+            Well done!
+          </h2>
+
+          <p id="winText">
+            You matched all pairs.
+          </p>
+
+          <button
+            class="ui-btn"
+            id="playAgainBtn"
+            type="button"
+          >
+            Play Again
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================================
+           TOAST
+           =================================================== -->
+
+      <div
+        class="toast"
+        id="toast"
+        aria-live="polite"
+      ></div>
 
     </div>
 
   </div>
 
-  <!-- WIN POPUP -->
-  <div
-    class="win-modal"
-    id="winModal"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="winTitle"
-    aria-describedby="winText"
-  >
+  <!-- =======================================================
+       BACKGROUND MUSIC
+       ======================================================= -->
 
-    <div class="win-popup">
-
-      <div class="win-icon">
-        ✓
-      </div>
-
-      <h2 id="winTitle">
-        Well done!
-      </h2>
-
-      <p id="winText">
-        You matched all pairs.
-      </p>
-
-      <button
-        class="ui-btn"
-        id="playAgainBtn"
-        type="button"
-      >
-        Play Again
-      </button>
-
-    </div>
-
-  </div>
-
-  <!-- TOAST -->
-  <div
-    class="toast"
-    id="toast"
-    aria-live="polite"
-  ></div>
-
-  <!-- BACKGROUND MUSIC -->
   <audio
     id="music"
     src="./Song.mp3"
     loop
+    preload="auto"
   ></audio>
 
   <script>
-    /* ======================================================
+    /* =========================================================
+       FIXED DESIGN SCALE
+       ========================================================= */
+
+    /*
+      The game is ALWAYS designed at 1600 x 900.
+
+      We only scale the whole design according to the
+      real browser width and height.
+
+      This means:
+
+      Desktop = same layout
+      Laptop  = same layout
+      Tablet  = same layout
+      Mobile  = same layout
+      TV      = same layout
+      Projector = same layout
+
+      Nothing moves into different rows.
+    */
+
+    const DESIGN_WIDTH = 1600;
+    const DESIGN_HEIGHT = 900;
+
+    const designScaler =
+      document.getElementById(
+        "designScaler"
+      );
+
+    function scaleGameToScreen() {
+
+      const screenWidth =
+        window.innerWidth;
+
+      const screenHeight =
+        window.innerHeight;
+
+      const scaleX =
+        screenWidth /
+        DESIGN_WIDTH;
+
+      const scaleY =
+        screenHeight /
+        DESIGN_HEIGHT;
+
+      /*
+        contain behavior:
+
+        The whole interface remains visible
+        without cropping.
+      */
+
+      const scale =
+        Math.min(
+          scaleX,
+          scaleY
+        );
+
+      designScaler.style.transform =
+        `scale(${scale})`;
+    }
+
+    /* =========================================================
        CONFIG
-       ====================================================== */
+       ========================================================= */
 
     const TOTAL = 6;
 
@@ -1700,9 +1689,9 @@
     const ANSWER_DURATION =
       4000;
 
-    /* ======================================================
+    /* =========================================================
        STATE
-       ====================================================== */
+       ========================================================= */
 
     let cards = [];
 
@@ -1726,18 +1715,15 @@
 
     let answerCountdownInterval = null;
 
-    /* ======================================================
+    let previewTimeout = null;
+
+    /* =========================================================
        ELEMENTS
-       ====================================================== */
+       ========================================================= */
 
     const stage =
       document.getElementById(
         "stage"
-      );
-
-    const stageWrap =
-      document.querySelector(
-        ".stage-wrap"
       );
 
     const toast =
@@ -1775,31 +1761,64 @@
         "answerCountdown"
       );
 
-    let pairText;
+    const pairText =
+      document.getElementById(
+        "pairText"
+      );
 
-    let moveText;
+    const moveText =
+      document.getElementById(
+        "moveText"
+      );
 
-    let progressFill;
+    const progressFill =
+      document.getElementById(
+        "progressFill"
+      );
 
-    let musicVol;
+    const musicVol =
+      document.getElementById(
+        "musicVol"
+      );
 
-    let musicVolValue;
+    const musicVolValue =
+      document.getElementById(
+        "musicVolValue"
+      );
 
-    let effectVol;
+    const effectVol =
+      document.getElementById(
+        "effectVol"
+      );
 
-    let effectVolValue;
+    const effectVolValue =
+      document.getElementById(
+        "effectVolValue"
+      );
 
-    let previewBtn;
+    const previewBtn =
+      document.getElementById(
+        "previewBtn"
+      );
 
-    let answerBtn;
+    const answerBtn =
+      document.getElementById(
+        "answerBtn"
+      );
 
-    let restartBtn;
+    const restartBtn =
+      document.getElementById(
+        "restartBtn"
+      );
 
-    let timerText;
+    const timerText =
+      document.getElementById(
+        "timerText"
+      );
 
-    /* ======================================================
+    /* =========================================================
        CARD DATA
-       ====================================================== */
+       ========================================================= */
 
     const data = [];
 
@@ -1821,12 +1840,11 @@
           src: `./${i}DESC.png`
         }
       );
-
     }
 
-    /* ======================================================
-       UTILITIES
-       ====================================================== */
+    /* =========================================================
+       SHUFFLE
+       ========================================================= */
 
     function shuffle(arr) {
 
@@ -1834,7 +1852,8 @@
         [...arr];
 
       for (
-        let i = cloned.length - 1;
+        let i =
+          cloned.length - 1;
         i > 0;
         i--
       ) {
@@ -1853,12 +1872,14 @@
           cloned[j],
           cloned[i]
         ];
-
       }
 
       return cloned;
-
     }
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
 
     function showToast(message) {
 
@@ -1884,8 +1905,11 @@
           },
           1400
         );
-
     }
+
+    /* =========================================================
+       TIME FORMAT
+       ========================================================= */
 
     function formatTime(seconds) {
 
@@ -1910,24 +1934,18 @@
           "0"
         )
       );
-
     }
 
-    /* ======================================================
+    /* =========================================================
        TIMER
-       ====================================================== */
+       ========================================================= */
 
     function updateTimer() {
-
-      if (!timerText) {
-        return;
-      }
 
       timerText.textContent =
         formatTime(
           timerSeconds
         );
-
     }
 
     function startTimer() {
@@ -1949,7 +1967,6 @@
           },
           1000
         );
-
     }
 
     function stopTimer() {
@@ -1961,7 +1978,6 @@
       timerInterval = null;
 
       timerStarted = false;
-
     }
 
     function resetTimer() {
@@ -1971,18 +1987,13 @@
       timerSeconds = 0;
 
       updateTimer();
-
     }
 
-    /* ======================================================
+    /* =========================================================
        PROGRESS
-       ====================================================== */
+       ========================================================= */
 
     function updateProgress() {
-
-      if (!pairText) {
-        return;
-      }
 
       pairText.textContent =
         `Pairs: ${matches} / ${TOTAL}`;
@@ -1995,14 +2006,17 @@
           (matches / TOTAL) *
           100
         }%`;
-
     }
 
-    /* ======================================================
+    /* =========================================================
        ANSWER POPUP
-       ====================================================== */
+       ========================================================= */
 
     function showAnswer() {
+
+      if (lock) {
+        return;
+      }
 
       startAudio();
       startTimer();
@@ -2030,11 +2044,14 @@
 
             secondsLeft -= 1;
 
-            if (secondsLeft > 0) {
+            if (
+              secondsLeft > 0
+            ) {
 
               answerCountdown.textContent =
-                String(secondsLeft);
-
+                String(
+                  secondsLeft
+                );
             }
 
           },
@@ -2046,7 +2063,6 @@
           closeAnswer,
           ANSWER_DURATION
         );
-
     }
 
     function closeAnswer() {
@@ -2066,120 +2082,41 @@
       answerTimeout = null;
 
       answerCountdownInterval = null;
-
     }
 
-    /* ======================================================
-       GRID
-       ====================================================== */
-
-    function getGridDimensions() {
-
-      const cardCount =
-        TOTAL * 2;
-
-      let columns;
-
-      if (cardCount <= 4) {
-
-        columns = 2;
-
-      }
-
-      else if (cardCount <= 6) {
-
-        columns = 3;
-
-      }
-
-      else if (cardCount <= 8) {
-
-        columns = 4;
-
-      }
-
-      else if (cardCount <= 10) {
-
-        columns = 5;
-
-      }
-
-      else {
-
-        columns = 6;
-
-      }
-
-      if (
-        window.innerWidth <=
-        430
-      ) {
-
-        columns =
-          Math.min(
-            columns,
-            2
-          );
-
-      }
-
-      else if (
-        window.innerWidth <=
-        700
-      ) {
-
-        columns =
-          Math.min(
-            columns,
-            3
-          );
-
-      }
-
-      else if (
-        window.innerWidth <=
-        1100
-      ) {
-
-        columns =
-          Math.min(
-            columns,
-            4
-          );
-
-      }
-
-      const rows =
-        Math.ceil(
-          cardCount /
-          columns
-        );
-
-      return {
-        columns,
-        rows
-      };
-
-    }
+    /* =========================================================
+       FIXED 6 x 2 GRID
+       ========================================================= */
 
     function updateGridLayout() {
 
-      const {
-        columns,
-        rows
-      } =
-        getGridDimensions();
+      /*
+        Layout does NOT depend on the actual device width.
+
+        It always calculates cards inside the
+        fixed 1600 x 900 design.
+      */
+
+      const columns = 6;
+      const rows = 2;
 
       const gap = 14;
 
       const rect =
         stage.getBoundingClientRect();
 
+      /*
+        getBoundingClientRect is affected by transform scale.
+
+        Instead use clientWidth/clientHeight, because they
+        represent the original fixed design dimensions.
+      */
+
       const availableWidth =
-        rect.width;
+        stage.clientWidth;
 
       const availableHeight =
-        rect.height;
+        stage.clientHeight;
 
       const widthSize =
         (
@@ -2205,15 +2142,15 @@
           heightSize
         );
 
-      cardSize =
-        Math.min(
-          cardSize,
-          440
-        );
+      /*
+        Slight breathing space.
+      */
+
+      cardSize -= 4;
 
       cardSize =
         Math.max(
-          100,
+          80,
           cardSize
         );
 
@@ -2221,18 +2158,11 @@
         "--card-size",
         `${cardSize}px`
       );
-
-      stage.style.gridTemplateColumns =
-        `repeat(${columns}, ${cardSize}px)`;
-
-      stage.style.gridTemplateRows =
-        `repeat(${rows}, ${cardSize}px)`;
-
     }
 
-    /* ======================================================
+    /* =========================================================
        CREATE CARD
-       ====================================================== */
+       ========================================================= */
 
     function createCard(d) {
 
@@ -2294,167 +2224,11 @@
       );
 
       return el;
-
     }
 
-    /* ======================================================
-       CREATE CONTROL DOCK
-       ====================================================== */
-
-    function createDock() {
-
-      const template =
-        document.getElementById(
-          "dockTemplate"
-        );
-
-      const fragment =
-        template.content.cloneNode(
-          true
-        );
-
-      const wrapper =
-        document.createElement(
-          "div"
-        );
-
-      wrapper.appendChild(
-        fragment
-      );
-
-      pairText =
-        wrapper.querySelector(
-          "#pairText"
-        );
-
-      moveText =
-        wrapper.querySelector(
-          "#moveText"
-        );
-
-      progressFill =
-        wrapper.querySelector(
-          "#progressFill"
-        );
-
-      musicVol =
-        wrapper.querySelector(
-          "#musicVol"
-        );
-
-      musicVolValue =
-        wrapper.querySelector(
-          "#musicVolValue"
-        );
-
-      effectVol =
-        wrapper.querySelector(
-          "#effectVol"
-        );
-
-      effectVolValue =
-        wrapper.querySelector(
-          "#effectVolValue"
-        );
-
-      previewBtn =
-        wrapper.querySelector(
-          "#previewBtn"
-        );
-
-      answerBtn =
-        wrapper.querySelector(
-          "#answerBtn"
-        );
-
-      restartBtn =
-        wrapper.querySelector(
-          "#restartBtn"
-        );
-
-      timerText =
-        wrapper.querySelector(
-          "#timerText"
-        );
-
-      previewBtn.addEventListener(
-        "click",
-        preview
-      );
-
-      answerBtn.addEventListener(
-        "click",
-        showAnswer
-      );
-
-      restartBtn.addEventListener(
-        "click",
-        restart
-      );
-
-      musicVol.value =
-        Math.round(
-          music.volume *
-          100
-        );
-
-      musicVolValue.textContent =
-        `${musicVol.value}%`;
-
-      musicVol.addEventListener(
-        "input",
-        e => {
-
-          music.volume =
-            Number(
-              e.target.value
-            )
-            /
-            100;
-
-          musicVolValue.textContent =
-            `${e.target.value}%`;
-
-        }
-      );
-
-      effectVol.value =
-        Math.round(
-          effectVolume *
-          100
-        );
-
-      effectVolValue.textContent =
-        `${effectVol.value}%`;
-
-      effectVol.addEventListener(
-        "input",
-        e => {
-
-          effectVolume =
-            Number(
-              e.target.value
-            )
-            /
-            100;
-
-          effectVolValue.textContent =
-            `${e.target.value}%`;
-
-        }
-      );
-
-      updateProgress();
-
-      updateTimer();
-
-      return wrapper.firstElementChild;
-
-    }
-
-    /* ======================================================
+    /* =========================================================
        GAME LOGIC
-       ====================================================== */
+       ========================================================= */
 
     function clickCard(
       el,
@@ -2468,6 +2242,10 @@
           "show"
         )
         ||
+        winModal.classList.contains(
+          "show"
+        )
+        ||
         el.classList.contains(
           "is-flipped"
         )
@@ -2476,9 +2254,7 @@
           "is-matched"
         )
       ) {
-
         return;
-
       }
 
       startAudio();
@@ -2499,7 +2275,6 @@
         };
 
         return;
-
       }
 
       moves += 1;
@@ -2556,12 +2331,9 @@
             },
             350
           );
-
         }
 
-      }
-
-      else {
+      } else {
 
         playWrong();
 
@@ -2588,14 +2360,12 @@
           },
           700
         );
-
       }
-
     }
 
-    /* ======================================================
+    /* =========================================================
        PREVIEW
-       ====================================================== */
+       ========================================================= */
 
     function preview() {
 
@@ -2603,6 +2373,10 @@
         lock
         ||
         answerModal.classList.contains(
+          "show"
+        )
+        ||
+        winModal.classList.contains(
           "show"
         )
       ) {
@@ -2615,7 +2389,12 @@
 
       lock = true;
 
-      previewBtn.disabled = true;
+      previewBtn.disabled =
+        true;
+
+      clearTimeout(
+        previewTimeout
+      );
 
       cards.forEach(
         card => {
@@ -2629,7 +2408,6 @@
             card.classList.add(
               "is-flipped"
             );
-
           }
 
         }
@@ -2639,42 +2417,42 @@
         "Memorize the cards!"
       );
 
-      setTimeout(
-        () => {
+      previewTimeout =
+        setTimeout(
+          () => {
 
-          cards.forEach(
-            card => {
+            cards.forEach(
+              card => {
 
-              if (
-                !card.classList.contains(
-                  "is-matched"
-                )
-              ) {
+                if (
+                  !card.classList.contains(
+                    "is-matched"
+                  )
+                ) {
 
-                card.classList.remove(
-                  "is-flipped"
-                );
+                  card.classList.remove(
+                    "is-flipped"
+                  );
+                }
 
               }
+            );
 
-            }
-          );
+            first = null;
 
-          lock = false;
+            lock = false;
 
-          if (previewBtn) {
-            previewBtn.disabled = false;
-          }
+            previewBtn.disabled =
+              false;
 
-        },
-        5000
-      );
-
+          },
+          5000
+        );
     }
 
-    /* ======================================================
+    /* =========================================================
        RENDER
-       ====================================================== */
+       ========================================================= */
 
     function render() {
 
@@ -2707,25 +2485,6 @@
         }
       );
 
-      const oldDock =
-        document.querySelector(
-          ".control-dock"
-        );
-
-      if (oldDock) {
-
-        oldDock.remove();
-
-      }
-
-      const dock =
-        createDock();
-
-      stageWrap.insertAdjacentElement(
-        "afterend",
-        dock
-      );
-
       updateProgress();
 
       updateTimer();
@@ -2739,14 +2498,19 @@
 
         }
       );
-
     }
 
-    /* ======================================================
+    /* =========================================================
        RESTART
-       ====================================================== */
+       ========================================================= */
 
     function restart() {
+
+      clearTimeout(
+        previewTimeout
+      );
+
+      previewTimeout = null;
 
       first = null;
 
@@ -2755,6 +2519,9 @@
       matches = 0;
 
       moves = 0;
+
+      previewBtn.disabled =
+        false;
 
       closeAnswer();
 
@@ -2765,12 +2532,11 @@
       resetTimer();
 
       render();
-
     }
 
-    /* ======================================================
+    /* =========================================================
        AUDIO
-       ====================================================== */
+       ========================================================= */
 
     music.volume = 0.5;
 
@@ -2785,7 +2551,6 @@
 
       ctx =
         new AudioContextClass();
-
     }
 
     function startAudio() {
@@ -2801,22 +2566,16 @@
             .catch(
               () => {}
             );
-
         }
-
       }
 
-      if (
-        music.paused
-      ) {
+      if (music.paused) {
 
         music.play()
           .catch(
             () => {}
           );
-
       }
-
     }
 
     document.body.addEventListener(
@@ -2847,7 +2606,6 @@
           .catch(
             () => {}
           );
-
       }
 
       const oscillator =
@@ -2880,7 +2638,6 @@
         ctx.currentTime +
         dur
       );
-
     }
 
     function playClick() {
@@ -2891,7 +2648,6 @@
         "square",
         0.25
       );
-
     }
 
     function playMatch() {
@@ -2916,7 +2672,6 @@
         },
         80
       );
-
     }
 
     function playWrong() {
@@ -2927,17 +2682,89 @@
         "sawtooth",
         0.25
       );
-
     }
 
-    /* ======================================================
-       EVENTS
-       ====================================================== */
+    /* =========================================================
+       VOLUME EVENTS
+       ========================================================= */
+
+    musicVol.value =
+      Math.round(
+        music.volume *
+        100
+      );
+
+    musicVolValue.textContent =
+      `${musicVol.value}%`;
+
+    musicVol.addEventListener(
+      "input",
+      e => {
+
+        music.volume =
+          Number(
+            e.target.value
+          )
+          /
+          100;
+
+        musicVolValue.textContent =
+          `${e.target.value}%`;
+      }
+    );
+
+    effectVol.value =
+      Math.round(
+        effectVolume *
+        100
+      );
+
+    effectVolValue.textContent =
+      `${effectVol.value}%`;
+
+    effectVol.addEventListener(
+      "input",
+      e => {
+
+        effectVolume =
+          Number(
+            e.target.value
+          )
+          /
+          100;
+
+        effectVolValue.textContent =
+          `${e.target.value}%`;
+      }
+    );
+
+    /* =========================================================
+       BUTTON EVENTS
+       ========================================================= */
+
+    previewBtn.addEventListener(
+      "click",
+      preview
+    );
+
+    answerBtn.addEventListener(
+      "click",
+      showAnswer
+    );
+
+    restartBtn.addEventListener(
+      "click",
+      restart
+    );
 
     playAgainBtn.addEventListener(
       "click",
       restart
     );
+
+    /* =========================================================
+       ANSWER MODAL EVENT
+       ========================================================= */
 
     answerModal.addEventListener(
       "click",
@@ -2949,11 +2776,14 @@
         ) {
 
           closeAnswer();
-
         }
 
       }
     );
+
+    /* =========================================================
+       WIN MODAL EVENT
+       ========================================================= */
 
     winModal.addEventListener(
       "click",
@@ -2965,18 +2795,22 @@
         ) {
 
           restart();
-
         }
 
       }
     );
+
+    /* =========================================================
+       KEYBOARD
+       ========================================================= */
 
     document.addEventListener(
       "keydown",
       e => {
 
         if (
-          e.key === "Escape"
+          e.key ===
+          "Escape"
           &&
           answerModal.classList.contains(
             "show"
@@ -2986,11 +2820,11 @@
           closeAnswer();
 
           return;
-
         }
 
         if (
-          e.key === "Escape"
+          e.key ===
+          "Escape"
           &&
           winModal.classList.contains(
             "show"
@@ -2998,38 +2832,123 @@
         ) {
 
           restart();
-
         }
 
       }
     );
 
+    /* =========================================================
+       RESIZE / ORIENTATION
+       ========================================================= */
+
     let resizeTimer;
+
+    function handleResize() {
+
+      clearTimeout(
+        resizeTimer
+      );
+
+      resizeTimer =
+        setTimeout(
+          () => {
+
+            /*
+              Only scale the whole application.
+
+              We do NOT change columns, rows,
+              controls, or layout.
+            */
+
+            scaleGameToScreen();
+
+          },
+          50
+        );
+    }
 
     window.addEventListener(
       "resize",
+      handleResize
+    );
+
+    window.addEventListener(
+      "orientationchange",
       () => {
 
-        clearTimeout(
-          resizeTimer
+        setTimeout(
+          scaleGameToScreen,
+          100
         );
-
-        resizeTimer =
-          setTimeout(
-            updateGridLayout,
-            80
-          );
 
       }
     );
 
-    /* ======================================================
+    /*
+      Helps mobile browsers when the browser
+      address/navigation bars change viewport size.
+    */
+
+    if (window.visualViewport) {
+
+      window.visualViewport.addEventListener(
+        "resize",
+        scaleGameToScreen
+      );
+    }
+
+    /* =========================================================
+       IMAGE ERROR FALLBACK
+       ========================================================= */
+
+    document.addEventListener(
+      "error",
+      event => {
+
+        const target =
+          event.target;
+
+        if (
+          target &&
+          target.tagName ===
+          "IMG"
+        ) {
+
+          console.warn(
+            "Image could not be loaded:",
+            target.src
+          );
+        }
+
+      },
+      true
+    );
+
+    /* =========================================================
        START
-       ====================================================== */
+       ========================================================= */
+
+    scaleGameToScreen();
 
     resetTimer();
 
     render();
+
+    /*
+      Run scaling one more time after page resources
+      have finished loading.
+    */
+
+    window.addEventListener(
+      "load",
+      () => {
+
+        scaleGameToScreen();
+
+        updateGridLayout();
+
+      }
+    );
   </script>
 
 </body>
