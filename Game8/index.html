@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#9ce000">
+  <title>Match Mania | Exact 859x860 PNG Cards</title>
+  <style>
+    /* Change these colours to restyle the entire game. */
+    :root {
+      --lime: #9ce000;
+      --lime-dark: #80bc00;
+      --forest: #16490e;
+      --forest-dark: #0d3510;
+      --paper: #f4f6ee;
+      --white: #ffffff;
+      --line: #d7e0d0;
+      --muted: #62715d;
+      --ink: #1b331b;
+      /* Each card artwork is exactly 859 pixels wide by 860 high. */
+      --art-ratio: 859 / 860;
+      --card-width: 120px;
+      --card-height: 120.1397px;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible {
+      outline: 3px solid #ec8c22;
+      outline-offset: 3px;
+    }
+
+    .game-shell {
+      width: min(100%, 1600px);
+      height: 100dvh;
+      min-height: 0;
+      margin: 0 auto;
+      padding: clamp(10px, 1.8vw, 20px);
+      padding-top: max(10px, env(safe-area-inset-top));
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: clamp(8px, 1.1vh, 13px);
+    }
+
+    /* A flat colour header, like the original campaign artwork. */
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--lime);
+      border-radius: 10px;
+      padding: 15px 21px 14px;
+      border-bottom: 4px solid var(--forest);
+    }
+    .kicker {
+      display: block;
+      color: var(--forest);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.35px;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 4px 0 0;
+      color: var(--forest-dark);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(34px, 4.8vw, 52px);
+      line-height: .98;
+      letter-spacing: -1.8px;
+    }
+    .masthead-note {
+      margin: 6px 0 0;
+      color: #346119;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .brand-mark {
+      flex: 0 0 auto;
+      width: 65px;
+      height: 65px;
+      display: block;
+    }
+
+    /* Small, unboxed score display. */
+    .score-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+    .score {
+      min-width: 0;
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 11px;
+      padding: 10px 8px;
+    }
+    .score + .score { border-left: 1px solid var(--line); }
+    .score-label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+    }
+    .score-value {
+      color: var(--forest);
+      font-size: clamp(22px, 3vw, 30px);
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .playfield {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 13px 16px 11px;
+    }
+    .board-heading,
+    .board-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .board-heading { flex: 0 0 auto; padding: 0 2px 10px; }
+    .board-heading h2 {
+      margin: 0;
+      color: var(--forest-dark);
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .board-heading .level {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .board-area {
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    /* Cards fit their PNGs exactly: the largest 859:860 grid that fits
+       inside the board area. Portrait 4 x 3, landscape 6 x 2. */
+    .board {
+      --columns: 6;
+      --rows: 2;
+      --gap: clamp(7px, .85vw, 15px);
+      display: grid;
+      flex: 0 0 auto;
+      width: max-content;
+      height: max-content;
+      grid-template-columns: repeat(var(--columns), var(--card-width));
+      grid-template-rows: repeat(var(--rows), var(--card-height));
+      gap: var(--gap);
+      justify-content: center;
+      align-content: center;
+      margin: 0 auto;
+    }
+
+    .card {
+      position: relative;
+      display: block;
+      width: var(--card-width);
+      height: var(--card-height);
+      aspect-ratio: var(--art-ratio);
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      perspective: 850px;
+      touch-action: manipulation;
+    }
+    .card:disabled { cursor: default; }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform .35s ease;
+    }
+    .card.is-flipped .card-inner,
+    .card.is-matched .card-inner { transform: rotateY(180deg); }
+    .face {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .face-back {
+      background: var(--lime);
+      border: 0;
+    }
+    .face-back svg {
+      width: 49%;
+      height: 56%;
+      fill: none;
+      stroke: var(--forest);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: .83;
+    }
+    .face-back .back-image {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    .face-front {
+      background: transparent;
+      border: 0;
+      padding: 0;
+      transform: rotateY(180deg);
+    }
+    .face-front img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      /* PNG and frame share 859:860; no zoom, crop or extra padding. */
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+    }
+    .missing-art {
+      padding: 7px;
+      color: var(--forest);
+      text-align: center;
+      font-size: clamp(11px, 1.2vw, 18px);
+      line-height: 1.25;
+      font-weight: 700;
+    }
+    .card.is-matched .face-front {
+      background: transparent;
+      /* Outside highlight does not cover even one pixel of the artwork. */
+      filter: drop-shadow(0 0 3px var(--forest));
+    }
+    .card.is-matched::after {
+      content: '✓';
+      position: absolute;
+      z-index: 2;
+      right: -4px;
+      top: -4px;
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--forest);
+      border: 2px solid #fff;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .board-footer {
+      flex: 0 0 auto;
+      border-top: 1px solid #e8eee3;
+      padding: 10px 2px 0;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .progress-dots { display: flex; align-items: center; gap: 5px; }
+    .progress-dot {
+      display: block;
+      width: 16px;
+      height: 7px;
+      border-radius: 2px;
+      background: #e1e9d9;
+    }
+    .progress-dot.active { background: var(--forest); }
+
+    .control-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 15px;
+      align-items: center;
+      background: var(--white);
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+    }
+    .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .action {
+      min-height: 43px;
+      border-radius: 6px;
+      border: 1px solid var(--forest);
+      background: var(--forest);
+      color: var(--white);
+      font-weight: 800;
+      font-size: 12px;
+      line-height: 1.1;
+      padding: 9px 10px;
+      white-space: nowrap;
+    }
+    .action.secondary { background: var(--white); color: var(--forest); }
+    .action.lime { background: var(--lime); color: var(--forest); border-color: var(--lime-dark); }
+    .action:active { transform: translateY(1px); }
+    .action:disabled { opacity: .5; cursor: not-allowed; }
+    .sound-controls { display: flex; align-items: center; gap: 15px; }
+    .sound-controls label { display: flex; align-items: center; gap: 7px; color: var(--forest); font-size: 11px; font-weight: 700; }
+    .sound-controls input { width: 75px; accent-color: var(--forest); cursor: pointer; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(9, 35, 9, .72);
+      padding: 16px;
+    }
+    .dialog {
+      width: min(520px, 100%);
+      max-height: 88dvh;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 10px;
+      border-top: 6px solid var(--lime);
+      padding: 18px;
+    }
+    .dialog-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .dialog-header h2 {
+      margin: 0;
+      color: var(--forest);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 28px;
+    }
+    .close-button { border: 0; background: #edf3e8; border-radius: 5px; color: var(--forest); font-size: 21px; width: 32px; height: 32px; }
+    .dialog p { margin: 10px 0 13px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .answer-content { min-height: 0; overflow: auto; }
+    .answer-content > img { width: 100%; max-height: 60dvh; object-fit: contain; display: block; }
+    .answer-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .answer-pair { border: 1px solid var(--line); padding: 6px; }
+    .answer-pair strong { display: block; margin-bottom: 4px; color: var(--forest); font-size: 11px; }
+    .answer-images { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .answer-images img { width: 100%; aspect-ratio: 1; object-fit: contain; }
+    .answer-fallback { font-size: 10px; text-align: center; color: var(--muted); }
+    .dialog .action { min-width: 150px; align-self: flex-start; }
+    .win-number { color: var(--forest); font-size: 20px; font-weight: 800; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      z-index: 30;
+      transform: translateX(-50%);
+      padding: 11px 17px;
+      background: var(--forest-dark);
+      color: white;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Portrait: exactly 4 cards per row, 3 rows, across the full screen width. */
+    @media (orientation: portrait) {
+      .game-shell { max-width: 100%; padding: clamp(8px, 1.2vw, 18px); gap: clamp(7px, .8vh, 13px); }
+      .masthead { padding: 11px 14px 10px; }
+      .masthead-note { font-size: 11px; }
+      .brand-mark { width: 48px; height: 48px; }
+      h1 { font-size: clamp(30px, 7.7vw, 47px); }
+      .score { gap: 5px; padding: 9px 5px; }
+      .score-label { font-size: 9px; letter-spacing: .3px; }
+      .score-value { font-size: clamp(18px, 5.1vw, 25px); }
+      .playfield { padding: 9px 10px 7px; }
+      .board-heading { padding-bottom: 7px; }
+      .board-heading h2 { font-size: 13px; }
+      .board-heading .level { font-size: 10px; }
+      .board { --columns: 4; --rows: 3; --gap: clamp(6px, .85vw, 15px); }
+      .board-footer { padding-top: 7px; margin-top: 6px; font-size: 10px; }
+      .progress-dot { width: 13px; height: 6px; }
+      .control-panel { grid-template-columns: 1fr; gap: 9px; padding: 9px 10px; }
+      .action { min-height: 42px; padding: 9px 6px; font-size: 12px; }
+      .sound-controls { justify-content: center; gap: 20px; }
+      .sound-controls input { width: clamp(50px, 16vw, 90px); }
+    }
+    /* Larger portrait screens should not render as a narrow phone-sized column. */
+    @media (orientation: portrait) and (min-width: 650px) {
+      .masthead { padding: clamp(14px, 1.6vw, 28px); }
+      h1 { font-size: clamp(46px, 4.8vw, 70px); }
+      .kicker { font-size: clamp(11px, 1vw, 16px); }
+      .masthead-note { font-size: clamp(12px, 1vw, 17px); }
+      .brand-mark { width: clamp(54px, 5vw, 78px); height: clamp(54px, 5vw, 78px); }
+      .score { padding: clamp(10px, 1.1vw, 17px) 8px; }
+      .score-label { font-size: clamp(11px, .92vw, 15px); }
+      .score-value { font-size: clamp(24px, 2.2vw, 35px); }
+      .playfield { padding: clamp(12px, 1.2vw, 20px); }
+      .board-heading h2 { font-size: clamp(17px, 1.35vw, 23px); }
+      .board-heading .level { font-size: clamp(11px, .95vw, 15px); }
+      .board-footer { font-size: clamp(12px, .9vw, 16px); }
+      .control-panel { padding: clamp(12px, 1.2vw, 20px); }
+      .action { font-size: clamp(13px, 1.05vw, 17px); min-height: 48px; }
+      .sound-controls label { font-size: clamp(12px, .95vw, 16px); }
+      .sound-controls input { width: clamp(90px, 12vw, 160px); }
+    }
+    @media (orientation: portrait) and (max-width: 355px) {
+      .kicker { font-size: 8px; letter-spacing: .8px; }
+      .masthead-note { display: none; }
+      .brand-mark { width: 41px; height: 41px; }
+      .score { flex-direction: column; align-items: center; gap: 2px; }
+      .score-label { font-size: 9px; }
+      .control-panel { gap: 6px; padding: 7px; }
+      .board { --gap: 6px; }
+    }
+    @media (max-height: 620px) {
+      .masthead { padding-top: 7px; padding-bottom: 6px; }
+      .masthead-note { display: none; }
+      .score { padding-top: 6px; padding-bottom: 6px; }
+      .board-heading { padding-bottom: 5px; }
+      .board-footer { padding-top: 5px; margin-top: 4px; }
+      .control-panel { padding-top: 6px; padding-bottom: 6px; gap: 6px; }
+      .action { min-height: 36px; padding-top: 5px; padding-bottom: 5px; }
+    }
+    /* A phone turned sideways uses a compact side panel, not a tiny scaled canvas. */
+    @media (orientation: landscape) and (max-height: 540px) {
+      .game-shell {
+        min-height: 0;
+        grid-template-columns: minmax(152px, 220px) minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        gap: 7px;
+        padding: 7px;
+      }
+      .masthead { grid-column: 1; grid-row: 1; padding: 8px 11px 7px; }
+      .masthead .brand-mark, .masthead-note { display: none; }
+      .masthead h1 { font-size: 27px; }
+      .masthead .kicker { font-size: 8px; letter-spacing: .7px; }
+      .score-strip { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; }
+      .score { flex: 1; justify-content: space-between; align-items: center; padding: 4px 11px; }
+      .score + .score { border-left: 0; border-top: 1px solid var(--line); }
+      .score-value { font-size: 19px; }
+      .playfield { grid-column: 2; grid-row: 1 / span 2; padding: 7px; }
+      .board-heading { padding-bottom: 4px; }
+      .board-footer { padding-top: 4px; margin-top: 4px; }
+      .board { --gap: 6px; }
+      .control-panel { grid-column: 1 / -1; grid-row: 3; padding: 5px 8px; }
+      .action { min-height: 34px; padding: 6px; }
+      .sound-controls { gap: 10px; }
+      .sound-controls input { width: 52px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="game-shell">
+    <header class="masthead">
+      <div>
+        <span class="kicker">Australian Avocados / Memory Game</span>
+        <h1>Match Mania</h1>
+        <p class="masthead-note">เกมจับคู่ มหาสนุก</p>
+      </div>
+      <!-- Simple avocado stamp; no external icon or font required. -->
+      <svg class="brand-mark" viewBox="0 0 72 72" aria-hidden="true">
+        <path d="M37 5C21 5 13 21 9 37 3 57 13 69 35 69s36-12 30-32C60 19 52 5 37 5Z" fill="#16490e" />
+        <path d="M42 7C28 7 21 23 16 38 10 55 20 64 36 64s28-10 23-26C55 23 51 7 42 7Z" fill="#f5ffe2" />
+        <path d="M45 8C33 8 26 24 22 40c-4 14 4 22 16 22s22-8 19-22C53 24 50 8 45 8Z" fill="#9ce000" />
+        <ellipse cx="42" cy="44" rx="13" ry="15" fill="#16490e" />
+        <path d="M48 43c0 5-2 8-5 10" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" />
+      </svg>
+    </header>
+
+    <section class="score-strip" aria-label="Game statistics">
+      <div class="score"><span class="score-label">Pairs</span><strong class="score-value" id="pairCount">0/6</strong></div>
+      <div class="score"><span class="score-label">Moves</span><strong class="score-value" id="moveCount">0</strong></div>
+      <div class="score"><span class="score-label">Time</span><strong class="score-value" id="timer">00:00</strong></div>
+    </section>
+
+    <section class="playfield" aria-label="Memory game board">
+      <div class="board-heading">
+        <h2>Find the matching pairs</h2>
+        <span class="level" id="levelText">ROUND 01 · 6 PAIRS</span>
+      </div>
+      <div class="board-area" id="boardArea">
+        <div class="board" id="board" aria-label="12 face-down cards"></div>
+      </div>
+      <div class="board-footer">
+        <span id="hint">Tap any two cards to start.</span>
+        <div class="progress-dots" id="progress" aria-label="0 of 6 pairs matched"></div>
+      </div>
+    </section>
+
+    <section class="control-panel" aria-label="Game controls">
+      <div class="actions">
+        <button type="button" class="action secondary" id="previewBtn">Preview 5s</button>
+        <button type="button" class="action lime" id="answerBtn">Show answer</button>
+        <button type="button" class="action" id="restartBtn">New game</button>
+      </div>
+      <div class="sound-controls">
+        <label for="musicVolume">Music <input type="range" id="musicVolume" min="0" max="100" value="40" aria-label="Music volume"></label>
+        <label for="effectsVolume">Effects <input type="range" id="effectsVolume" min="0" max="100" value="50" aria-label="Effects volume"></label>
+      </div>
+    </section>
+  </main>
+
+  <div class="overlay" id="answerOverlay" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="answerTitle">
+      <div class="dialog-header">
+        <h2 id="answerTitle">Answer key</h2>
+        <button class="close-button" id="closeAnswerBtn" type="button" aria-label="Close answer">×</button>
+      </div>
+      <p>Look carefully. This view closes in <strong id="answerCountdown">4</strong> seconds.</p>
+      <div class="answer-content">
+        <img id="answerImage" src="./Key.png" alt="The six correct matching pairs">
+        <div id="answerFallback" class="answer-grid" hidden></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="overlay" id="winOverlay" hidden>
+    <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+      <div class="dialog-header"><h2 id="winTitle">All matched.</h2></div>
+      <p id="winMessage">You found all six pairs.</p>
+      <button type="button" class="action" id="playAgainBtn">Play again</button>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <audio id="music" src="./Song.mp3" loop preload="none"></audio>
+
+  <script>
+    'use strict';
+
+    // These image files should be 859 x 860 pixels for exact edge-to-edge fit.
+    // Keep the original six picture/description pairs.
+    // 1IMG.png matches 1DESC.png, ..., 6IMG.png matches 6DESC.png.
+    const PAIRS = 6;
+    const BACK_IMAGE = './BacksideCover.png';
+    const deck = Array.from({ length: PAIRS }, (_, index) => index + 1)
+      .flatMap(id => [
+        { id, type: 'IMG', src: `./${id}IMG.png` },
+        { id, type: 'DESC', src: `./${id}DESC.png` }
+      ]);
+
+    const $ = id => document.getElementById(id);
+    const board = $('board');
+    const music = $('music');
+    music.volume = 0.4;
+
+    let cards = [];
+    let firstCard = null;
+    let locked = false;
+    let matches = 0;
+    let moves = 0;
+    let seconds = 0;
+    let running = false;
+    let timerId = null;
+    let previewId = null;
+    let answerId = null;
+    let countdownId = null;
+    let toastId = null;
+    let roundId = 0;
+    let effectsVolume = 0.5;
+    let audioContext;
+
+    function shuffled(items) {
+      const out = [...items];
+      for (let i = out.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [out[i], out[j]] = [out[j], out[i]];
+      }
+      return out;
+    }
+
+    function timeText(value) {
+      return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+    }
+
+    function updateScores() {
+      $('pairCount').textContent = `${matches}/${PAIRS}`;
+      $('moveCount').textContent = String(moves);
+      $('timer').textContent = timeText(seconds);
+      $('progress').setAttribute('aria-label', `${matches} of ${PAIRS} pairs matched`);
+      for (const dot of $('progress').children) {
+        dot.classList.toggle('active', Number(dot.dataset.index) < matches);
+      }
+    }
+
+    function say(message, duration = 1300) {
+      const toast = $('toast');
+      toast.textContent = message;
+      toast.hidden = false;
+      clearTimeout(toastId);
+      toastId = setTimeout(() => { toast.hidden = true; }, duration);
+    }
+
+    function startGame() {
+      if (!running) {
+        running = true;
+        timerId = setInterval(() => { seconds += 1; updateScores(); }, 1000);
+      }
+      if (music.volume > 0 && music.paused) music.play().catch(() => {});
+    }
+
+    function sound(frequency, duration = .08) {
+      if (effectsVolume <= 0) return;
+      const AudioContextType = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextType) return;
+      try {
+        audioContext ||= new AudioContextType();
+        if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency;
+        const now = audioContext.currentTime;
+        gain.gain.setValueAtTime(Math.max(.001, effectsVolume * .12), now);
+        gain.gain.exponentialRampToValueAtTime(.001, now + duration);
+        oscillator.connect(gain).connect(audioContext.destination);
+        oscillator.start(now);
+        oscillator.stop(now + duration);
+      } catch (error) { /* Audio is optional. */ }
+    }
+
+    // Use a clear label if the original PNGs are not in the HTML folder yet.
+    function makeImage(src, fallbackText, className = '') {
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.draggable = false;
+      if (className) img.className = className;
+      img.addEventListener('error', () => {
+        const fallback = document.createElement('span');
+        fallback.className = 'missing-art';
+        fallback.textContent = fallbackText;
+        img.replaceWith(fallback);
+      }, { once: true });
+      return img;
+    }
+
+    function createCard(item, index) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'card';
+      button.setAttribute('aria-label', `Hidden card ${index + 1}`);
+
+      const inner = document.createElement('div');
+      inner.className = 'card-inner';
+      const back = document.createElement('div');
+      back.className = 'face face-back';
+      back.innerHTML = '<svg viewBox="0 0 60 72" aria-hidden="true"><path d="M31 5C17 5 12 22 8 39S14 66 30 66s27-10 22-27S45 5 31 5Z"/><ellipse cx="31" cy="43" rx="11" ry="14"/></svg>';
+      const backImg = document.createElement('img');
+      backImg.src = BACK_IMAGE;
+      backImg.alt = '';
+      backImg.draggable = false;
+      backImg.className = 'back-image';
+      backImg.addEventListener('error', () => backImg.remove(), { once: true });
+      back.append(backImg);
+
+      const front = document.createElement('div');
+      front.className = 'face face-front';
+      front.append(makeImage(item.src, `${item.type === 'IMG' ? 'Image' : 'Description'} ${item.id}`));
+      inner.append(back, front);
+      button.append(inner);
+      button.addEventListener('click', () => flipCard(button, item));
+      return button;
+    }
+
+    function flipCard(button, item) {
+      if (locked || !($('answerOverlay').hidden && $('winOverlay').hidden) ||
+          button.classList.contains('is-flipped') || button.classList.contains('is-matched')) return;
+
+      startGame();
+      sound(500, .05);
+      button.classList.add('is-flipped');
+      button.setAttribute('aria-label', `Revealed ${item.type === 'IMG' ? 'picture' : 'description'} card ${item.id}`);
+      if (!firstCard) {
+        firstCard = { button, item };
+        $('hint').textContent = 'Choose its matching card.';
+        return;
+      }
+
+      moves += 1;
+      const previous = firstCard;
+      firstCard = null;
+      const correct = previous.item.id === item.id && previous.item.type !== item.type;
+      updateScores();
+
+      if (correct) {
+        previous.button.classList.add('is-matched');
+        button.classList.add('is-matched');
+        previous.button.disabled = true;
+        button.disabled = true;
+        matches += 1;
+        sound(820, .16);
+        updateScores();
+        $('hint').textContent = matches === PAIRS ? 'All six pairs found.' : 'Good match. Keep going.';
+        if (matches === PAIRS) {
+          locked = true;
+          clearInterval(timerId);
+          running = false;
+          const thisRound = roundId;
+          setTimeout(() => {
+            if (thisRound !== roundId) return;
+            $('winMessage').textContent = `You matched all ${PAIRS} pairs in ${moves} moves and ${timeText(seconds)}.`;
+            $('winOverlay').hidden = false;
+            $('playAgainBtn').focus();
+          }, 450);
+        }
+      } else {
+        locked = true;
+        sound(240, .12);
+        $('hint').textContent = 'Not a match. Try again.';
+        const thisRound = roundId;
+        setTimeout(() => {
+          if (thisRound !== roundId) return;
+          previous.button.classList.remove('is-flipped');
+          button.classList.remove('is-flipped');
+          previous.button.setAttribute('aria-label', 'Hidden card');
+          button.setAttribute('aria-label', 'Hidden card');
+          locked = false;
+          $('hint').textContent = 'Tap any two cards to continue.';
+        }, 850);
+      }
+    }
+
+    function newGame() {
+      roundId += 1; // Old timeouts cannot affect the new round.
+      clearInterval(timerId);
+      clearTimeout(previewId);
+      closeAnswers();
+      firstCard = null;
+      locked = false;
+      running = false;
+      matches = 0;
+      moves = 0;
+      seconds = 0;
+      $('previewBtn').disabled = false;
+      $('winOverlay').hidden = true;
+      $('hint').textContent = 'Tap any two cards to start.';
+      cards = shuffled(deck).map(createCard);
+      board.replaceChildren(...cards);
+      updateScores();
+      requestAnimationFrame(resizeBoard);
+    }
+
+    function previewCards() {
+      if (locked || !$('answerOverlay').hidden || !$('winOverlay').hidden) return;
+      startGame();
+      locked = true;
+      firstCard = null;
+      $('previewBtn').disabled = true;
+      $('hint').textContent = 'Memorize the cards — 5 seconds.';
+      const cardsToPreview = cards.filter(card => !card.classList.contains('is-matched'));
+      cardsToPreview.forEach(card => card.classList.add('is-flipped'));
+      const thisRound = roundId;
+      previewId = setTimeout(() => {
+        if (thisRound !== roundId) return;
+        cardsToPreview.forEach(card => card.classList.remove('is-flipped'));
+        $('previewBtn').disabled = false;
+        locked = false;
+        $('hint').textContent = 'Tap any two cards to continue.';
+      }, 5000);
+    }
+
+    function closeAnswers() {
+      clearTimeout(answerId);
+      clearInterval(countdownId);
+      $('answerOverlay').hidden = true;
+    }
+
+    function showAnswers() {
+      if (locked || !$('winOverlay').hidden) return;
+      startGame();
+      closeAnswers();
+      $('answerOverlay').hidden = false;
+      let remaining = 4;
+      $('answerCountdown').textContent = String(remaining);
+      countdownId = setInterval(() => {
+        remaining -= 1;
+        $('answerCountdown').textContent = String(Math.max(0, remaining));
+      }, 1000);
+      answerId = setTimeout(closeAnswers, 4000);
+      $('closeAnswerBtn').focus();
+    }
+
+    // If Key.png is unavailable, show the original six pairs automatically.
+    function buildAnswerFallback() {
+      const answerGrid = $('answerFallback');
+      for (let id = 1; id <= PAIRS; id++) {
+        const pair = document.createElement('div');
+        pair.className = 'answer-pair';
+        const heading = document.createElement('strong');
+        heading.textContent = `PAIR ${id}`;
+        const images = document.createElement('div');
+        images.className = 'answer-images';
+        images.append(
+          makeImage(`./${id}IMG.png`, `Image ${id}`),
+          makeImage(`./${id}DESC.png`, `Description ${id}`)
+        );
+        pair.append(heading, images);
+        answerGrid.append(pair);
+      }
+    }
+
+    // The original artwork supplied for this layout is 859 x 860 pixels.
+    // Find the largest possible 859:860 card that fits within BOTH the
+    // board's height and width; no squashing, stretching or clipping.
+    const IMAGE_WIDTH = 859;
+    const IMAGE_HEIGHT = 860;
+    const IMAGE_RATIO = IMAGE_WIDTH / IMAGE_HEIGHT;
+    function resizeBoard() {
+      const portrait = window.matchMedia('(orientation: portrait)').matches;
+      const cols = portrait ? 4 : 6;
+      const rows = portrait ? 3 : 2;
+      const area = $('boardArea');
+      const styles = getComputedStyle(board);
+      const gapX = parseFloat(styles.columnGap) || 8;
+      const gapY = parseFloat(styles.rowGap) || gapX;
+      const widthAvailable = Math.max(1, area.clientWidth - gapX * (cols - 1));
+      const heightAvailable = Math.max(1, area.clientHeight - gapY * (rows - 1));
+      const cardWidth = Math.max(1, Math.min(widthAvailable / cols, heightAvailable / rows * IMAGE_RATIO));
+      const cardHeight = cardWidth / IMAGE_RATIO;
+      board.style.setProperty('--card-width', `${cardWidth}px`);
+      board.style.setProperty('--card-height', `${cardHeight}px`);
+    }
+
+    $('previewBtn').addEventListener('click', previewCards);
+    $('answerBtn').addEventListener('click', showAnswers);
+    $('restartBtn').addEventListener('click', newGame);
+    $('playAgainBtn').addEventListener('click', newGame);
+    $('closeAnswerBtn').addEventListener('click', closeAnswers);
+    $('musicVolume').addEventListener('input', event => {
+      music.volume = Number(event.target.value) / 100;
+      if (music.volume === 0) music.pause();
+      else if (running && music.paused) music.play().catch(() => {});
+    });
+    $('effectsVolume').addEventListener('input', event => {
+      effectsVolume = Number(event.target.value) / 100;
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !$('answerOverlay').hidden) closeAnswers();
+    });
+    $('answerImage').addEventListener('error', () => {
+      $('answerImage').hidden = true;
+      $('answerFallback').hidden = false;
+    });
+    buildAnswerFallback();
+    for (let i = 0; i < PAIRS; i++) {
+      const dot = document.createElement('span');
+      dot.className = 'progress-dot';
+      dot.dataset.index = String(i);
+      $('progress').append(dot);
+    }
+    newGame();
+    if ('ResizeObserver' in window) new ResizeObserver(resizeBoard).observe($('boardArea'));
+    window.addEventListener('resize', resizeBoard);
+    window.addEventListener('orientationchange', () => requestAnimationFrame(resizeBoard));
+    window.addEventListener('load', resizeBoard);
+  </script>
+</body>
+</html>
