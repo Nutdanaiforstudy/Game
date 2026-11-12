@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "Australian Avocados Match Mania",
+  "short_name": "Match Mania",
+  "description": "A six-pair image and description matching game.",
+  "lang": "en",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "background_color": "#f5f6ed",
+  "theme_color": "#9ce000",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

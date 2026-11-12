@@ -12,6 +12,21 @@
 
   <title>Australian Avocados Match Mania</title>
 
+  <!--
+    Home Screen app settings.
+    These do not force an ordinary browser tab into fullscreen.
+  -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Match Mania">
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  >
+
+  <!-- Optional for Home Screen installation. -->
+  <link rel="manifest" href="./manifest.webmanifest">
+
   <link rel="icon" type="image/png" href="./LogoHeader.png">
   <link rel="apple-touch-icon" href="./LogoHeader.png">
 
@@ -152,13 +167,9 @@
         max(var(--pad), env(safe-area-inset-left));
 
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
 
-      grid-template-rows:
-        auto
-        auto
-        minmax(0, 1fr)
-        auto;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
 
       gap: clamp(8px, 1.3vh, 16px);
     }
@@ -204,16 +215,8 @@
       letter-spacing: -.045em;
     }
 
-    /*
-      Thai subtitle directly below Match Mania.
-
-      A generous line-height leaves room for Thai
-      vowels and tone marks.
-    */
-
     .header-subtitle {
       margin-top: 8px;
-
       color: var(--forest);
 
       font-family: var(--font-thai);
@@ -224,7 +227,7 @@
       letter-spacing: normal;
     }
 
-    /* The logo keeps its original proportions. */
+    /* The header logo keeps its own original proportions. */
 
     .logo-slot {
       flex: 0 0 auto;
@@ -324,6 +327,7 @@
 
     .board-heading {
       padding: 0 6px 8px;
+      flex-wrap: wrap;
     }
 
     .board-heading h2 {
@@ -333,11 +337,42 @@
     }
 
     .round {
+      color: var(--muted);
+
       font-size: clamp(12px, 1.4vmin, 18px);
       font-weight: 700;
 
-      color: var(--muted);
       white-space: nowrap;
+    }
+
+    .board-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+
+      gap: 8px 16px;
+      margin-left: auto;
+    }
+
+    .screen-button {
+      min-height: 44px;
+      padding: 8px 12px;
+
+      border: 1px solid var(--forest);
+      border-radius: 3px;
+
+      color: var(--forest);
+      background: transparent;
+
+      font-size: clamp(12px, 1.4vmin, 18px);
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+    .screen-button:disabled {
+      opacity: .55;
     }
 
     .board-area {
@@ -371,7 +406,7 @@
       align-content: space-evenly;
     }
 
-    /* Cards retain the original 859:860 aspect ratio. */
+    /* Cards preserve the original 859:860 aspect ratio. */
 
     .card {
       position: relative;
@@ -570,7 +605,6 @@
     .sound-sliders {
       display: flex;
       align-items: center;
-
       gap: clamp(14px, 3vw, 36px);
     }
 
@@ -679,7 +713,6 @@
 
     .answer-pair h3 {
       margin-bottom: 5px;
-
       font-size: 18px;
       font-weight: 800;
     }
@@ -688,7 +721,6 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-items: start;
-
       gap: 6px;
     }
 
@@ -698,12 +730,69 @@
       height: auto;
     }
 
+    .launch-dialog {
+      width: min(560px, calc(100% - 24px));
+    }
+
+    .screen-help {
+      width: min(650px, calc(100% - 24px));
+    }
+
+    .screen-help h3 {
+      font-size: 18px;
+    }
+
+    .help-section p {
+      margin-top: 5px;
+    }
+
+    .screen-note {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .screen-status {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: 1px;
+      height: 1px;
+
+      padding: 0;
+      overflow: hidden;
+
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
     noscript {
       display: block;
       padding: 20px;
     }
 
-    /* Portrait: 3 columns × 4 rows. */
+    /*
+      Fullscreen is applied to the HTML root.
+      The game, controls, and dialogs are all included.
+    */
+
+    html:fullscreen {
+      background: var(--paper);
+    }
+
+    html:-webkit-full-screen {
+      background: var(--paper);
+    }
+
+    html:fullscreen .game {
+      max-width: none;
+    }
+
+    html:-webkit-full-screen .game {
+      max-width: none;
+    }
+
+    /* Portrait: 3 columns x 4 rows. */
 
     @media (orientation: portrait) {
       .game {
@@ -720,7 +809,7 @@
       }
     }
 
-    /* 1080 × 1920 and similar portrait displays. */
+    /* 1080 x 1920 and similar portrait displays. */
 
     @media
       (orientation: portrait)
@@ -769,7 +858,7 @@
       }
     }
 
-    /* 1920 × 1080 and similar landscape displays. */
+    /* 1920 x 1080 and similar landscape displays. */
 
     @media
       (orientation: landscape)
@@ -863,6 +952,15 @@
         padding-bottom: 4px;
       }
 
+      .board-tools {
+        gap: 6px 8px;
+      }
+
+      .screen-button {
+        font-size: 12px;
+        padding: 7px 9px;
+      }
+
       .board-footer {
         font-size: 12px;
       }
@@ -949,6 +1047,15 @@
 
       .board-footer {
         padding-top: 4px;
+      }
+    }
+
+    @media
+      (orientation: portrait)
+      and (max-width: 355px) {
+
+      .board-tools .round {
+        display: none;
       }
     }
 
@@ -1172,9 +1279,19 @@
       <div class="board-heading">
         <h2 id="boardTitle">Find your match.</h2>
 
-        <span id="roundText" class="round">
-          Round 01 / 6 pairs
-        </span>
+        <div class="board-tools">
+          <span id="roundText" class="round">
+            Round 01 / 6 pairs
+          </span>
+
+          <button
+            id="fullscreenBtn"
+            class="screen-button"
+            type="button"
+          >
+            Full screen
+          </button>
+        </div>
       </div>
 
       <div id="boardArea" class="board-area">
@@ -1230,7 +1347,6 @@
         <div class="sound-sliders">
           <label for="musicVol">
             Music
-
             <input
               id="musicVol"
               type="range"
@@ -1242,7 +1358,6 @@
 
           <label for="effectsVol">
             Effects
-
             <input
               id="effectsVol"
               type="range"
@@ -1256,8 +1371,123 @@
     </footer>
   </main>
 
-  <!-- Answer dialog -->
+  <!-- One explicit tap requests fullscreen. -->
+  <dialog
+    id="launchDialog"
+    class="launch-dialog"
+    aria-labelledby="launchTitle"
+    aria-describedby="launchText"
+  >
+    <h2 id="launchTitle">Ready to play?</h2>
 
+    <p id="launchText">
+      Tap below to request fullscreen and hide browser controls
+      where supported. You can leave fullscreen at any time.
+    </p>
+
+    <div class="dialog-actions">
+      <button
+        id="launchFullscreen"
+        class="button"
+        type="button"
+        autofocus
+      >
+        Play full screen
+      </button>
+
+      <button
+        id="launchBrowser"
+        class="button light"
+        type="button"
+      >
+        Play in browser
+      </button>
+    </div>
+
+    <p class="screen-note">
+      The game timer starts when you play, not when this screen opens.
+    </p>
+  </dialog>
+
+  <!-- Fallback when fullscreen is unsupported or denied. -->
+  <dialog
+    id="screenHelp"
+    class="screen-help"
+    aria-labelledby="screenHelpTitle"
+  >
+    <div class="dialog-heading">
+      <h2 id="screenHelpTitle">Play without browser bars.</h2>
+
+      <button
+        id="closeScreenHelp"
+        class="close"
+        type="button"
+        aria-label="Close screen help"
+      >
+        &times;
+      </button>
+    </div>
+
+    <p id="screenHelpReason">
+      Fullscreen is not available in this browser or page context.
+    </p>
+
+    <section class="help-section">
+      <h3>iPhone / iPad</h3>
+
+      <p>
+        Open the hosted game in Safari. Use Share, then Add to Home
+        Screen. Enable Open as Web App if shown. Open the game using
+        its new Home Screen icon.
+      </p>
+    </section>
+
+    <section class="help-section">
+      <h3>Android</h3>
+
+      <p>
+        Open the hosted game in your browser and use its Install app
+        or Add to Home Screen option. Launch the installed app from
+        its icon. An ordinary browser shortcut may still show
+        browser bars.
+      </p>
+    </section>
+
+    <section class="help-section">
+      <h3>Desktop / embedded previews</h3>
+
+      <p>
+        Open the game directly in a browser tab, rather than inside
+        a file preview. Use the browser's own fullscreen command
+        if needed. An embedding page must allow fullscreen for
+        its iframe.
+      </p>
+    </section>
+
+    <p class="screen-note">
+      Your device controls its system status bar, Home indicator
+      and navigation buttons. This page cannot guarantee that those
+      disappear. Home Screen installation needs a hosted website;
+      use HTTPS for deployment.
+    </p>
+
+    <button
+      id="continueFromHelp"
+      class="button"
+      type="button"
+    >
+      Continue playing
+    </button>
+  </dialog>
+
+  <p
+    id="screenStatus"
+    class="screen-status"
+    role="status"
+    aria-live="polite"
+  ></p>
+
+  <!-- Answer dialog -->
   <dialog id="answerDialog" aria-labelledby="answerTitle">
     <div class="dialog-heading">
       <h2 id="answerTitle">The matching pairs.</h2>
@@ -1295,26 +1525,17 @@
   </dialog>
 
   <!-- Win dialog -->
-
   <dialog id="winDialog" aria-labelledby="winTitle">
     <h2 id="winTitle">A perfect match.</h2>
 
     <p id="winText"></p>
 
     <div class="dialog-actions">
-      <button
-        id="playAgain"
-        class="button"
-        type="button"
-      >
+      <button id="playAgain" class="button" type="button">
         Play again
       </button>
 
-      <button
-        id="viewBoard"
-        class="button light"
-        type="button"
-      >
+      <button id="viewBoard" class="button light" type="button">
         View board
       </button>
     </div>
@@ -1358,6 +1579,19 @@
 
     const answerDialog = $("answerDialog");
     const winDialog = $("winDialog");
+    const launchDialog = $("launchDialog");
+    const screenHelp = $("screenHelp");
+
+    const fullscreenBtn = $("fullscreenBtn");
+    const root = document.documentElement;
+
+    const fullDisplay =
+      matchMedia("(display-mode: fullscreen)");
+
+    const standaloneDisplay =
+      matchMedia("(display-mode: standalone)");
+
+    let fullscreenPending = false;
 
     const deck = Array.from(
       { length: CONFIG.pairs },
@@ -1391,7 +1625,6 @@
     let previewTicker;
     let answerTicker;
     let answerTask;
-
     let layoutFrame = 0;
 
     let musicLevel = .20;
@@ -1410,11 +1643,14 @@
     const reportedImages = new Set();
 
     const dialogsOpen = () =>
-      answerDialog.open || winDialog.open;
+      answerDialog.open ||
+      winDialog.open ||
+      launchDialog.open ||
+      screenHelp.open;
 
     /*
       Delayed callbacks belong to the current round.
-      Restarting prevents old callbacks from affecting a new game.
+      Restarting prevents old callbacks from changing a new game.
     */
 
     function later(fn, delay) {
@@ -1429,7 +1665,6 @@
       }, delay);
 
       tasks.add(id);
-
       return id;
     }
 
@@ -1642,7 +1877,6 @@
       osc.onended = () => {
         osc.disconnect();
         gain.disconnect();
-
         voices.delete(voice);
       };
 
@@ -1966,7 +2200,6 @@
 
       if (!first) {
         first = card;
-
         playSound("flip");
 
         $("hint").textContent =
@@ -1987,7 +2220,6 @@
       if (isMatch) {
         for (const c of [previous, card]) {
           c.matched = true;
-
           c.el.classList.add("is-matched");
           c.el.disabled = true;
 
@@ -2034,7 +2266,6 @@
 
       } else {
         mode = "compare";
-
         playSound("wrong");
 
         $("hint").textContent =
@@ -2271,11 +2502,11 @@
     }
 
     /*
-      Responsive sizing.
+      Responsive proportional sizing.
 
-      One scale factor is applied to both dimensions:
-      width  = 859 × scale
-      height = 860 × scale
+      The same scale factor is used for width and height:
+        width  = 859 * scale
+        height = 860 * scale
     */
 
     function resizeBoard() {
@@ -2349,6 +2580,273 @@
         requestAnimationFrame(resizeBoard);
     }
 
+    /* =====================================================
+       FULLSCREEN
+
+       A real click/tap is required.
+
+       Request the HTML root, not just the board, so all
+       controls and dialogs remain part of fullscreen.
+
+       No orientation lock.
+       No blocking Escape.
+       No automatic re-entry after the user exits.
+       ===================================================== */
+
+    function fullscreenElement() {
+      return (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        null
+      );
+    }
+
+    function installedMode() {
+      return (
+        standaloneDisplay.matches ||
+        window.navigator.standalone === true
+      );
+    }
+
+    function canFullscreen() {
+      if (root.requestFullscreen) {
+        return document.fullscreenEnabled !== false;
+      }
+
+      return (
+        Boolean(root.webkitRequestFullscreen) &&
+        document.webkitFullscreenEnabled !== false
+      );
+    }
+
+    function screenStateChanged() {
+      const nativeFullscreen =
+        Boolean(fullscreenElement());
+
+      const windowFullscreen =
+        fullDisplay.matches && !nativeFullscreen;
+
+      const installedWithoutAPI =
+        installedMode() &&
+        !canFullscreen() &&
+        !nativeFullscreen;
+
+      /*
+        Window/installed fullscreen is different from
+        element fullscreen. Do not show an exit button
+        that cannot actually exit that display mode.
+      */
+      fullscreenBtn.hidden =
+        windowFullscreen || installedWithoutAPI;
+
+      fullscreenBtn.disabled =
+        fullscreenPending;
+
+      fullscreenBtn.textContent =
+        nativeFullscreen
+          ? "Exit full screen"
+          : canFullscreen()
+            ? "Full screen"
+            : "Screen options";
+
+      fullscreenBtn.setAttribute(
+        "aria-label",
+        fullscreenBtn.textContent
+      );
+
+      $("screenStatus").textContent =
+        nativeFullscreen || windowFullscreen
+          ? "Fullscreen is active."
+          : installedMode()
+            ? "Home Screen app mode is active."
+            : "Browser mode is active.";
+
+      scheduleLayout();
+    }
+
+    function showScreenHelp(message) {
+      $("screenHelpReason").textContent = message;
+
+      if (!screenHelp.open) {
+        screenHelp.showModal();
+      }
+
+      sync();
+    }
+
+    async function enterFullscreen() {
+      if (
+        fullscreenElement() ||
+        fullDisplay.matches ||
+        fullscreenPending
+      ) {
+        return;
+      }
+
+      if (!canFullscreen()) {
+        showScreenHelp(
+          "This browser or page context does not allow page " +
+          "fullscreen. You can still play, or use the Home " +
+          "Screen option below."
+        );
+
+        return;
+      }
+
+      fullscreenPending = true;
+      screenStateChanged();
+
+      try {
+        /*
+          This call happens immediately from the click handler.
+          Do not put a timer, fetch, or another await before it.
+        */
+        if (root.requestFullscreen) {
+          await root.requestFullscreen({
+            navigationUI: "hide"
+          });
+
+        } else {
+          await root.webkitRequestFullscreen();
+        }
+
+      } catch (error) {
+        showScreenHelp(
+          "The browser declined fullscreen. Open the game " +
+          "directly in a browser tab, check its fullscreen " +
+          "permissions, or use the Home Screen option below."
+        );
+
+      } finally {
+        fullscreenPending = false;
+        screenStateChanged();
+      }
+    }
+
+    async function toggleFullscreen() {
+      if (fullscreenPending) {
+        return;
+      }
+
+      if (!fullscreenElement()) {
+        await enterFullscreen();
+        return;
+      }
+
+      fullscreenPending = true;
+      screenStateChanged();
+
+      try {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen();
+        }
+
+      } catch (error) {
+        showScreenHelp(
+          "Use your browser's fullscreen exit command or " +
+          "device exit gesture to leave fullscreen."
+        );
+
+      } finally {
+        fullscreenPending = false;
+        screenStateChanged();
+      }
+    }
+
+    fullscreenBtn.addEventListener(
+      "click",
+      toggleFullscreen
+    );
+
+    $("launchFullscreen").addEventListener("click", () => {
+      launchDialog.close();
+
+      // Still inside the user's click/tap event.
+      enterFullscreen();
+    });
+
+    $("launchBrowser").addEventListener("click", () => {
+      launchDialog.close();
+    });
+
+    $("closeScreenHelp").addEventListener("click", () => {
+      screenHelp.close();
+    });
+
+    $("continueFromHelp").addEventListener("click", () => {
+      screenHelp.close();
+    });
+
+    launchDialog.addEventListener("close", sync);
+    screenHelp.addEventListener("close", sync);
+
+    document.addEventListener(
+      "fullscreenchange",
+      screenStateChanged
+    );
+
+    document.addEventListener(
+      "webkitfullscreenchange",
+      screenStateChanged
+    );
+
+    document.addEventListener(
+      "webkitfullscreenerror",
+      () => {
+        fullscreenPending = false;
+        screenStateChanged();
+
+        showScreenHelp(
+          "This browser could not enter fullscreen. " +
+          "The game is still playable in browser mode."
+        );
+      }
+    );
+
+    for (const query of [fullDisplay, standaloneDisplay]) {
+      if (query.addEventListener) {
+        query.addEventListener(
+          "change",
+          screenStateChanged
+        );
+
+      } else if (query.addListener) {
+        query.addListener(screenStateChanged);
+      }
+    }
+
+    function showLaunchScreen() {
+      screenStateChanged();
+
+      /*
+        Installed apps already have their own display mode.
+        Do not ask for fullscreen again on those launches.
+      */
+      if (
+        installedMode() ||
+        fullDisplay.matches ||
+        fullscreenElement()
+      ) {
+        return;
+      }
+
+      if (!canFullscreen()) {
+        $("launchFullscreen").textContent =
+          "Home Screen instructions";
+
+        $("launchText").textContent =
+          "This browser does not offer page fullscreen here. " +
+          "Launching the hosted game from a Home Screen web-app " +
+          "icon can remove browser bars, or you can play in this tab.";
+      }
+
+      launchDialog.showModal();
+      sync();
+    }
+
     /* Header logo */
 
     const logo = $("headerLogo");
@@ -2370,7 +2868,7 @@
       logoResult(logo.naturalWidth > 0);
     }
 
-    /* Controls */
+    /* Game controls */
 
     $("previewBtn").onclick = previewCards;
     $("answerBtn").onclick = showAnswers;
@@ -2457,11 +2955,13 @@
         document.createElement("span");
 
       dot.setAttribute("aria-hidden", "true");
+
       $("progress").append(dot);
     }
 
     buildAnswers();
     newGame();
+    showLaunchScreen();
 
     if ("ResizeObserver" in window) {
       new ResizeObserver(
