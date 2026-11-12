@@ -2,16 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" >
   <meta name="theme-color" content="#9ce000">
-
   <title>Australian Avocados Match Mania</title>
-
   <!--
     Home Screen app settings.
     These do not force an ordinary browser tab into fullscreen.
@@ -19,1580 +12,553 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Match Mania">
-  <meta
-    name="apple-mobile-web-app-status-bar-style"
-    content="black-translucent"
-  >
-
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" >
   <!-- Optional for Home Screen installation. -->
   <link rel="manifest" href="./manifest.webmanifest">
-
   <link rel="icon" type="image/png" href="./LogoHeader.png">
   <link rel="apple-touch-icon" href="./LogoHeader.png">
-
   <!-- English and Thai sans-serif fonts. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@600;700&amp;family=Nunito:wght@400;600;700;800;900&amp;display=swap"
-    rel="stylesheet"
-  >
-
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@600;700&amp;family=Nunito:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet" >
   <style>
     :root {
-      --font:
-        "Nunito",
-        "Trebuchet MS",
-        "Segoe UI",
-        Arial,
-        sans-serif;
-
-      --font-thai:
-        "Noto Sans Thai",
-        Tahoma,
-        sans-serif;
-
+      --font: "Nunito", "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+      --font-thai: "Noto Sans Thai", Tahoma, sans-serif;
       --lime: #9ce000;
       --forest: #16490e;
       --paper: #f5f6ed;
       --line: #cbd7c1;
       --muted: #48633b;
-
       --pad: clamp(12px, 1.55vw, 28px);
-
       --card-w: 100px;
       --card-h: 100.1164px;
     }
-
     /* Reset */
-
-    * {
-      box-sizing: border-box;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
-
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-    }
-
-    body {
-      color: var(--forest);
-      background: var(--paper);
-
-      font: 600 16px/1.4 var(--font);
-
-      -webkit-font-smoothing: antialiased;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    button,
-    input,
-    select,
-    textarea,
-    dialog {
-      font-family: var(--font);
-      color: inherit;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    button:disabled {
-      cursor: default;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin: 0;
-    }
-
-    h1,
-    h2,
-    h3 {
-      font-weight: 900;
-    }
-
-    strong,
-    b {
-      font-weight: 800;
-    }
-
-    button:focus-visible,
-    input:focus-visible,
-    a:focus-visible {
-      outline: 3px solid #a94300;
-      outline-offset: 5px;
-    }
-
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html, body { margin: 0; min-height: 100%; }
+    body { color: var(--forest); background: var(--paper); font: 600 16px/1.4 var(--font); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+    button, input, select, textarea, dialog { font-family: var(--font); color: inherit; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; touch-action: manipulation; }
+    button:disabled { cursor: default; }
+    h1, h2, h3, p { margin: 0; }
+    h1, h2, h3 { font-weight: 900; }
+    strong, b { font-weight: 800; }
+    button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid #a94300; outline-offset: 5px; }
     /* Main layout */
-
     .game {
       width: 100%;
       max-width: 2300px;
-
       height: 100vh;
       height: 100dvh;
       min-height: 540px;
-
       margin: auto;
       padding: var(--pad);
-
-      padding-top:
-        max(var(--pad), env(safe-area-inset-top));
-
-      padding-right:
-        max(var(--pad), env(safe-area-inset-right));
-
-      padding-bottom:
-        max(var(--pad), env(safe-area-inset-bottom));
-
-      padding-left:
-        max(var(--pad), env(safe-area-inset-left));
-
+      padding-top: max(var(--pad), env(safe-area-inset-top));
+      padding-right: max(var(--pad), env(safe-area-inset-right));
+      padding-bottom: max(var(--pad), env(safe-area-inset-bottom));
+      padding-left: max(var(--pad), env(safe-area-inset-left));
       display: grid;
-
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: auto auto minmax(0, 1fr) auto;
-
       gap: clamp(8px, 1.3vh, 16px);
     }
-
     /* Header */
-
     .masthead {
       display: flex;
       align-items: center;
       justify-content: space-between;
-
       gap: 24px;
       padding: 20px 26px;
-
       background: var(--lime);
       border-bottom: 3px solid var(--forest);
     }
-
-    .title-block {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-
-    .title {
-      min-width: 0;
-      line-height: 1.04;
-    }
-
-    .brand-name {
-      display: block;
-
-      font-size: clamp(18px, 2.7vmin, 34px);
-      font-weight: 800;
-      letter-spacing: -.025em;
-    }
-
-    .game-name {
-      display: block;
-      margin-top: 5px;
-
-      font-size: clamp(36px, 6.8vmin, 80px);
-      font-weight: 900;
-      letter-spacing: -.045em;
-    }
-
+    .title-block { flex: 1 1 auto; min-width: 0; }
+    .title { min-width: 0; line-height: 1.04; }
+    .brand-name { display: block; font-size: clamp(18px, 2.7vmin, 34px); font-weight: 800; letter-spacing: -.025em; }
+    .game-name { display: block; margin-top: 5px; font-size: clamp(36px, 6.8vmin, 80px); font-weight: 900; letter-spacing: -.045em; }
     .header-subtitle {
       margin-top: 8px;
       color: var(--forest);
-
       font-family: var(--font-thai);
       font-size: clamp(14px, 2vmin, 24px);
       font-weight: 700;
-
       line-height: 1.6;
       letter-spacing: normal;
     }
-
     /* The header logo keeps its own original proportions. */
-
-    .logo-slot {
-      flex: 0 0 auto;
-
-      width: clamp(76px, 17vw, 220px);
-      height: clamp(58px, 10vmin, 122px);
-
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-    }
-
-    .header-logo {
-      display: block;
-      flex: 0 0 auto;
-
-      width: auto;
-      height: auto;
-
-      max-width: 100%;
-      max-height: 100%;
-
-      object-fit: contain;
-      object-position: right center;
-    }
-
-    .logo-fallback {
-      font-size: clamp(13px, 1.7vw, 22px);
-      font-weight: 900;
-      line-height: 1.1;
-      text-align: right;
-    }
-
+    .logo-slot { flex: 0 0 auto; width: clamp(76px, 17vw, 220px); height: clamp(58px, 10vmin, 122px); display: flex; align-items: center; justify-content: flex-end; }
+    .header-logo { display: block; flex: 0 0 auto; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; object-position: right center; }
+    .logo-fallback { font-size: clamp(13px, 1.7vw, 22px); font-weight: 900; line-height: 1.1; text-align: right; }
     /* Scores */
-
-    .scores {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-
-      border-bottom: 1px solid var(--forest);
-      padding: 6px 0 12px;
-    }
-
-    .score {
-      min-width: 0;
-
-      display: flex;
-      justify-content: center;
-      align-items: baseline;
-
-      gap: 12px;
-    }
-
-    .score + .score {
-      border-left: 1px solid var(--line);
-    }
-
-    .score-label {
-      font-size: clamp(14px, 1.55vmin, 21px);
-      font-weight: 700;
-    }
-
-    .score-value {
-      font-size: clamp(26px, 3.8vmin, 44px);
-      font-weight: 900;
-
-      line-height: 1.1;
-      letter-spacing: -.03em;
-
-      font-variant-numeric: tabular-nums;
-    }
-
-    #timer {
-      min-width: 5ch;
-      text-align: center;
-    }
-
+    .scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--forest); padding: 6px 0 12px; }
+    .score { min-width: 0; display: flex; justify-content: center; align-items: baseline; gap: 12px; }
+    .score + .score { border-left: 1px solid var(--line); }
+    .score-label { font-size: clamp(14px, 1.55vmin, 21px); font-weight: 700; }
+    .score-value { font-size: clamp(26px, 3.8vmin, 44px); font-weight: 900; line-height: 1.1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+    #timer { min-width: 5ch; text-align: center; }
     /* Board */
-
-    .playfield {
-      display: flex;
-      flex-direction: column;
-
-      min-width: 0;
-      min-height: 0;
-    }
-
-    .board-heading,
-    .board-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 12px;
-      flex: 0 0 auto;
-    }
-
-    .board-heading {
-      padding: 0 6px 8px;
-      flex-wrap: wrap;
-    }
-
-    .board-heading h2 {
-      font-size: clamp(16px, 2vmin, 25px);
-      font-weight: 800;
-      letter-spacing: -.02em;
-    }
-
-    .round {
-      color: var(--muted);
-
-      font-size: clamp(12px, 1.4vmin, 18px);
-      font-weight: 700;
-
-      white-space: nowrap;
-    }
-
-    .board-tools {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      flex-wrap: wrap;
-
-      gap: 8px 16px;
-      margin-left: auto;
-    }
-
+    .playfield { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+    .board-heading, .board-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 0 0 auto; }
+    .board-heading { padding: 0 6px 8px; flex-wrap: wrap; }
+    .board-heading h2 { font-size: clamp(16px, 2vmin, 25px); font-weight: 800; letter-spacing: -.02em; }
+    .round { color: var(--muted); font-size: clamp(12px, 1.4vmin, 18px); font-weight: 700; white-space: nowrap; }
+    .board-tools { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px 16px; margin-left: auto; }
     .screen-button {
       min-height: 44px;
       padding: 8px 12px;
-
       border: 1px solid var(--forest);
       border-radius: 3px;
-
       color: var(--forest);
       background: transparent;
-
       font-size: clamp(12px, 1.4vmin, 18px);
       font-weight: 800;
-
       white-space: nowrap;
     }
-
-    .screen-button:disabled {
-      opacity: .55;
-    }
-
-    .board-area {
-      flex: 1 1 0;
-
-      min-height: 0;
-      min-width: 0;
-
-      padding: 6px;
-    }
-
+    .screen-button:disabled { opacity: .55; }
+    .board-area { flex: 1 1 0; min-height: 0; min-width: 0; padding: 6px; }
     .board {
       --gap-x: clamp(8px, 1.05vw, 20px);
       --gap-y: clamp(10px, 1.5vh, 24px);
-
       width: 100%;
       height: 100%;
-
       display: grid;
-
-      grid-template-columns:
-        repeat(var(--columns, 6), var(--card-w));
-
-      grid-template-rows:
-        repeat(var(--rows, 2), var(--card-h));
-
+      grid-template-columns: repeat(var(--columns, 6), var(--card-w));
+      grid-template-rows: repeat(var(--rows, 2), var(--card-h));
       column-gap: var(--gap-x);
       row-gap: var(--gap-y);
-
       justify-content: center;
       align-content: space-evenly;
     }
-
     /* Cards preserve the original 859:860 aspect ratio. */
-
     .card {
       position: relative;
       display: block;
-
       width: var(--card-w);
       height: var(--card-h);
-
       aspect-ratio: 859 / 860;
-
       margin: 0;
       padding: 0;
-
       border: 0;
       border-radius: 0;
-
       background: transparent;
       perspective: 1000px;
     }
-
-    .card-inner {
-      position: relative;
-      display: block;
-
-      width: 100%;
-      height: 100%;
-
-      transform-style: preserve-3d;
-      transition: transform .32s ease;
-    }
-
-    .card.is-flipped .card-inner,
-    .card.is-matched .card-inner {
-      transform: rotateY(180deg);
-    }
-
+    .card-inner { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .32s ease; }
+    .card.is-flipped .card-inner, .card.is-matched .card-inner { transform: rotateY(180deg); }
     .face {
       position: absolute;
       inset: 0;
-
       display: grid;
       place-items: center;
-
       padding: 0;
       border: 0;
       border-radius: 0;
-
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
-
-    .back {
-      background: var(--lime);
-    }
-
-    .back-word {
-      font-size: calc(var(--card-w) * .22);
-      font-weight: 900;
-
-      letter-spacing: -.04em;
-      line-height: .95;
-      text-align: center;
-    }
-
-    .back-word small {
-      display: block;
-      margin-bottom: .8em;
-
-      font-size: .25em;
-      font-weight: 800;
-
-      letter-spacing: 0;
-      line-height: 1.2;
-    }
-
-    .front {
-      background: transparent;
-      transform: rotateY(180deg);
-    }
-
-    .face img {
-      display: block;
-
-      width: 100%;
-      height: 100%;
-
-      object-fit: contain;
-      object-position: center;
-
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .back-image {
-      position: absolute;
-      inset: 0;
-    }
-
-    .card.is-matched {
-      outline: 3px solid var(--forest);
-      outline-offset: 3px;
-    }
-
-    .missing-art {
-      padding: 8px;
-      font-size: 12px;
-      overflow-wrap: anywhere;
-    }
-
-    .board-footer {
-      padding: 8px 6px 2px;
-
-      font-size: clamp(13px, 1.5vmin, 20px);
-      font-weight: 600;
-    }
-
-    .progress {
-      display: flex;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    .progress span {
-      width: 18px;
-      height: 7px;
-
-      background: var(--line);
-    }
-
-    .progress .active {
-      background: var(--forest);
-    }
-
+    .back { background: var(--lime); }
+    .back-word { font-size: calc(var(--card-w) * .22); font-weight: 900; letter-spacing: -.04em; line-height: .95; text-align: center; }
+    .back-word small { display: block; margin-bottom: .8em; font-size: .25em; font-weight: 800; letter-spacing: 0; line-height: 1.2; }
+    .front { background: transparent; transform: rotateY(180deg); }
+    .face img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; pointer-events: none; user-select: none; }
+    .back-image { position: absolute; inset: 0; }
+    .card.is-matched { outline: 3px solid var(--forest); outline-offset: 3px; }
+    .missing-art { padding: 8px; font-size: 12px; overflow-wrap: anywhere; }
+    .board-footer { padding: 8px 6px 2px; font-size: clamp(13px, 1.5vmin, 20px); font-weight: 600; }
+    .progress { display: flex; gap: 6px; flex-shrink: 0; }
+    .progress span { width: 18px; height: 7px; background: var(--line); }
+    .progress .active { background: var(--forest); }
     /* Controls */
-
-    .controls {
-      border-top: 1px solid var(--forest);
-      padding-top: 12px;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-
+    .controls { border-top: 1px solid var(--forest); padding-top: 12px; }
+    .actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .button {
       min-height: 50px;
       padding: 12px 16px;
-
       border: 1px solid var(--forest);
       border-radius: 3px;
-
       background: var(--forest);
       color: white;
-
       font-size: clamp(15px, 1.8vmin, 23px);
       font-weight: 800;
       line-height: 1.15;
     }
-
-    .button.light {
-      background: transparent;
-      color: var(--forest);
-    }
-
-    .button.lime {
-      background: var(--lime);
-      color: var(--forest);
-    }
-
-    .button:disabled {
-      opacity: .45;
-    }
-
-    .button:active:not(:disabled) {
-      transform: translateY(1px);
-    }
-
+    .button.light { background: transparent; color: var(--forest); }
+    .button.lime { background: var(--lime); color: var(--forest); }
+    .button:disabled { opacity: .45; }
+    .button:active:not(:disabled) { transform: translateY(1px); }
     @media (hover: hover) {
-      .button.light:hover {
-        background: #e5ecd9;
-      }
+      .button.light:hover { background: #e5ecd9; }
     }
-
-    .sound-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-
-      gap: 4px 20px;
-      margin-top: 6px;
-    }
-
-    .sound-sliders {
-      display: flex;
-      align-items: center;
-      gap: clamp(14px, 3vw, 36px);
-    }
-
-    .sound-sliders label {
-      display: flex;
-      align-items: center;
-
-      gap: 10px;
-
-      font-size: clamp(13px, 1.45vmin, 18px);
-      font-weight: 700;
-    }
-
-    input[type="range"] {
-      width: clamp(64px, 11vw, 150px);
-      height: 40px;
-
-      margin: 0;
-      accent-color: var(--forest);
-    }
-
+    .sound-row { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 4px 20px; margin-top: 6px; }
+    .sound-sliders { display: flex; align-items: center; gap: clamp(14px, 3vw, 36px); }
+    .sound-sliders label { display: flex; align-items: center; gap: 10px; font-size: clamp(13px, 1.45vmin, 18px); font-weight: 700; }
+    input[type="range"] { width: clamp(64px, 11vw, 150px); height: 40px; margin: 0; accent-color: var(--forest); }
     /* Dialogs */
-
     dialog {
       width: min(780px, calc(100% - 24px));
-
       max-height: 90vh;
       max-height: 90dvh;
-
       padding: clamp(18px, 3vw, 30px);
-
       border: 2px solid var(--forest);
-
       background: var(--paper);
       color: var(--forest);
-
       overflow: auto;
     }
-
-    dialog::backdrop {
-      background: rgb(12 35 10 / .72);
-    }
-
-    dialog[open] {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .dialog-heading {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      gap: 16px;
-    }
-
-    dialog h2 {
-      font-size: clamp(26px, 4vw, 40px);
-      line-height: 1.1;
-      letter-spacing: -.035em;
-    }
-
-    dialog p {
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    .close {
-      flex: 0 0 auto;
-
-      width: 44px;
-      height: 44px;
-
-      padding: 0;
-
-      background: none;
-      border: 1px solid var(--forest);
-
-      font-size: 28px;
-      font-weight: 700;
-    }
-
-    .dialog-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .answer-content {
-      min-height: 0;
-      overflow: auto;
-    }
-
-    .answer-key {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .answer-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .answer-pair h3 {
-      margin-bottom: 5px;
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .answer-images {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: start;
-      gap: 6px;
-    }
-
-    .answer-images img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .launch-dialog {
-      width: min(560px, calc(100% - 24px));
-    }
-
-    .screen-help {
-      width: min(650px, calc(100% - 24px));
-    }
-
-    .screen-help h3 {
-      font-size: 18px;
-    }
-
-    .help-section p {
-      margin-top: 5px;
-    }
-
-    .screen-note {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .screen-status {
-      position: absolute;
-      top: 0;
-      left: 0;
-
-      width: 1px;
-      height: 1px;
-
-      padding: 0;
+    dialog::backdrop { background: rgb(12 35 10 / .72); }
+    dialog[open] { display: flex; flex-direction: column; gap: 18px; }
+    .dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+    dialog h2 { font-size: clamp(26px, 4vw, 40px); line-height: 1.1; letter-spacing: -.035em; }
+    dialog p { font-size: 16px; line-height: 1.5; }
+    .close { flex: 0 0 auto; width: 44px; height: 44px; padding: 0; background: none; border: 1px solid var(--forest); font-size: 28px; font-weight: 700; }
+    .dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    /* All six answer pairs fit in the visible dialog, without scrolling. */
+    #answerDialog {
+      --answer-edge-top: max(12px, env(safe-area-inset-top));
+      --answer-edge-bottom: max(12px, env(safe-area-inset-bottom));
+      --answer-edge-left: max(12px, env(safe-area-inset-left));
+      --answer-edge-right: max(12px, env(safe-area-inset-right));
+      width: calc(100% - var(--answer-edge-left) - var(--answer-edge-right));
+      height: calc(100vh - var(--answer-edge-top) - var(--answer-edge-bottom));
+      height: calc(100dvh - var(--answer-edge-top) - var(--answer-edge-bottom));
+      max-width: none;
+      max-height: none;
+      margin: auto;
+      padding: clamp(12px, 1.5vmin, 24px);
       overflow: hidden;
-
-      clip-path: inset(50%);
-      white-space: nowrap;
+      overscroll-behavior: contain;
     }
-
-    noscript {
+    #answerDialog[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: clamp(8px, 1.2vmin, 16px); }
+    #answerDialog .dialog-heading { min-width: 0; align-items: flex-start; }
+    #answerDialog .answer-title-block { min-width: 0; }
+    #answerDialog h2 { font-size: clamp(20px, 2.8vmin, 36px); }
+    #answerNotice { margin-top: 4px; font-size: clamp(12px, 1.5vmin, 18px); line-height: 1.35; color: var(--muted); }
+    #answerContent { min-width: 0; min-height: 0; overflow: hidden; position: relative; }
+    #answerKey { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: contain; object-position: center; }
+    #answerGrid {
+      --pair-columns: 3;
+      --pair-rows: 2;
+      --pair-image-columns: 2;
+      --pair-image-rows: 1;
+      --answer-card-w: 1px;
+      --answer-card-h: 1px;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(var(--pair-columns), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--pair-rows), minmax(0, 1fr));
+      gap: clamp(6px, 1.2vmin, 18px);
+    }
+    #answerGrid .answer-pair {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 6px;
+      padding: clamp(4px, .7vmin, 12px);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      background: #fff;
+    }
+    #answerGrid h3 { margin: 0; font-size: clamp(12px, 1.6vmin, 20px); line-height: 1.25; font-weight: 800; white-space: nowrap; }
+    #answerGrid .answer-images {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(var(--pair-image-columns), var(--answer-card-w));
+      grid-template-rows: repeat(var(--pair-image-rows), var(--answer-card-h));
+      gap: 6px;
+      justify-content: center;
+      align-content: center;
+    }
+    #answerGrid .answer-images > * {
       display: block;
-      padding: 20px;
+      width: var(--answer-card-w);
+      height: var(--answer-card-h);
+      min-width: 0;
+      min-height: 0;
+      margin: 0;
+      object-fit: contain;
+      object-position: center;
     }
-
-    /*
-      Fullscreen is applied to the HTML root.
-      The game, controls, and dialogs are all included.
-    */
-
-    html:fullscreen {
-      background: var(--paper);
-    }
-
-    html:-webkit-full-screen {
-      background: var(--paper);
-    }
-
-    html:fullscreen .game {
-      max-width: none;
-    }
-
-    html:-webkit-full-screen .game {
-      max-width: none;
-    }
-
+    .answer-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+    #answerDialog .answer-clock { margin: 0; font-size: clamp(12px, 1.5vmin, 18px); line-height: 1.3; }
+    #answerTimer { font-variant-numeric: tabular-nums; font-size: clamp(18px, 2vmin, 28px); font-weight: 900; }
+    #keepAnswer { min-height: 44px; padding: 9px 14px; font-size: clamp(13px, 1.6vmin, 20px); white-space: nowrap; flex: 0 0 auto; }
+    #keepAnswer:disabled { opacity: 1; background: #e5ecd9; }
+    .launch-dialog { width: min(560px, calc(100% - 24px)); }
+    .screen-help { width: min(650px, calc(100% - 24px)); }
+    .screen-help h3 { font-size: 18px; }
+    .help-section p { margin-top: 5px; }
+    .screen-note { color: var(--muted); font-size: 14px; }
+    .screen-status { position: absolute; top: 0; left: 0; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    noscript { display: block; padding: 20px; }
+    /* Fullscreen is applied to the HTML root. The game, controls, and dialogs are all included. */
+    html:fullscreen { background: var(--paper); }
+    html:-webkit-full-screen { background: var(--paper); }
+    html:fullscreen .game { max-width: none; }
+    html:-webkit-full-screen .game { max-width: none; }
     /* Portrait: 3 columns x 4 rows. */
-
     @media (orientation: portrait) {
-      .game {
-        --pad: clamp(12px, 2.2vw, 24px);
-      }
-
-      .masthead {
-        padding: 20px 24px;
-      }
-
-      .board {
-        --gap-x: clamp(8px, 1.65vw, 18px);
-        --gap-y: clamp(12px, 1.4vh, 22px);
-      }
+      .game { --pad: clamp(12px, 2.2vw, 24px); }
+      .masthead { padding: 20px 24px; }
+      .board { --gap-x: clamp(8px, 1.65vw, 18px); --gap-y: clamp(12px, 1.4vh, 22px); }
     }
-
     /* 1080 x 1920 and similar portrait displays. */
-
-    @media
-      (orientation: portrait)
-      and (min-width: 900px)
-      and (min-height: 1500px) {
-
-      .game {
-        --pad: 24px;
-        gap: 14px;
-      }
-
-      .masthead {
-        padding: 22px 28px;
-      }
-
-      .brand-name {
-        font-size: 34px;
-      }
-
-      .game-name {
-        font-size: 80px;
-      }
-
-      .header-subtitle {
-        margin-top: 10px;
-        font-size: 24px;
-      }
-
-      .logo-slot {
-        width: 190px;
-        height: 122px;
-      }
-
-      .scores {
-        padding: 8px 0 14px;
-      }
-
-      .board {
-        --gap-x: 18px;
-        --gap-y: 20px;
-      }
-
-      .button {
-        min-height: 58px;
-        font-size: 23px;
-      }
+    @media (orientation: portrait) and (min-width: 900px) and (min-height: 1500px) {
+      .game { --pad: 24px; gap: 14px; }
+      .masthead { padding: 22px 28px; }
+      .brand-name { font-size: 34px; }
+      .game-name { font-size: 80px; }
+      .header-subtitle { margin-top: 10px; font-size: 24px; }
+      .logo-slot { width: 190px; height: 122px; }
+      .scores { padding: 8px 0 14px; }
+      .board { --gap-x: 18px; --gap-y: 20px; }
+      .button { min-height: 58px; font-size: 23px; }
     }
-
     /* 1920 x 1080 and similar landscape displays. */
-
-    @media
-      (orientation: landscape)
-      and (min-width: 1600px)
-      and (min-height: 900px) {
-
-      .game {
-        --pad: 28px;
-        gap: 14px;
-      }
-
-      .masthead {
-        padding: 18px 28px;
-      }
-
-      .brand-name {
-        font-size: 30px;
-      }
-
-      .game-name {
-        font-size: 76px;
-      }
-
-      .board {
-        --gap-x: 20px;
-        --gap-y: 24px;
-      }
+    @media (orientation: landscape) and (min-width: 1600px) and (min-height: 900px) {
+      .game { --pad: 28px; gap: 14px; }
+      .masthead { padding: 18px 28px; }
+      .brand-name { font-size: 30px; }
+      .game-name { font-size: 76px; }
+      .board { --gap-x: 20px; --gap-y: 24px; }
     }
-
     /* Smaller phones. */
-
     @media (max-width: 600px) {
-      .game {
-        gap: 8px;
-      }
-
-      .masthead {
-        padding: 12px;
-        gap: 10px;
-      }
-
-      .brand-name {
-        font-size: clamp(16px, 4.4vw, 25px);
-      }
-
-      .game-name {
-        font-size: clamp(31px, 8.7vw, 47px);
-      }
-
-      .header-subtitle {
-        margin-top: 6px;
-        font-size: 14px;
-      }
-
-      .logo-slot {
-        width: 66px;
-        height: 66px;
-      }
-
-      .logo-fallback {
-        font-size: 12px;
-      }
-
-      .score {
-        flex-direction: column;
-        align-items: center;
-        gap: 2px;
-      }
-
-      .scores {
-        padding: 2px 0 8px;
-      }
-
-      .score-label {
-        font-size: 13px;
-      }
-
-      .score-value {
-        font-size: 24px;
-      }
-
-      .board-heading h2 {
-        font-size: 15px;
-      }
-
-      .round {
-        font-size: 11px;
-      }
-
-      .board-heading {
-        padding-bottom: 4px;
-      }
-
-      .board-tools {
-        gap: 6px 8px;
-      }
-
-      .screen-button {
-        font-size: 12px;
-        padding: 7px 9px;
-      }
-
-      .board-footer {
-        font-size: 12px;
-      }
-
-      .progress {
-        gap: 4px;
-      }
-
-      .progress span {
-        width: 10px;
-        height: 5px;
-      }
-
-      .controls {
-        padding-top: 8px;
-      }
-
-      .actions {
-        gap: 6px;
-      }
-
-      .button {
-        min-height: 44px;
-        font-size: 13px;
-        padding: 10px 5px;
-      }
-
-      .sound-row {
-        gap: 0;
-      }
-
-      .sound-sliders {
-        width: 100%;
-        justify-content: center;
-        gap: 20px;
-      }
-
-      .sound-sliders label {
-        font-size: 12px;
-        gap: 7px;
-      }
-
-      input[type="range"] {
-        width: clamp(68px, 18vw, 100px);
-        height: 34px;
-      }
-
-      .answer-grid {
-        grid-template-columns: 1fr;
-      }
+      .game { gap: 8px; }
+      .masthead { padding: 12px; gap: 10px; }
+      .brand-name { font-size: clamp(16px, 4.4vw, 25px); }
+      .game-name { font-size: clamp(31px, 8.7vw, 47px); }
+      .header-subtitle { margin-top: 6px; font-size: 14px; }
+      .logo-slot { width: 66px; height: 66px; }
+      .logo-fallback { font-size: 12px; }
+      .score { flex-direction: column; align-items: center; gap: 2px; }
+      .scores { padding: 2px 0 8px; }
+      .score-label { font-size: 13px; }
+      .score-value { font-size: 24px; }
+      .board-heading h2 { font-size: 15px; }
+      .round { font-size: 11px; }
+      .board-heading { padding-bottom: 4px; }
+      .board-tools { gap: 6px 8px; }
+      .screen-button { font-size: 12px; padding: 7px 9px; }
+      .board-footer { font-size: 12px; }
+      .progress { gap: 4px; }
+      .progress span { width: 10px; height: 5px; }
+      .controls { padding-top: 8px; }
+      .actions { gap: 6px; }
+      .button { min-height: 44px; font-size: 13px; padding: 10px 5px; }
+      .sound-row { gap: 0; }
+      .sound-sliders { width: 100%; justify-content: center; gap: 20px; }
+      .sound-sliders label { font-size: 12px; gap: 7px; }
+      input[type="range"] { width: clamp(68px, 18vw, 100px); height: 34px; }
     }
-
-    @media
-      (orientation: portrait)
-      and (max-height: 700px) {
-
-      .game {
-        gap: 6px;
-      }
-
-      .masthead {
-        padding: 8px 12px;
-      }
-
-      .logo-slot {
-        height: 52px;
-      }
-
-      .game-name {
-        font-size: 30px;
-      }
-
-      .brand-name {
-        font-size: 16px;
-      }
-
-      .board {
-        --gap-y: 8px;
-      }
-
-      .board-heading {
-        padding-bottom: 2px;
-      }
-
-      .board-footer {
-        padding-top: 4px;
-      }
+    @media (orientation: portrait) and (max-height: 700px) {
+      .game { gap: 6px; }
+      .masthead { padding: 8px 12px; }
+      .logo-slot { height: 52px; }
+      .game-name { font-size: 30px; }
+      .brand-name { font-size: 16px; }
+      .board { --gap-y: 8px; }
+      .board-heading { padding-bottom: 2px; }
+      .board-footer { padding-top: 4px; }
     }
-
-    @media
-      (orientation: portrait)
-      and (max-width: 355px) {
-
-      .board-tools .round {
-        display: none;
-      }
+    @media (orientation: portrait) and (max-width: 355px) {
+      .board-tools .round { display: none; }
     }
-
     /* Compact layout for a sideways phone. */
-
-    @media
-      (orientation: landscape)
-      and (max-height: 600px) {
-
-      .game {
-        --pad: 8px;
-
-        min-height: 320px;
-        gap: 8px;
-
-        grid-template-columns:
-          clamp(144px, 21vw, 190px)
-          minmax(0, 1fr);
-
-        grid-template-rows:
-          auto
-          minmax(0, 1fr)
-          auto;
-      }
-
-      .masthead {
-        grid-column: 1;
-        grid-row: 1;
-
-        padding: 10px;
-        display: block;
-      }
-
-      .brand-name {
-        font-size: 17px;
-      }
-
-      .game-name {
-        font-size: 31px;
-      }
-
-      .header-subtitle {
-        margin-top: 4px;
-        font-size: 13px;
-      }
-
-      .logo-slot {
-        width: 90px;
-        height: 38px;
-
-        margin-top: 8px;
-        justify-content: flex-start;
-      }
-
-      .header-logo {
-        object-position: left center;
-      }
-
-      .logo-fallback {
-        font-size: 10px;
-        text-align: left;
-      }
-
-      .scores {
-        grid-column: 1;
-        grid-row: 2;
-
-        display: flex;
-        flex-direction: column;
-        justify-content: space-evenly;
-
-        padding: 0;
-      }
-
-      .score {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-
-        padding: 0 4px;
-        gap: 4px;
-      }
-
-      .score + .score {
-        border: 0;
-      }
-
-      .score-label {
-        font-size: 12px;
-      }
-
-      .score-value {
-        font-size: 22px;
-      }
-
-      .playfield {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-      }
-
-      .board-heading h2 {
-        font-size: 15px;
-      }
-
-      .round {
-        font-size: 11px;
-      }
-
-      .board-footer {
-        font-size: 11px;
-        padding-top: 4px;
-      }
-
-      .board {
-        --gap-x: 8px;
-        --gap-y: 10px;
-      }
-
-      .controls {
-        grid-column: 1 / -1;
-        grid-row: 3;
-
-        padding-top: 6px;
-      }
-
-      .button {
-        min-height: 40px;
-        padding: 8px 5px;
-        font-size: 14px;
-      }
-
-      .sound-row {
-        flex-wrap: nowrap;
-        margin-top: 2px;
-      }
-
-      .sound-sliders {
-        width: auto;
-        gap: 16px;
-      }
-
-      .sound-sliders label {
-        font-size: 12px;
-        gap: 6px;
-      }
-
-      input[type="range"] {
-        width: 65px;
-        height: 30px;
-      }
-
-      .progress span {
-        width: 10px;
-      }
+    @media (orientation: landscape) and (max-height: 600px) {
+      .game { --pad: 8px; min-height: 320px; gap: 8px; grid-template-columns: clamp(144px, 21vw, 190px) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+      .masthead { grid-column: 1; grid-row: 1; padding: 10px; display: block; }
+      .brand-name { font-size: 17px; }
+      .game-name { font-size: 31px; }
+      .header-subtitle { margin-top: 4px; font-size: 13px; }
+      .logo-slot { width: 90px; height: 38px; margin-top: 8px; justify-content: flex-start; }
+      .header-logo { object-position: left center; }
+      .logo-fallback { font-size: 10px; text-align: left; }
+      .scores { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; justify-content: space-evenly; padding: 0; }
+      .score { flex-direction: row; justify-content: space-between; align-items: center; padding: 0 4px; gap: 4px; }
+      .score + .score { border: 0; }
+      .score-label { font-size: 12px; }
+      .score-value { font-size: 22px; }
+      .playfield { grid-column: 2; grid-row: 1 / span 2; }
+      .board-heading h2 { font-size: 15px; }
+      .round { font-size: 11px; }
+      .board-footer { font-size: 11px; padding-top: 4px; }
+      .board { --gap-x: 8px; --gap-y: 10px; }
+      .controls { grid-column: 1 / -1; grid-row: 3; padding-top: 6px; }
+      .button { min-height: 40px; padding: 8px 5px; font-size: 14px; }
+      .sound-row { flex-wrap: nowrap; margin-top: 2px; }
+      .sound-sliders { width: auto; gap: 16px; }
+      .sound-sliders label { font-size: 12px; gap: 6px; }
+      input[type="range"] { width: 65px; height: 30px; }
+      .progress span { width: 10px; }
     }
-
     @media (prefers-reduced-motion: reduce) {
-      .card-inner {
-        transition: none;
-      }
-
-      .button:active:not(:disabled) {
-        transform: none;
-      }
+      .card-inner { transition: none; }
+      .button:active:not(:disabled) { transform: none; }
     }
   </style>
 </head>
-
 <body>
   <main class="game">
-
     <header class="masthead">
       <div class="title-block">
         <h1 class="title">
           <span class="brand-name">Australian Avocados</span>
           <span class="game-name">Match Mania</span>
         </h1>
-
-        <p class="header-subtitle" lang="th">
-          เกมจับคู่ มหาสนุก
-        </p>
+        <p class="header-subtitle" lang="th">เกมจับคู่ มหาสนุก</p>
       </div>
-
       <div class="logo-slot">
-        <img
-          id="headerLogo"
-          class="header-logo"
-          src="./LogoHeader.png"
-          alt="Australian Avocados"
-          draggable="false"
-        >
-
-        <span
-          id="logoFallback"
-          class="logo-fallback"
-          hidden
-        >
+        <img id="headerLogo" class="header-logo" src="./LogoHeader.png" alt="Australian Avocados" draggable="false" >
+        <span id="logoFallback" class="logo-fallback" hidden >
           Australian<br>Avocados
         </span>
       </div>
     </header>
-
     <section class="scores" aria-label="Game statistics">
       <div class="score">
         <span class="score-label">Pairs</span>
         <strong id="pairs" class="score-value">0 / 6</strong>
       </div>
-
       <div class="score">
         <span class="score-label">Moves</span>
         <strong id="moves" class="score-value">0</strong>
       </div>
-
       <div class="score">
         <span class="score-label">Time</span>
         <strong id="timer" class="score-value">00:00</strong>
       </div>
     </section>
-
     <section class="playfield" aria-labelledby="boardTitle">
       <div class="board-heading">
         <h2 id="boardTitle">Find your match.</h2>
-
         <div class="board-tools">
-          <span id="roundText" class="round">
-            Round 01 / 6 pairs
-          </span>
-
-          <button
-            id="fullscreenBtn"
-            class="screen-button"
-            type="button"
-          >
-            Full screen
-          </button>
+          <span id="roundText" class="round">Round 01 / 6 pairs</span>
+          <button id="fullscreenBtn" class="screen-button" type="button" >Full screen</button>
         </div>
       </div>
-
       <div id="boardArea" class="board-area">
-        <div
-          id="board"
-          class="board"
-          role="group"
-          aria-label="Twelve matching cards"
-        ></div>
+        <div id="board" class="board" role="group" aria-label="Twelve matching cards" ></div>
       </div>
-
       <div class="board-footer">
-        <span id="hint" role="status" aria-live="polite">
-          Choose any two cards.
-        </span>
-
-        <div
-          id="progress"
-          class="progress"
-          aria-label="0 of 6 pairs found"
-        ></div>
+        <span id="hint" role="status" aria-live="polite">Choose any two cards.</span>
+        <div id="progress" class="progress" aria-label="0 of 6 pairs found" ></div>
       </div>
     </section>
-
     <footer class="controls" aria-label="Game controls">
       <div class="actions">
-        <button
-          id="previewBtn"
-          class="button light"
-          type="button"
-        >
-          Preview 5s
-        </button>
-
-        <button
-          id="answerBtn"
-          class="button lime"
-          type="button"
-        >
-          Show answer
-        </button>
-
-        <button
-          id="restartBtn"
-          class="button"
-          type="button"
-        >
-          New game
-        </button>
+        <button id="previewBtn" class="button light" type="button" >Preview 5s</button>
+        <button id="answerBtn" class="button lime" type="button" >Show answer</button>
+        <button id="restartBtn" class="button" type="button" >New game</button>
       </div>
-
       <div class="sound-row">
         <div class="sound-sliders">
           <label for="musicVol">
             Music
-            <input
-              id="musicVol"
-              type="range"
-              min="0"
-              max="100"
-              value="20"
-            >
+            <input id="musicVol" type="range" min="0" max="100" value="20" >
           </label>
-
           <label for="effectsVol">
             Effects
-            <input
-              id="effectsVol"
-              type="range"
-              min="0"
-              max="100"
-              value="75"
-            >
+            <input id="effectsVol" type="range" min="0" max="100" value="75" >
           </label>
         </div>
       </div>
     </footer>
   </main>
-
   <!-- One explicit tap requests fullscreen. -->
-  <dialog
-    id="launchDialog"
-    class="launch-dialog"
-    aria-labelledby="launchTitle"
-    aria-describedby="launchText"
-  >
+  <dialog id="launchDialog" class="launch-dialog" aria-labelledby="launchTitle" aria-describedby="launchText" >
     <h2 id="launchTitle">Ready to play?</h2>
-
-    <p id="launchText">
-      Tap below to request fullscreen and hide browser controls
-      where supported. You can leave fullscreen at any time.
-    </p>
-
+    <p id="launchText">Tap below to request fullscreen and hide browser controls where supported. You can leave fullscreen at any time.</p>
     <div class="dialog-actions">
-      <button
-        id="launchFullscreen"
-        class="button"
-        type="button"
-        autofocus
-      >
-        Play full screen
-      </button>
-
-      <button
-        id="launchBrowser"
-        class="button light"
-        type="button"
-      >
-        Play in browser
-      </button>
+      <button id="launchFullscreen" class="button" type="button" autofocus >Play full screen</button>
+      <button id="launchBrowser" class="button light" type="button" >Play in browser</button>
     </div>
-
-    <p class="screen-note">
-      The game timer starts when you play, not when this screen opens.
-    </p>
+    <p class="screen-note">The game timer starts when you play, not when this screen opens.</p>
   </dialog>
-
   <!-- Fallback when fullscreen is unsupported or denied. -->
-  <dialog
-    id="screenHelp"
-    class="screen-help"
-    aria-labelledby="screenHelpTitle"
-  >
+  <dialog id="screenHelp" class="screen-help" aria-labelledby="screenHelpTitle" >
     <div class="dialog-heading">
       <h2 id="screenHelpTitle">Play without browser bars.</h2>
-
-      <button
-        id="closeScreenHelp"
-        class="close"
-        type="button"
-        aria-label="Close screen help"
-      >
-        &times;
-      </button>
+      <button id="closeScreenHelp" class="close" type="button" aria-label="Close screen help" >&times;</button>
     </div>
-
-    <p id="screenHelpReason">
-      Fullscreen is not available in this browser or page context.
-    </p>
-
+    <p id="screenHelpReason">Fullscreen is not available in this browser or page context.</p>
     <section class="help-section">
       <h3>iPhone / iPad</h3>
-
-      <p>
-        Open the hosted game in Safari. Use Share, then Add to Home
-        Screen. Enable Open as Web App if shown. Open the game using
-        its new Home Screen icon.
-      </p>
+      <p>Open the hosted game in Safari. Use Share, then Add to Home Screen. Enable Open as Web App if shown. Open the game using its new Home Screen icon.</p>
     </section>
-
     <section class="help-section">
       <h3>Android</h3>
-
-      <p>
-        Open the hosted game in your browser and use its Install app
-        or Add to Home Screen option. Launch the installed app from
-        its icon. An ordinary browser shortcut may still show
-        browser bars.
-      </p>
+      <p>Open the hosted game in your browser and use its Install app or Add to Home Screen option. Launch the installed app from its icon. An ordinary browser shortcut may still show browser bars.</p>
     </section>
-
     <section class="help-section">
       <h3>Desktop / embedded previews</h3>
-
-      <p>
-        Open the game directly in a browser tab, rather than inside
-        a file preview. Use the browser's own fullscreen command
-        if needed. An embedding page must allow fullscreen for
-        its iframe.
-      </p>
+      <p>Open the game directly in a browser tab, rather than inside a file preview. Use the browser's own fullscreen command if needed. An embedding page must allow fullscreen for its iframe.</p>
     </section>
-
-    <p class="screen-note">
-      Your device controls its system status bar, Home indicator
-      and navigation buttons. This page cannot guarantee that those
-      disappear. Home Screen installation needs a hosted website;
-      use HTTPS for deployment.
-    </p>
-
-    <button
-      id="continueFromHelp"
-      class="button"
-      type="button"
-    >
-      Continue playing
-    </button>
+    <p class="screen-note">Your device controls its system status bar, Home indicator and navigation buttons. This page cannot guarantee that those disappear. Home Screen installation needs a hosted website; use HTTPS for deployment.</p>
+    <button id="continueFromHelp" class="button" type="button" >Continue playing</button>
   </dialog>
-
-  <p
-    id="screenStatus"
-    class="screen-status"
-    role="status"
-    aria-live="polite"
-  ></p>
-
-  <!-- Answer dialog -->
-  <dialog id="answerDialog" aria-labelledby="answerTitle">
+  <p id="screenStatus" class="screen-status" role="status" aria-live="polite" ></p>
+  <!-- All answer pairs stay visible; Keep open cancels only the answer countdown. -->
+  <dialog id="answerDialog" aria-labelledby="answerTitle" aria-describedby="answerNotice">
     <div class="dialog-heading">
-      <h2 id="answerTitle">The matching pairs.</h2>
-
-      <button
-        id="closeAnswer"
-        class="close"
-        aria-label="Close answer"
-        type="button"
-      >
-        &times;
-      </button>
+      <div class="answer-title-block">
+        <h2 id="answerTitle">The matching pairs.</h2>
+        <p id="answerNotice">Closes in 4 seconds. Choose Keep open for more time.</p>
+      </div>
+      <button id="closeAnswer" class="close" aria-label="Close answers and continue playing" type="button">&times;</button>
     </div>
-
-    <p id="answerNotice">Closes in 4 seconds.</p>
-
-    <div class="answer-content">
-      <img
-        id="answerKey"
-        class="answer-key"
-        alt="The six correct matching pairs"
-        hidden
-      >
-
-      <div id="answerGrid" class="answer-grid"></div>
+    <div id="answerContent" class="answer-content">
+      <img id="answerKey" class="answer-key" alt="The six correct matching pairs" hidden>
+      <div id="answerGrid" class="answer-grid" aria-label="All six correct pairs"></div>
     </div>
-
-    <button
-      id="keepAnswer"
-      class="button light"
-      type="button"
-    >
-      Keep open
-    </button>
+    <div class="answer-footer">
+      <p class="answer-clock">Time <strong id="answerTimer">00:00</strong><br>Timer keeps running.</p>
+      <button id="keepAnswer" class="button light" type="button" aria-pressed="false">Keep open</button>
+    </div>
   </dialog>
-
   <!-- Win dialog -->
   <dialog id="winDialog" aria-labelledby="winTitle">
     <h2 id="winTitle">A perfect match.</h2>
-
     <p id="winText"></p>
-
     <div class="dialog-actions">
-      <button id="playAgain" class="button" type="button">
-        Play again
-      </button>
-
-      <button id="viewBoard" class="button light" type="button">
-        View board
-      </button>
+      <button id="playAgain" class="button" type="button">Play again</button>
+      <button id="viewBoard" class="button light" type="button">View board</button>
     </div>
   </dialog>
-
-  <audio
-    id="music"
-    src="./Song.mp3"
-    loop
-    preload="none"
-  ></audio>
-
-  <noscript>
-    Enable JavaScript to play Australian Avocados Match Mania.
-  </noscript>
-
+  <audio id="music" src="./Song.mp3" loop preload="none" ></audio>
+  <noscript>Enable JavaScript to play Australian Avocados Match Mania.</noscript>
   <script>
     "use strict";
-
     /* Configuration */
-
     const CONFIG = {
       pairs: 6,
-
       imageWidth: 859,
       imageHeight: 860,
-
       portraitColumns: 3,
       landscapeColumns: 6,
-
       previewMs: 5000,
-      answerMs: 4000,
+      answerMs: 5000,
       mismatchMs: 900
     };
-
     const $ = id => document.getElementById(id);
-
     const board = $("board");
     const area = $("boardArea");
     const music = $("music");
-
     const answerDialog = $("answerDialog");
     const winDialog = $("winDialog");
     const launchDialog = $("launchDialog");
     const screenHelp = $("screenHelp");
-
     const fullscreenBtn = $("fullscreenBtn");
     const root = document.documentElement;
-
-    const fullDisplay =
-      matchMedia("(display-mode: fullscreen)");
-
-    const standaloneDisplay =
-      matchMedia("(display-mode: standalone)");
-
+    const fullDisplay = matchMedia("(display-mode: fullscreen)");
+    const standaloneDisplay = matchMedia("(display-mode: standalone)");
     let fullscreenPending = false;
-
     const deck = Array.from(
       { length: CONFIG.pairs },
       (_, i) => i + 1
@@ -1608,353 +574,216 @@
         src: `./${id}DESC.png`
       }
     ]);
-
     let cards = [];
     let first = null;
     let mode = "idle";
-
     let matches = 0;
     let moves = 0;
     let round = 0;
-
     let running = false;
     let startedAt = 0;
     let elapsed = 0;
-
     let timerId;
     let previewTicker;
     let answerTicker;
     let answerTask;
+    let answerPinned = false;
+    let answerSession = 0;
     let layoutFrame = 0;
-
     let musicLevel = .20;
     let effectsLevel = .75;
-
     let duckUntil = 0;
     let duckTimer;
-
     let context;
     let effectsBus;
     let compressor;
     let audioEpoch = 0;
-
     const tasks = new Set();
     const voices = new Set();
     const reportedImages = new Set();
-
     const dialogsOpen = () =>
       answerDialog.open ||
       winDialog.open ||
       launchDialog.open ||
       screenHelp.open;
-
     /*
       Delayed callbacks belong to the current round.
       Restarting prevents old callbacks from changing a new game.
     */
-
     function later(fn, delay) {
       const generation = round;
-
       const id = setTimeout(() => {
         tasks.delete(id);
-
         if (round === generation) {
           fn();
         }
       }, delay);
-
       tasks.add(id);
       return id;
     }
-
     function shuffle(items) {
       const copy = [...items];
-
       for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-
         [copy[i], copy[j]] = [
           copy[j],
           copy[i]
         ];
       }
-
       return copy;
     }
-
     /* Timer and scores */
-
     function timeText(ms) {
       const seconds = Math.floor(ms / 1000);
-
-      return (
-        String(Math.floor(seconds / 60)).padStart(2, "0") +
-        ":" +
-        String(seconds % 60).padStart(2, "0")
-      );
+      return (String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0"));
     }
-
     function tick() {
       if (running) {
         elapsed = performance.now() - startedAt;
       }
-
-      $("timer").textContent = timeText(elapsed);
+      const text = timeText(elapsed);
+      $("timer").textContent = text;
+      $("answerTimer").textContent = text;
     }
-
+    // Once started, the clock runs through preview, answers and Keep open.
+    // Only completing all six pairs or starting a new round stops/resets it.
     function startGame() {
       if (!running && matches < CONFIG.pairs) {
         running = true;
         startedAt = performance.now() - elapsed;
-
         timerId = setInterval(tick, 200);
       }
-
       playMusic();
     }
-
     function stopTimer() {
       tick();
       running = false;
-
       clearInterval(timerId);
     }
-
     function sync() {
-      $("pairs").textContent =
-        `${matches} / ${CONFIG.pairs}`;
-
+      $("pairs").textContent = `${matches} / ${CONFIG.pairs}`;
       $("moves").textContent = moves;
-
       $("progress").setAttribute(
         "aria-label",
         `${matches} of ${CONFIG.pairs} pairs found`
       );
-
       [...$("progress").children].forEach((dot, i) => {
         dot.classList.toggle("active", i < matches);
       });
-
-      const busy =
-        mode !== "idle" || dialogsOpen();
-
+      const busy = mode !== "idle" || dialogsOpen();
       $("previewBtn").disabled = busy;
       $("answerBtn").disabled = busy;
     }
-
     /* Music and generated sound effects */
-
     function updateMusicVolume() {
       music.volume =
         musicLevel *
         (performance.now() < duckUntil ? .24 : 1);
-
       if (!musicLevel) {
         music.pause();
       }
     }
-
     function playMusic() {
       updateMusicVolume();
-
-      if (
-        musicLevel &&
-        music.paused &&
-        !music.error &&
-        !document.hidden
-      ) {
+      if (musicLevel && music.paused && !music.error && !document.hidden) {
         music.play().catch(() => {});
       }
     }
-
     function duckMusic(ms) {
-      duckUntil = Math.max(
-        duckUntil,
-        performance.now() + ms
-      );
-
+      duckUntil = Math.max(duckUntil, performance.now() + ms);
       updateMusicVolume();
       clearTimeout(duckTimer);
-
-      duckTimer = setTimeout(
-        updateMusicVolume,
-        Math.max(0, duckUntil - performance.now()) + 20
-      );
+      duckTimer = setTimeout(updateMusicVolume, Math.max(0, duckUntil - performance.now()) + 20);
     }
-
     async function audioReady() {
       const AudioType =
         window.AudioContext ||
         window.webkitAudioContext;
-
       if (!AudioType) {
         return null;
       }
-
       try {
         if (!context) {
           context = new AudioType();
-
           effectsBus = context.createGain();
           effectsBus.gain.value = effectsLevel * .85;
-
-          compressor =
-            context.createDynamicsCompressor();
-
+          compressor = context.createDynamicsCompressor();
           compressor.threshold.value = -12;
           compressor.knee.value = 16;
           compressor.ratio.value = 4;
           compressor.attack.value = .003;
           compressor.release.value = .18;
-
           effectsBus
             .connect(compressor)
             .connect(context.destination);
         }
-
         if (context.state === "suspended") {
           await context.resume();
         }
-
         return context.state === "running"
           ? context
           : null;
-
       } catch (_) {
         return null;
       }
     }
-
-    function note(
-      frequency,
-      time,
-      duration,
-      amplitude,
-      waveform,
-      channel,
-      endFrequency = frequency
-    ) {
+    function note(frequency, time, duration, amplitude, waveform, channel, endFrequency = frequency) {
       const osc = context.createOscillator();
       const gain = context.createGain();
-
       osc.type = waveform;
-
-      osc.frequency.setValueAtTime(
-        frequency,
-        time
-      );
-
+      osc.frequency.setValueAtTime(frequency, time);
       if (endFrequency !== frequency) {
-        osc.frequency.exponentialRampToValueAtTime(
-          endFrequency,
-          time + duration
-        );
+        osc.frequency.exponentialRampToValueAtTime(endFrequency, time + duration);
       }
-
       gain.gain.setValueAtTime(.0001, time);
-
-      gain.gain.linearRampToValueAtTime(
-        amplitude,
-        time + .008
-      );
-
-      gain.gain.exponentialRampToValueAtTime(
-        .0001,
-        time + duration
-      );
-
+      gain.gain.linearRampToValueAtTime(amplitude, time + .008);
+      gain.gain.exponentialRampToValueAtTime(.0001, time + duration);
       osc.connect(gain).connect(effectsBus);
-
       const voice = {
         osc,
         gain,
         channel
       };
-
       voices.add(voice);
-
       osc.onended = () => {
         osc.disconnect();
         gain.disconnect();
         voices.delete(voice);
       };
-
       osc.start(time);
       osc.stop(time + duration + .02);
     }
-
     function stopVoices(channel) {
       for (const voice of [...voices]) {
         if (!channel || voice.channel === channel) {
           try {
             voice.osc.stop();
           } catch (_) {}
-
           voice.osc.disconnect();
           voice.gain.disconnect();
-
           voices.delete(voice);
         }
       }
     }
-
     async function playSound(kind) {
       if (!effectsLevel) {
         return;
       }
-
       const generation = audioEpoch;
       const ctx = await audioReady();
-
-      if (
-        !ctx ||
-        generation !== audioEpoch ||
-        !effectsLevel ||
-        document.hidden
-      ) {
+      if (!ctx || generation !== audioEpoch || !effectsLevel || document.hidden) {
         return;
       }
-
       const t = ctx.currentTime + .015;
-
       if (kind === "flip") {
-        note(
-          660,
-          t,
-          .055,
-          .10,
-          "triangle",
-          "flip",
-          420
-        );
-
+        note(660, t, .055, .10, "triangle", "flip", 420);
       } else if (kind === "wrong") {
         stopVoices("wrong");
-
-        note(
-          196,
-          t,
-          .16,
-          .18,
-          "triangle",
-          "wrong"
-        );
-
-        note(
-          146.83,
-          t + .13,
-          .24,
-          .16,
-          "triangle",
-          "wrong"
-        );
-
+        note(196, t, .16, .18, "triangle", "wrong");
+        note(146.83, t + .13, .24, .16, "triangle", "wrong");
       } else {
         const channel = "success";
-
         stopVoices(channel);
-
         const melody = kind === "win"
           ? [
               [523.25, 0, .30],
@@ -1969,60 +798,21 @@
               [783.99, .20, .36],
               [1046.50, .32, .65]
             ];
-
-        for (
-          const [frequency, offset, duration]
-          of melody
-        ) {
-          note(
-            frequency,
-            t + offset,
-            duration,
-            .32,
-            "sine",
-            channel
-          );
-
-          note(
-            frequency * 2,
-            t + offset,
-            duration * .62,
-            .055,
-            "triangle",
-            channel
-          );
+        for (const [frequency, offset, duration] of melody) {
+          note(frequency, t + offset, duration, .32, "sine", channel);
+          note(frequency * 2, t + offset, duration * .62, .055, "triangle", channel);
         }
-
         if (kind === "win") {
-          note(
-            523.25,
-            t + .48,
-            .85,
-            .12,
-            "sine",
-            channel
-          );
+          note(523.25, t + .48, .85, .12, "sine", channel);
         }
-
-        duckMusic(
-          kind === "win" ? 1450 : 1050
-        );
+        duckMusic(kind === "win" ? 1450 : 1050);
       }
     }
-
     /* Image loading */
-
-    function imageElement(
-      src,
-      missingText,
-      onLoad,
-      onError
-    ) {
+    function imageElement(src, missingText, onLoad, onError) {
       const img = new Image();
-
       img.alt = "";
       img.draggable = false;
-
       img.addEventListener(
         "load",
         () => {
@@ -2032,72 +822,48 @@
         },
         { once: true }
       );
-
       img.addEventListener(
         "error",
         () => {
-          const label =
-            document.createElement("span");
-
+          const label = document.createElement("span");
           label.className = "missing-art";
           label.textContent = missingText;
-
           img.replaceWith(label);
-
           if (onError) {
             onError();
           }
         },
         { once: true }
       );
-
       img.src = src;
-
       return img;
     }
-
     function warnImage(src, message) {
       if (reportedImages.has(src)) {
         return;
       }
-
       reportedImages.add(src);
       console.warn(message, src);
     }
-
     function reveal(card, visible) {
-      card.el.classList.toggle(
-        "is-flipped",
-        visible
-      );
-
-      card.el.setAttribute(
-        "aria-pressed",
-        String(visible || card.matched)
-      );
-
+      card.el.classList.toggle("is-flipped", visible);
+      card.el.setAttribute("aria-pressed", String(visible || card.matched));
       const type =
         card.item.type === "IMG"
           ? "picture"
           : "description";
-
       const label = card.matched
         ? `Matched ${type}`
         : visible
           ? `Revealed ${type} card ${card.item.id}`
           : `Hidden card ${card.index + 1}`;
-
       card.el.setAttribute("aria-label", label);
     }
-
     function createCard(item, index) {
-      const el =
-        document.createElement("button");
-
+      const el = document.createElement("button");
       el.type = "button";
       el.className = "card";
       el.disabled = true;
-
       const card = {
         el,
         item,
@@ -2105,7 +871,6 @@
         matched: false,
         loaded: false
       };
-
       el.innerHTML = `
         <span class="card-inner" aria-hidden="true">
           <span class="face back">
@@ -2118,389 +883,308 @@
           <span class="face front"></span>
         </span>
       `;
-
-      const back =
-        el.querySelector(".back");
-
+      const back = el.querySelector(".back");
       const backImg = new Image();
-
       backImg.alt = "";
       backImg.draggable = false;
       backImg.className = "back-image";
-
       backImg.onload = () => {
         back.querySelector(".back-word").hidden = true;
       };
-
       backImg.onerror = () => {
         backImg.remove();
       };
-
       backImg.src = "./BacksideCover.png";
       back.append(backImg);
-
       el.querySelector(".front").append(
         imageElement(
           item.src,
           `Missing ${item.id}${item.type}.png`,
-
           img => {
             card.loaded = true;
             el.disabled = card.matched;
-
-            const expectedRatio =
-              CONFIG.imageWidth / CONFIG.imageHeight;
-
-            const actualRatio =
-              img.naturalWidth / img.naturalHeight;
-
-            if (
-              Math.abs(actualRatio - expectedRatio) > .0001
-            ) {
-              warnImage(
-                item.src,
-                "PNG is not 859:860; it stays uncropped but may leave space:"
-              );
+            const expectedRatio = CONFIG.imageWidth / CONFIG.imageHeight;
+            const actualRatio = img.naturalWidth / img.naturalHeight;
+            if (Math.abs(actualRatio - expectedRatio) > .0001) {
+              warnImage(item.src, "PNG is not 859:860; it stays uncropped but may leave space:");
             }
           },
-
           () => {
-            warnImage(
-              item.src,
-              "Missing card image. Place this PNG beside the HTML:"
-            );
+            warnImage(item.src, "Missing card image. Place this PNG beside the HTML:");
           }
         )
       );
-
       reveal(card, false);
-
       el.addEventListener("click", event => {
         flip(card, event.detail === 0);
       });
-
       return card;
     }
-
     /* Matching logic */
-
     function flip(card, keyboard) {
-      if (
-        mode !== "idle" ||
-        dialogsOpen() ||
-        card.matched ||
-        !card.loaded ||
-        card === first
-      ) {
+      if (mode !== "idle" || dialogsOpen() || card.matched || !card.loaded || card === first) {
         return;
       }
-
       startGame();
       reveal(card, true);
-
       if (!first) {
         first = card;
         playSound("flip");
-
-        $("hint").textContent =
-          "Now find its partner.";
-
+        $("hint").textContent = "Now find its partner.";
         return;
       }
-
       const previous = first;
-
       first = null;
       moves++;
-
       const isMatch =
         previous.item.id === card.item.id &&
         previous.item.type !== card.item.type;
-
       if (isMatch) {
         for (const c of [previous, card]) {
           c.matched = true;
           c.el.classList.add("is-matched");
           c.el.disabled = true;
-
           reveal(c, true);
         }
-
         matches++;
-
         $("hint").textContent =
           matches === CONFIG.pairs
             ? "All six pairs found."
             : "That's a match.";
-
-        playSound(
-          matches === CONFIG.pairs
-            ? "win"
-            : "match"
-        );
-
+        playSound(matches === CONFIG.pairs ? "win" : "match");
         if (matches === CONFIG.pairs) {
           mode = "won";
           stopTimer();
-
           later(() => {
             $("winText").textContent =
               `All six pairs in ${moves} moves ` +
               `and ${timeText(elapsed)}.`;
-
             winDialog.showModal();
             $("playAgain").focus();
-
             sync();
           }, 550);
-
         } else if (keyboard) {
-          const next = cards.find(
-            c => !c.matched && c.loaded
-          );
-
+          const next = cards.find(c => !c.matched && c.loaded);
           if (next) {
             next.el.focus();
           }
         }
-
       } else {
         mode = "compare";
         playSound("wrong");
-
-        $("hint").textContent =
-          "Not this time. Try another pair.";
-
+        $("hint").textContent = "Not this time. Try another pair.";
         later(() => {
           reveal(previous, false);
           reveal(card, false);
-
           mode = "idle";
-
-          $("hint").textContent =
-            "Choose any two cards.";
-
+          $("hint").textContent = "Choose any two cards.";
           sync();
         }, CONFIG.mismatchMs);
       }
-
       sync();
     }
-
     /* Restart */
-
     function newGame() {
       round++;
       audioEpoch++;
-
       stopVoices();
-
       tasks.forEach(clearTimeout);
       tasks.clear();
-
       clearInterval(timerId);
       clearInterval(previewTicker);
-      clearInterval(answerTicker);
-
+      cancelAnswerTimer();
+      answerPinned = false;
       clearTimeout(duckTimer);
-
       duckUntil = 0;
       updateMusicVolume();
-
       for (const dialog of [answerDialog, winDialog]) {
         if (dialog.open) {
           dialog.close();
         }
       }
-
       first = null;
       mode = "idle";
-
       matches = 0;
       moves = 0;
-
       elapsed = 0;
       running = false;
-
-      $("previewBtn").textContent =
-        "Preview 5s";
-
-      $("hint").textContent =
-        "Choose any two cards.";
-
-      $("roundText").textContent =
-        `Round ${String(round).padStart(2, "0")} / 6 pairs`;
-
+      $("previewBtn").textContent = "Preview 5s";
+      $("hint").textContent = "Choose any two cards.";
+      $("roundText").textContent = `Round ${String(round).padStart(2, "0")} / 6 pairs`;
       cards = shuffle(deck).map(createCard);
-
-      board.replaceChildren(
-        ...cards.map(c => c.el)
-      );
-
+      board.replaceChildren(...cards.map(c => c.el));
       sync();
       tick();
       scheduleLayout();
     }
-
     /* Preview */
-
     function previewCards() {
       if (mode !== "idle" || dialogsOpen()) {
         return;
       }
-
       startGame();
-
       first = null;
       mode = "preview";
-
       sync();
-
-      const visible = cards.filter(
-        c => !c.matched
-      );
-
+      const visible = cards.filter(c => !c.matched);
       visible.forEach(c => {
         reveal(c, true);
       });
-
-      const end =
-        performance.now() + CONFIG.previewMs;
-
-      $("hint").textContent =
-        "Take a look. Remember the pairs.";
-
+      const end = performance.now() + CONFIG.previewMs;
+      $("hint").textContent = "Take a look. Remember the pairs.";
       const update = () => {
-        const remaining = Math.max(
-          0,
-          Math.ceil(
-            (end - performance.now()) / 1000
-          )
-        );
-
-        $("previewBtn").textContent =
-          `Preview ${remaining}s`;
+        const remaining = Math.max(0, Math.ceil((end - performance.now()) / 1000));
+        $("previewBtn").textContent = `Preview ${remaining}s`;
       };
-
       update();
-
-      previewTicker =
-        setInterval(update, 100);
-
+      previewTicker = setInterval(update, 100);
       later(() => {
         clearInterval(previewTicker);
-
         visible.forEach(c => {
           reveal(c, false);
         });
-
         mode = "idle";
-
-        $("previewBtn").textContent =
-          "Preview 5s";
-
-        $("hint").textContent =
-          "Your turn. Find a pair.";
-
+        $("previewBtn").textContent = "Preview 5s";
+        $("hint").textContent = "Your turn. Find a pair.";
         sync();
       }, CONFIG.previewMs);
     }
-
-    /* Answer dialog */
-
+    /* Answer dialog: a separate countdown, never a pause for the game clock. */
     function showAnswers() {
-      if (mode !== "idle" || dialogsOpen()) {
-        return;
-      }
-
+      if (mode !== "idle" || dialogsOpen()) return;
       startGame();
-
-      $("keepAnswer").hidden = false;
-
-      const end =
-        performance.now() + CONFIG.answerMs;
-
-      const update = () => {
-        const remaining = Math.max(
-          0,
-          Math.ceil(
-            (end - performance.now()) / 1000
-          )
-        );
-
-        $("answerNotice").textContent =
-          `Closes in ${remaining} seconds.`;
-      };
-
-      update();
-
+      cancelAnswerTimer();
+      answerPinned = false;
+      const keep = $("keepAnswer");
+      keep.hidden = false;
+      keep.disabled = false;
+      keep.textContent = "Keep open";
+      keep.setAttribute("aria-pressed", "false");
+      const session = answerSession;
+      const end = performance.now() + CONFIG.answerMs;
       answerDialog.showModal();
+      tick();
       sync();
-
-      answerTicker =
-        setInterval(update, 100);
-
+      scheduleLayout();
+      keep.focus({ preventScroll: true });
+      const update = () => {
+        if (!answerDialog.open || answerPinned || session !== answerSession) return;
+        const remaining = Math.max(0, Math.ceil((end - performance.now()) / 1000));
+        const notice = `Closes in ${remaining} seconds. Choose Keep open for more time.`;
+        if ($("answerNotice").textContent !== notice) $("answerNotice").textContent = notice;
+      };
+      update();
+      answerTicker = setInterval(update, 100);
       answerTask = later(() => {
-        answerDialog.close();
+        if (answerDialog.open && !answerPinned && session === answerSession) {
+          closeAnswers();
+        }
       }, CONFIG.answerMs);
     }
-
     function cancelAnswerTimer() {
+      answerSession++; // Invalidates any countdown callback already queued.
       clearInterval(answerTicker);
       clearTimeout(answerTask);
-
       tasks.delete(answerTask);
+      answerTicker = null;
       answerTask = null;
+      // Do not clear timerId: the game clock is independent.
     }
-
+    function keepAnswersOpen() {
+      if (!answerDialog.open) return;
+      answerPinned = true;
+      cancelAnswerTimer();
+      $("answerNotice").textContent = "Kept open. Close with the X above to continue playing.";
+      $("keepAnswer").textContent = "Kept open";
+      $("keepAnswer").disabled = true;
+      $("keepAnswer").setAttribute("aria-pressed", "true");
+      $("closeAnswer").focus({ preventScroll: true });
+      tick();
+      scheduleLayout();
+    }
+    function closeAnswers() {
+      cancelAnswerTimer();
+      answerPinned = false;
+      if (answerDialog.open) answerDialog.close();
+      tick();
+      sync();
+    }
     function buildAnswers() {
+      $("answerGrid").replaceChildren();
       for (let id = 1; id <= CONFIG.pairs; id++) {
-        const pair =
-          document.createElement("section");
-
+        const pair = document.createElement("section");
         pair.className = "answer-pair";
-
-        const heading =
-          document.createElement("h3");
-
+        pair.setAttribute("aria-label", `Correct pair ${id}`);
+        const heading = document.createElement("h3");
         heading.textContent = `Pair ${id}`;
-
-        const images =
-          document.createElement("div");
-
+        const images = document.createElement("div");
         images.className = "answer-images";
-
-        images.append(
-          imageElement(
-            `./${id}IMG.png`,
-            `Image ${id}`
-          ),
-
-          imageElement(
-            `./${id}DESC.png`,
-            `Description ${id}`
-          )
-        );
-
+        const picture = imageElement(`./${id}IMG.png`, `Image ${id}`, scheduleLayout, scheduleLayout);
+        const description = imageElement(`./${id}DESC.png`, `Description ${id}`, scheduleLayout, scheduleLayout);
+        picture.alt = `Pair ${id}: picture`;
+        description.alt = `Pair ${id}: description`;
+        images.append(picture, description);
         pair.append(heading, images);
         $("answerGrid").append(pair);
       }
-
+      // Preserve the optional Key.png from the supplied game.
+      // It is fitted as a complete image, never scrolled or cropped.
       const key = $("answerKey");
-
       key.onload = () => {
         key.hidden = false;
         $("answerGrid").hidden = true;
+        scheduleLayout();
       };
-
       key.onerror = () => {
         key.hidden = true;
         $("answerGrid").hidden = false;
+        scheduleLayout();
       };
-
       key.src = "./Key.png";
     }
-
+    /* Choose the largest uncropped pair layout for the actual answer area.
+       All six groups remain on-screen. Each group's two pictures stay together.
+       Portrait normally stacks images; landscape normally puts them side by side. */
+    function resizeAnswers() {
+      const grid = $("answerGrid");
+      if (!answerDialog.open || grid.hidden || !grid.firstElementChild) return;
+      const pair = grid.firstElementChild;
+      const images = pair.querySelector(".answer-images");
+      const gc = getComputedStyle(grid);
+      const pc = getComputedStyle(pair);
+      const ic = getComputedStyle(images);
+      const number = value => parseFloat(value) || 0;
+      const gx = number(gc.columnGap), gy = number(gc.rowGap);
+      const ix = number(ic.columnGap), iy = number(ic.rowGap);
+      const insetX = number(pc.paddingLeft) + number(pc.paddingRight) +
+        number(pc.borderLeftWidth) + number(pc.borderRightWidth);
+      const insetY = number(pc.paddingTop) + number(pc.paddingBottom) +
+        number(pc.borderTopWidth) + number(pc.borderBottomWidth) +
+        pair.querySelector("h3").getBoundingClientRect().height + number(pc.rowGap);
+      const portrait = matchMedia("(orientation: portrait)").matches;
+      let best = null;
+      for (const cols of [3, 2, 1, 6]) {
+        const rows = CONFIG.pairs / cols;
+        const pw = (grid.clientWidth - gx * (cols - 1)) / cols - insetX;
+        const ph = (grid.clientHeight - gy * (rows - 1)) / rows - insetY;
+        for (const stacked of (portrait ? [true, false] : [false, true])) {
+          const imageCols = stacked ? 1 : 2;
+          const imageRows = stacked ? 2 : 1;
+          const scale = Math.min((pw - ix * (imageCols - 1)) / (CONFIG.imageWidth * imageCols), (ph - iy * (imageRows - 1)) / (CONFIG.imageHeight * imageRows));
+          if (!best || scale > best.scale) {
+            best = { cols, rows, imageCols, imageRows, scale };
+          }
+        }
+      }
+      if (!best) return;
+      const scale = Math.max(.001, best.scale);
+      grid.style.setProperty("--pair-columns", best.cols);
+      grid.style.setProperty("--pair-rows", best.rows);
+      grid.style.setProperty("--pair-image-columns", best.imageCols);
+      grid.style.setProperty("--pair-image-rows", best.imageRows);
+      grid.style.setProperty("--answer-card-w", `${CONFIG.imageWidth * scale}px`);
+      grid.style.setProperty("--answer-card-h", `${CONFIG.imageHeight * scale}px`);
+    }
     /*
       Responsive proportional sizing.
 
@@ -2508,78 +1192,43 @@
         width  = 859 * scale
         height = 860 * scale
     */
-
     function resizeBoard() {
-      const portrait =
-        matchMedia("(orientation: portrait)").matches;
-
+      const portrait = matchMedia("(orientation: portrait)").matches;
       const cols = portrait
         ? CONFIG.portraitColumns
         : CONFIG.landscapeColumns;
-
-      const rows = Math.ceil(
-        CONFIG.pairs * 2 / cols
-      );
-
+      const rows = Math.ceil(CONFIG.pairs * 2 / cols);
       const css = getComputedStyle(board);
       const ac = getComputedStyle(area);
-
-      const gapX =
-        parseFloat(css.columnGap) || 0;
-
-      const gapY =
-        parseFloat(css.rowGap) || 0;
-
+      const gapX = parseFloat(css.columnGap) || 0;
+      const gapY = parseFloat(css.rowGap) || 0;
       const width =
         area.clientWidth -
         parseFloat(ac.paddingLeft) -
         parseFloat(ac.paddingRight);
-
       const height =
         area.clientHeight -
         parseFloat(ac.paddingTop) -
         parseFloat(ac.paddingBottom);
-
-      const scale = Math.max(
-        .001,
-        Math.min(
-          (
-            width -
-            gapX * (cols - 1)
-          ) / (
-            cols * CONFIG.imageWidth
-          ),
-
-          (
-            height -
-            gapY * (rows - 1)
-          ) / (
-            rows * CONFIG.imageHeight
-          )
-        )
-      );
-
+      const scale = Math.max(.001, Math.min((width - gapX * (cols - 1)) / (cols * CONFIG.imageWidth), (height - gapY * (rows - 1)) / (rows * CONFIG.imageHeight)));
       board.style.setProperty("--columns", cols);
       board.style.setProperty("--rows", rows);
-
       board.style.setProperty(
         "--card-w",
         `${CONFIG.imageWidth * scale}px`
       );
-
       board.style.setProperty(
         "--card-h",
         `${CONFIG.imageHeight * scale}px`
       );
     }
-
     function scheduleLayout() {
       cancelAnimationFrame(layoutFrame);
-
-      layoutFrame =
-        requestAnimationFrame(resizeBoard);
+      layoutFrame = requestAnimationFrame(() => {
+        resizeBoard();
+        resizeAnswers();
+      });
     }
-
     /* =====================================================
        FULLSCREEN
 
@@ -2592,110 +1241,64 @@
        No blocking Escape.
        No automatic re-entry after the user exits.
        ===================================================== */
-
     function fullscreenElement() {
-      return (
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        null
-      );
+      return (document.fullscreenElement || document.webkitFullscreenElement || null);
     }
-
     function installedMode() {
-      return (
-        standaloneDisplay.matches ||
-        window.navigator.standalone === true
-      );
+      return (standaloneDisplay.matches || window.navigator.standalone === true);
     }
-
     function canFullscreen() {
       if (root.requestFullscreen) {
         return document.fullscreenEnabled !== false;
       }
-
-      return (
-        Boolean(root.webkitRequestFullscreen) &&
-        document.webkitFullscreenEnabled !== false
-      );
+      return (Boolean(root.webkitRequestFullscreen) && document.webkitFullscreenEnabled !== false);
     }
-
     function screenStateChanged() {
-      const nativeFullscreen =
-        Boolean(fullscreenElement());
-
-      const windowFullscreen =
-        fullDisplay.matches && !nativeFullscreen;
-
+      const nativeFullscreen = Boolean(fullscreenElement());
+      const windowFullscreen = fullDisplay.matches && !nativeFullscreen;
       const installedWithoutAPI =
         installedMode() &&
         !canFullscreen() &&
         !nativeFullscreen;
-
       /*
         Window/installed fullscreen is different from
         element fullscreen. Do not show an exit button
         that cannot actually exit that display mode.
       */
-      fullscreenBtn.hidden =
-        windowFullscreen || installedWithoutAPI;
-
-      fullscreenBtn.disabled =
-        fullscreenPending;
-
+      fullscreenBtn.hidden = windowFullscreen || installedWithoutAPI;
+      fullscreenBtn.disabled = fullscreenPending;
       fullscreenBtn.textContent =
         nativeFullscreen
           ? "Exit full screen"
           : canFullscreen()
             ? "Full screen"
             : "Screen options";
-
-      fullscreenBtn.setAttribute(
-        "aria-label",
-        fullscreenBtn.textContent
-      );
-
+      fullscreenBtn.setAttribute("aria-label", fullscreenBtn.textContent);
       $("screenStatus").textContent =
         nativeFullscreen || windowFullscreen
           ? "Fullscreen is active."
           : installedMode()
             ? "Home Screen app mode is active."
             : "Browser mode is active.";
-
       scheduleLayout();
     }
-
     function showScreenHelp(message) {
       $("screenHelpReason").textContent = message;
-
       if (!screenHelp.open) {
         screenHelp.showModal();
       }
-
       sync();
     }
-
     async function enterFullscreen() {
-      if (
-        fullscreenElement() ||
-        fullDisplay.matches ||
-        fullscreenPending
-      ) {
+      if (fullscreenElement() || fullDisplay.matches || fullscreenPending) {
         return;
       }
-
       if (!canFullscreen()) {
-        showScreenHelp(
-          "This browser or page context does not allow page " +
-          "fullscreen. You can still play, or use the Home " +
-          "Screen option below."
-        );
-
+        showScreenHelp("This browser or page context does not allow page " + "fullscreen. You can still play, or use the Home " + "Screen option below.");
         return;
       }
-
       fullscreenPending = true;
       screenStateChanged();
-
       try {
         /*
           This call happens immediately from the click handler.
@@ -2705,299 +1308,187 @@
           await root.requestFullscreen({
             navigationUI: "hide"
           });
-
         } else {
           await root.webkitRequestFullscreen();
         }
-
       } catch (error) {
         showScreenHelp(
           "The browser declined fullscreen. Open the game " +
           "directly in a browser tab, check its fullscreen " +
           "permissions, or use the Home Screen option below."
         );
-
       } finally {
         fullscreenPending = false;
         screenStateChanged();
       }
     }
-
     async function toggleFullscreen() {
       if (fullscreenPending) {
         return;
       }
-
       if (!fullscreenElement()) {
         await enterFullscreen();
         return;
       }
-
       fullscreenPending = true;
       screenStateChanged();
-
       try {
         if (document.exitFullscreen) {
           await document.exitFullscreen();
-
         } else if (document.webkitExitFullscreen) {
           await document.webkitExitFullscreen();
         }
-
       } catch (error) {
-        showScreenHelp(
-          "Use your browser's fullscreen exit command or " +
-          "device exit gesture to leave fullscreen."
-        );
-
+        showScreenHelp("Use your browser's fullscreen exit command or " + "device exit gesture to leave fullscreen.");
       } finally {
         fullscreenPending = false;
         screenStateChanged();
       }
     }
-
-    fullscreenBtn.addEventListener(
-      "click",
-      toggleFullscreen
-    );
-
+    fullscreenBtn.addEventListener("click", toggleFullscreen);
     $("launchFullscreen").addEventListener("click", () => {
       launchDialog.close();
-
       // Still inside the user's click/tap event.
       enterFullscreen();
     });
-
     $("launchBrowser").addEventListener("click", () => {
       launchDialog.close();
     });
-
     $("closeScreenHelp").addEventListener("click", () => {
       screenHelp.close();
     });
-
     $("continueFromHelp").addEventListener("click", () => {
       screenHelp.close();
     });
-
     launchDialog.addEventListener("close", sync);
     screenHelp.addEventListener("close", sync);
-
-    document.addEventListener(
-      "fullscreenchange",
-      screenStateChanged
-    );
-
-    document.addEventListener(
-      "webkitfullscreenchange",
-      screenStateChanged
-    );
-
+    document.addEventListener("fullscreenchange", screenStateChanged);
+    document.addEventListener("webkitfullscreenchange", screenStateChanged);
     document.addEventListener(
       "webkitfullscreenerror",
       () => {
         fullscreenPending = false;
         screenStateChanged();
-
-        showScreenHelp(
-          "This browser could not enter fullscreen. " +
-          "The game is still playable in browser mode."
-        );
+        showScreenHelp("This browser could not enter fullscreen. " + "The game is still playable in browser mode.");
       }
     );
-
     for (const query of [fullDisplay, standaloneDisplay]) {
       if (query.addEventListener) {
-        query.addEventListener(
-          "change",
-          screenStateChanged
-        );
-
+        query.addEventListener("change", screenStateChanged);
       } else if (query.addListener) {
         query.addListener(screenStateChanged);
       }
     }
-
     function showLaunchScreen() {
       screenStateChanged();
-
       /*
         Installed apps already have their own display mode.
         Do not ask for fullscreen again on those launches.
       */
-      if (
-        installedMode() ||
-        fullDisplay.matches ||
-        fullscreenElement()
-      ) {
+      if (installedMode() || fullDisplay.matches || fullscreenElement()) {
         return;
       }
-
       if (!canFullscreen()) {
-        $("launchFullscreen").textContent =
-          "Home Screen instructions";
-
+        $("launchFullscreen").textContent = "Home Screen instructions";
         $("launchText").textContent =
           "This browser does not offer page fullscreen here. " +
           "Launching the hosted game from a Home Screen web-app " +
           "icon can remove browser bars, or you can play in this tab.";
       }
-
       launchDialog.showModal();
       sync();
     }
-
     /* Header logo */
-
     const logo = $("headerLogo");
-
     function logoResult(ok) {
       logo.hidden = !ok;
       $("logoFallback").hidden = ok;
     }
-
     logo.onload = () => {
       logoResult(true);
     };
-
     logo.onerror = () => {
       logoResult(false);
     };
-
     if (logo.complete) {
       logoResult(logo.naturalWidth > 0);
     }
-
     /* Game controls */
-
     $("previewBtn").onclick = previewCards;
     $("answerBtn").onclick = showAnswers;
     $("restartBtn").onclick = newGame;
     $("playAgain").onclick = newGame;
-
     $("viewBoard").onclick = () => {
       winDialog.close();
     };
-
-    $("closeAnswer").onclick = () => {
-      answerDialog.close();
-    };
-
-    $("keepAnswer").onclick = () => {
-      cancelAnswerTimer();
-
-      $("answerNotice").textContent =
-        "Take your time. Close this view to return to the game.";
-
-      $("keepAnswer").hidden = true;
-      $("closeAnswer").focus();
-    };
-
-    answerDialog.addEventListener("close", () => {
-      cancelAnswerTimer();
-      sync();
+    $("closeAnswer").onclick = closeAnswers;
+    $("keepAnswer").onclick = keepAnswersOpen;
+    // Once kept open, only the top X closes the answers.
+    // This does not trap the browser in fullscreen or block its exit controls.
+    answerDialog.addEventListener("cancel", event => {
+      if (answerPinned) event.preventDefault();
     });
-
+    answerDialog.addEventListener("close", () => {
+      if (answerDialog.open) return;
+      cancelAnswerTimer();
+      answerPinned = false;
+      tick();
+      sync();
+      scheduleLayout();
+    });
     winDialog.addEventListener("close", sync);
-
     $("musicVol").oninput = event => {
-      musicLevel =
-        Number(event.target.value) / 100;
-
+      musicLevel = Number(event.target.value) / 100;
       updateMusicVolume();
-
       if (running) {
         playMusic();
       }
     };
-
     $("effectsVol").oninput = event => {
-      effectsLevel =
-        Number(event.target.value) / 100;
-
+      effectsLevel = Number(event.target.value) / 100;
       if (context && effectsBus) {
-        effectsBus.gain.setTargetAtTime(
-          effectsLevel * .85,
-          context.currentTime,
-          .015
-        );
+        effectsBus.gain.setTargetAtTime(effectsLevel * .85, context.currentTime, .015);
       }
-
       if (!effectsLevel) {
         audioEpoch++;
         stopVoices();
       }
     };
-
     music.addEventListener("error", () => {
-      console.info(
-        "Optional Song.mp3 is unavailable. " +
-        "Generated game sounds still work."
-      );
+      console.info("Optional Song.mp3 is unavailable. " + "Generated game sounds still work.");
     });
-
     document.addEventListener(
       "visibilitychange",
       () => {
         if (document.hidden) {
           music.pause();
-
           audioEpoch++;
           stopVoices();
         }
       }
     );
-
     /* Start */
-
     for (let i = 0; i < CONFIG.pairs; i++) {
-      const dot =
-        document.createElement("span");
-
+      const dot = document.createElement("span");
       dot.setAttribute("aria-hidden", "true");
-
       $("progress").append(dot);
     }
-
     buildAnswers();
     newGame();
     showLaunchScreen();
-
     if ("ResizeObserver" in window) {
-      new ResizeObserver(
-        scheduleLayout
-      ).observe(area);
+      new ResizeObserver(scheduleLayout).observe(area);
+      new ResizeObserver(scheduleLayout).observe($("answerContent"));
     }
-
-    window.addEventListener(
-      "resize",
-      scheduleLayout
-    );
-
-    window.addEventListener(
-      "orientationchange",
-      scheduleLayout
-    );
-
-    window.addEventListener(
-      "load",
-      scheduleLayout
-    );
-
+    window.addEventListener("resize", scheduleLayout);
+    window.addEventListener("orientationchange", scheduleLayout);
+    window.addEventListener("load", scheduleLayout);
     if (window.visualViewport) {
-      window.visualViewport.addEventListener(
-        "resize",
-        scheduleLayout
-      );
+      window.visualViewport.addEventListener("resize", scheduleLayout);
     }
-
     if (document.fonts) {
       document.fonts.ready.then(scheduleLayout);
-
-      document.fonts.addEventListener(
-        "loadingdone",
-        scheduleLayout
-      );
+      document.fonts.addEventListener("loadingdone", scheduleLayout);
     }
   </script>
 </body>
