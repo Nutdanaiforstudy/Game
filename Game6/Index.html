@@ -1,497 +1,406 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-  />
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
-  <title>Juliet Apple Matching Game</title>
+  <meta name="theme-color" content="#9ce000">
+
+  <title>Australian Avocados Match Mania</title>
+
+  <link rel="icon" type="image/png" href="./LogoHeader.png">
+  <link rel="apple-touch-icon" href="./LogoHeader.png">
+
+  <!-- English and Thai sans-serif fonts. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@600;700&amp;family=Nunito:wght@400;600;700;800;900&amp;display=swap"
+    rel="stylesheet"
+  >
 
   <style>
-    /* =========================================================
-       ROOT
-       ========================================================= */
-
     :root {
-      --green: #7fc241;
-      --green-light: #97d45d;
-      --green-dark: #449f43;
-      --green-deep: #327e36;
-
-      --green-soft: #eaf6de;
-      --green-pale: #f6fbea;
-
-      --red: #f42629;
-      --red-dark: #d91f25;
-
-      --white: #ffffff;
-
-      --ink: #284026;
-      --muted: #67825d;
-
-      --shadow:
-        0 14px 40px rgba(54, 111, 42, 0.13);
-
-      --card-shadow:
-        0 10px 25px rgba(54, 111, 42, 0.18);
-
-      --radius-xl: 28px;
-      --radius-lg: 20px;
-
-      /*
-        IMPORTANT:
-        This is the fixed design resolution.
-
-        The complete interface will always use this size,
-        then JavaScript scales the whole page proportionally
-        to fit any browser/device.
-      */
-      --design-width: 1600px;
-      --design-height: 900px;
-    }
-
-    /* =========================================================
-       RESET
-       ========================================================= */
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-
-      width: 100%;
-      height: 100%;
-
-      overflow: hidden;
-    }
-
-    body {
-      font-family:
+      --font:
+        "Nunito",
         "Trebuchet MS",
         "Segoe UI",
         Arial,
         sans-serif;
 
-      color: var(--ink);
+      --font-thai:
+        "Noto Sans Thai",
+        Tahoma,
+        sans-serif;
 
-      background:
-        radial-gradient(
-          circle at 8% 8%,
-          rgba(127, 194, 65, 0.22),
-          transparent 28%
-        ),
-        radial-gradient(
-          circle at 92% 90%,
-          rgba(244, 38, 41, 0.08),
-          transparent 28%
-        ),
-        linear-gradient(
-          180deg,
-          #f8fceb 0%,
-          #f2f9e8 50%,
-          #ecf6dc 100%
-        );
+      --lime: #9ce000;
+      --forest: #16490e;
+      --paper: #f5f6ed;
+      --line: #cbd7c1;
+      --muted: #48633b;
+
+      --pad: clamp(12px, 1.55vw, 28px);
+
+      --card-w: 100px;
+      --card-h: 100.1164px;
+    }
+
+    /* Reset */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+    }
+
+    body {
+      color: var(--forest);
+      background: var(--paper);
+
+      font: 600 16px/1.4 var(--font);
 
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-
-      text-rendering: optimizeLegibility;
-
-      overscroll-behavior: none;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
 
     button,
-    input {
+    input,
+    select,
+    textarea,
+    dialog {
+      font-family: var(--font);
+      color: inherit;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
       font: inherit;
     }
 
     button {
-      -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
+      touch-action: manipulation;
     }
 
-    /* =========================================================
-       FIXED DESIGN VIEWPORT
-       ========================================================= */
+    button:disabled {
+      cursor: default;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-weight: 900;
+    }
+
+    strong,
+    b {
+      font-weight: 800;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    a:focus-visible {
+      outline: 3px solid #a94300;
+      outline-offset: 5px;
+    }
+
+    /* Main layout */
+
+    .game {
+      width: 100%;
+      max-width: 2300px;
+
+      height: 100vh;
+      height: 100dvh;
+      min-height: 540px;
+
+      margin: auto;
+      padding: var(--pad);
+
+      padding-top:
+        max(var(--pad), env(safe-area-inset-top));
+
+      padding-right:
+        max(var(--pad), env(safe-area-inset-right));
+
+      padding-bottom:
+        max(var(--pad), env(safe-area-inset-bottom));
+
+      padding-left:
+        max(var(--pad), env(safe-area-inset-left));
+
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+
+      grid-template-rows:
+        auto
+        auto
+        minmax(0, 1fr)
+        auto;
+
+      gap: clamp(8px, 1.3vh, 16px);
+    }
+
+    /* Header */
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 24px;
+      padding: 20px 26px;
+
+      background: var(--lime);
+      border-bottom: 3px solid var(--forest);
+    }
+
+    .title-block {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .title {
+      min-width: 0;
+      line-height: 1.04;
+    }
+
+    .brand-name {
+      display: block;
+
+      font-size: clamp(18px, 2.7vmin, 34px);
+      font-weight: 800;
+      letter-spacing: -.025em;
+    }
+
+    .game-name {
+      display: block;
+      margin-top: 5px;
+
+      font-size: clamp(36px, 6.8vmin, 80px);
+      font-weight: 900;
+      letter-spacing: -.045em;
+    }
 
     /*
-      viewport-shell always fills the real browser.
+      Thai subtitle directly below Match Mania.
 
-      design-scaler is the scaling container.
-
-      game-app itself always remains 1600 x 900.
+      A generous line-height leaves room for Thai
+      vowels and tone marks.
     */
 
-    .viewport-shell {
-      position: fixed;
-      inset: 0;
+    .header-subtitle {
+      margin-top: 8px;
+
+      color: var(--forest);
+
+      font-family: var(--font-thai);
+      font-size: clamp(14px, 2vmin, 24px);
+      font-weight: 700;
+
+      line-height: 1.6;
+      letter-spacing: normal;
+    }
+
+    /* The logo keeps its original proportions. */
+
+    .logo-slot {
+      flex: 0 0 auto;
+
+      width: clamp(76px, 17vw, 220px);
+      height: clamp(58px, 10vmin, 122px);
 
       display: flex;
       align-items: center;
-      justify-content: center;
-
-      overflow: hidden;
+      justify-content: flex-end;
     }
 
-    .design-scaler {
-      position: relative;
-
-      width: var(--design-width);
-      height: var(--design-height);
-
+    .header-logo {
+      display: block;
       flex: 0 0 auto;
 
-      transform-origin: center center;
+      width: auto;
+      height: auto;
 
-      will-change: transform;
+      max-width: 100%;
+      max-height: 100%;
+
+      object-fit: contain;
+      object-position: right center;
     }
 
-    /* =========================================================
-       APP
-       ========================================================= */
+    .logo-fallback {
+      font-size: clamp(13px, 1.7vw, 22px);
+      font-weight: 900;
+      line-height: 1.1;
+      text-align: right;
+    }
 
-    .app {
-      position: absolute;
-      inset: 0;
+    /* Scores */
 
-      width: var(--design-width);
-      height: var(--design-height);
-
-      padding: 14px;
-
+    .scores {
       display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
 
-      grid-template-rows:
-        82px
-        minmax(0, 1fr)
-        96px;
+      border-bottom: 1px solid var(--forest);
+      padding: 6px 0 12px;
+    }
+
+    .score {
+      min-width: 0;
+
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
 
       gap: 12px;
     }
 
-    /* =========================================================
-       HEADER
-       ========================================================= */
-
-    .game-header {
-      position: relative;
-
-      width: 100%;
-      height: 82px;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 10px 80px 10px 24px;
-
-      background:
-        linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.98),
-          rgba(246, 251, 234, 0.98)
-        );
-
-      border:
-        1px solid rgba(127, 194, 65, 0.25);
-
-      border-radius: var(--radius-xl);
-
-      box-shadow: var(--shadow);
-
-      overflow: hidden;
+    .score + .score {
+      border-left: 1px solid var(--line);
     }
 
-    .game-header::before {
-      content: "";
-
-      position: absolute;
-
-      left: 0;
-      top: 0;
-      bottom: 0;
-
-      width: 9px;
-
-      background:
-        linear-gradient(
-          180deg,
-          var(--green-light),
-          var(--green-dark)
-        );
-    }
-
-    .header-title {
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-
-      gap: 10px;
-
-      margin: 0;
-
-      text-align: center;
-
-      line-height: 1;
-    }
-
-    .header-best {
-      color: var(--green-deep);
-
-      font-size: 42px;
+    .score-label {
+      font-size: clamp(14px, 1.55vmin, 21px);
       font-weight: 700;
-
-      letter-spacing: -0.035em;
-
-      white-space: nowrap;
     }
 
-    .header-fukushima {
-      color: var(--red);
-
-      font-size: 58px;
+    .score-value {
+      font-size: clamp(26px, 3.8vmin, 44px);
       font-weight: 900;
 
-      letter-spacing: -0.055em;
+      line-height: 1.1;
+      letter-spacing: -.03em;
 
-      white-space: nowrap;
-
-      text-shadow:
-        0 3px 0 rgba(244, 38, 41, 0.08);
+      font-variant-numeric: tabular-nums;
     }
 
-    /* =========================================================
-       APPLE LOGO
-       ========================================================= */
-
-    .header-apple {
-      position: absolute;
-
-      right: 25px;
-      top: 50%;
-
-      transform:
-        translateY(-50%)
-        rotate(6deg);
-
-      width: 42px;
-      height: 42px;
+    #timer {
+      min-width: 5ch;
+      text-align: center;
     }
 
-    .header-apple::before {
-      content: "";
+    /* Board */
 
-      position: absolute;
+    .playfield {
+      display: flex;
+      flex-direction: column;
 
-      left: 7px;
-      top: 9px;
-
-      width: 28px;
-      height: 30px;
-
-      background: var(--red);
-
-      border-radius:
-        48% 52% 50% 50% /
-        42% 42% 58% 58%;
+      min-width: 0;
+      min-height: 0;
     }
 
-    .header-apple::after {
-      content: "";
-
-      position: absolute;
-
-      left: 23px;
-      top: 1px;
-
-      width: 15px;
-      height: 9px;
-
-      border-radius:
-        100% 0 100% 0;
-
-      background: var(--green-dark);
-
-      transform: rotate(-25deg);
-    }
-
-    /* =========================================================
-       GAME AREA
-       ========================================================= */
-
-    .stage-wrap {
-      position: relative;
-
-      width: 100%;
-      height: 100%;
-
-      overflow: hidden;
-
-      padding: 15px;
-
+    .board-heading,
+    .board-footer {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
 
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.96),
-          rgba(247, 252, 239, 0.98)
-        );
-
-      border:
-        1px solid rgba(127, 194, 65, 0.23);
-
-      border-radius: var(--radius-xl);
-
-      box-shadow: var(--shadow);
+      gap: 12px;
+      flex: 0 0 auto;
     }
 
-    .stage-wrap::before {
-      content: "";
-
-      position: absolute;
-
-      left: -130px;
-      bottom: -150px;
-
-      width: 320px;
-      height: 320px;
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(127, 194, 65, 0.16),
-          transparent 68%
-        );
+    .board-heading {
+      padding: 0 6px 8px;
     }
 
-    .stage-wrap::after {
-      content: "";
-
-      position: absolute;
-
-      right: -110px;
-      top: -110px;
-
-      width: 250px;
-      height: 250px;
-
-      border-radius: 50%;
-
-      background:
-        radial-gradient(
-          circle,
-          rgba(244, 38, 41, 0.07),
-          transparent 68%
-        );
+    .board-heading h2 {
+      font-size: clamp(16px, 2vmin, 25px);
+      font-weight: 800;
+      letter-spacing: -.02em;
     }
 
-    .stage {
-      position: relative;
-      z-index: 1;
+    .round {
+      font-size: clamp(12px, 1.4vmin, 18px);
+      font-weight: 700;
+
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .board-area {
+      flex: 1 1 0;
+
+      min-height: 0;
+      min-width: 0;
+
+      padding: 6px;
+    }
+
+    .board {
+      --gap-x: clamp(8px, 1.05vw, 20px);
+      --gap-y: clamp(10px, 1.5vh, 24px);
 
       width: 100%;
       height: 100%;
 
       display: grid;
 
-      /*
-        ALWAYS 6 columns and 2 rows.
-
-        Because the entire game scales instead of
-        rearranging on smaller screens.
-      */
       grid-template-columns:
-        repeat(6, 1fr);
+        repeat(var(--columns, 6), var(--card-w));
 
       grid-template-rows:
-        repeat(2, 1fr);
+        repeat(var(--rows, 2), var(--card-h));
 
-      gap: 14px;
+      column-gap: var(--gap-x);
+      row-gap: var(--gap-y);
 
-      align-items: center;
-      justify-items: center;
+      justify-content: center;
+      align-content: space-evenly;
     }
 
-    /* =========================================================
-       CARDS
-       ========================================================= */
+    /* Cards retain the original 859:860 aspect ratio. */
 
     .card {
       position: relative;
+      display: block;
 
-      /*
-        JavaScript calculates the largest square card
-        that fits inside the fixed 6 x 2 board.
-      */
-      width: var(--card-size, 285px);
-      height: var(--card-size, 285px);
+      width: var(--card-w);
+      height: var(--card-h);
+
+      aspect-ratio: 859 / 860;
+
+      margin: 0;
+      padding: 0;
 
       border: 0;
-      padding: 0;
-      margin: 0;
+      border-radius: 0;
 
       background: transparent;
-
-      cursor: pointer;
-
-      border-radius: var(--radius-lg);
-
-      perspective: 1200px;
-    }
-
-    .card:focus-visible {
-      outline:
-        4px solid
-        rgba(127, 194, 65, 0.4);
-
-      outline-offset: 4px;
-    }
-
-    .card.is-matched {
-      cursor: default;
+      perspective: 1000px;
     }
 
     .card-inner {
       position: relative;
+      display: block;
 
       width: 100%;
       height: 100%;
 
-      border-radius: var(--radius-lg);
-
       transform-style: preserve-3d;
-
-      transition:
-        transform 0.45s
-        cubic-bezier(
-          0.22,
-          0.76,
-          0.25,
-          1
-        ),
-        box-shadow 0.18s ease,
-        scale 0.18s ease;
-
-      box-shadow: var(--card-shadow);
-    }
-
-    .card:hover .card-inner {
-      scale: 1.018;
-
-      box-shadow:
-        0 17px 32px
-        rgba(54, 111, 42, 0.22);
+      transition: transform .32s ease;
     }
 
     .card.is-flipped .card-inner,
@@ -499,2576 +408,2097 @@
       transform: rotateY(180deg);
     }
 
-    .card-face {
+    .face {
       position: absolute;
       inset: 0;
 
-      width: 100%;
-      height: 100%;
-
-      overflow: hidden;
-
-      border-radius: var(--radius-lg);
-
-      border:
-        3px solid
-        rgba(127, 194, 65, 0.24);
-
       display: grid;
       place-items: center;
+
+      padding: 0;
+      border: 0;
+      border-radius: 0;
 
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
 
-    .card-back {
-      position: relative;
-
-      background:
-        linear-gradient(
-          145deg,
-          #98d45c 0%,
-          var(--green) 53%,
-          var(--green-dark) 100%
-        );
-
-      box-shadow:
-        inset 0 0 0 5px
-        rgba(255, 255, 255, 0.12);
+    .back {
+      background: var(--lime);
     }
 
-    .card-back::before {
-      content: "";
+    .back-word {
+      font-size: calc(var(--card-w) * .22);
+      font-weight: 900;
 
-      position: absolute;
-      inset: 9px;
-
-      border:
-        2px solid
-        rgba(255, 255, 255, 0.28);
-
-      border-radius: 15px;
+      letter-spacing: -.04em;
+      line-height: .95;
+      text-align: center;
     }
 
-    .card-front {
+    .back-word small {
+      display: block;
+      margin-bottom: .8em;
+
+      font-size: .25em;
+      font-weight: 800;
+
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    .front {
+      background: transparent;
       transform: rotateY(180deg);
-
-      background: var(--white);
-
-      padding: 5px;
     }
 
-    .card-face img {
+    .face img {
+      display: block;
+
       width: 100%;
       height: 100%;
-
-      display: block;
 
       object-fit: contain;
       object-position: center;
 
-      border-radius: 14px;
-
-      background: var(--white);
-
-      user-select: none;
       pointer-events: none;
-
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+      user-select: none;
     }
 
-    .card-back img {
-      position: relative;
-      z-index: 1;
+    .back-image {
+      position: absolute;
+      inset: 0;
+    }
 
+    .card.is-matched {
+      outline: 3px solid var(--forest);
+      outline-offset: 3px;
+    }
+
+    .missing-art {
       padding: 8px;
-
-      background: transparent;
+      font-size: 12px;
+      overflow-wrap: anywhere;
     }
 
-    .card.is-matched .card-front {
-      border-color:
-        rgba(68, 159, 67, 0.72);
+    .board-footer {
+      padding: 8px 6px 2px;
 
-      box-shadow:
-        inset 0 0 0 4px
-        rgba(127, 194, 65, 0.15),
-        0 0 22px
-        rgba(127, 194, 65, 0.22);
+      font-size: clamp(13px, 1.5vmin, 20px);
+      font-weight: 600;
     }
 
-    .card.is-matched .card-inner {
-      animation:
-        matchedPulse
-        0.42s ease;
+    .progress {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
     }
 
-    @keyframes matchedPulse {
-      0% {
-        scale: 1;
-      }
+    .progress span {
+      width: 18px;
+      height: 7px;
 
-      45% {
-        scale: 1.055;
-      }
-
-      100% {
-        scale: 1;
-      }
+      background: var(--line);
     }
 
-    /* =========================================================
-       CONTROL DOCK
-       ========================================================= */
+    .progress .active {
+      background: var(--forest);
+    }
 
-    .control-dock {
-      width: 100%;
-      height: 96px;
+    /* Controls */
 
+    .controls {
+      border-top: 1px solid var(--forest);
+      padding-top: 12px;
+    }
+
+    .actions {
       display: grid;
-
-      grid-template-columns:
-        1.3fr
-        1.25fr
-        1fr;
-
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
-
-      align-items: center;
-
-      padding: 10px 12px;
-
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.98),
-          rgba(246, 251, 234, 0.98)
-        );
-
-      border:
-        1px solid
-        rgba(127, 194, 65, 0.23);
-
-      border-radius: var(--radius-xl);
-
-      box-shadow: var(--shadow);
     }
 
-    /* =========================================================
-       DOCK BUTTONS
-       ========================================================= */
+    .button {
+      min-height: 50px;
+      padding: 12px 16px;
 
-    .dock-buttons {
-      display: grid;
+      border: 1px solid var(--forest);
+      border-radius: 3px;
 
-      grid-template-columns:
-        1fr
-        1fr
-        1fr
-        105px;
+      background: var(--forest);
+      color: white;
 
-      gap: 9px;
-
-      align-items: center;
+      font-size: clamp(15px, 1.8vmin, 23px);
+      font-weight: 800;
+      line-height: 1.15;
     }
 
-    .ui-btn {
-      appearance: none;
-
-      min-height: 44px;
-
-      border: 0;
-
-      border-radius: 999px;
-
-      padding: 10px 18px;
-
-      color: #ffffff;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--green-light),
-          var(--green) 50%,
-          var(--green-dark)
-        );
-
-      box-shadow:
-        0 8px 18px
-        rgba(68, 159, 67, 0.22);
-
-      cursor: pointer;
-
-      font-size: 13px;
-      font-weight: 900;
-
-      white-space: nowrap;
-
-      transition:
-        transform 0.15s ease,
-        box-shadow 0.15s ease,
-        filter 0.15s ease;
+    .button.light {
+      background: transparent;
+      color: var(--forest);
     }
 
-    .ui-btn:hover {
-      transform: translateY(-2px);
-
-      filter: brightness(1.035);
-
-      box-shadow:
-        0 11px 24px
-        rgba(68, 159, 67, 0.28);
+    .button.lime {
+      background: var(--lime);
+      color: var(--forest);
     }
 
-    .ui-btn:active {
-      transform: translateY(0);
+    .button:disabled {
+      opacity: .45;
     }
 
-    .ui-btn:disabled {
-      opacity: 0.55;
-
-      cursor: not-allowed;
-
-      transform: none;
+    .button:active:not(:disabled) {
+      transform: translateY(1px);
     }
 
-    .ui-btn.secondary {
-      color: var(--green-dark);
-
-      background:
-        linear-gradient(
-          180deg,
-          #ffffff,
-          var(--green-pale)
-        );
-
-      border:
-        1px solid
-        rgba(68, 159, 67, 0.24);
-
-      box-shadow: none;
+    @media (hover: hover) {
+      .button.light:hover {
+        background: #e5ecd9;
+      }
     }
 
-    .ui-btn.secondary:hover {
-      background: var(--green-soft);
-
-      box-shadow:
-        0 6px 16px
-        rgba(68, 159, 67, 0.12);
-    }
-
-    .ui-btn.answer-btn {
-      background:
-        linear-gradient(
-          135deg,
-          #f64b4d,
-          var(--red) 55%,
-          var(--red-dark)
-        );
-
-      box-shadow:
-        0 8px 18px
-        rgba(244, 38, 41, 0.2);
-    }
-
-    .ui-btn.answer-btn:hover {
-      box-shadow:
-        0 11px 24px
-        rgba(244, 38, 41, 0.28);
-    }
-
-    /* =========================================================
-       TIMER
-       ========================================================= */
-
-    .timer-box {
-      min-height: 44px;
-
+    .sound-row {
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-wrap: wrap;
 
-      padding: 0 8px;
-
-      border-radius: 999px;
-
-      color: var(--green-dark);
-
-      background:
-        linear-gradient(
-          180deg,
-          #ffffff,
-          var(--green-pale)
-        );
-
-      border:
-        1px solid
-        rgba(68, 159, 67, 0.2);
-
-      font-size: 13px;
-      font-weight: 900;
-
-      letter-spacing: 0.03em;
-
-      white-space: nowrap;
+      gap: 4px 20px;
+      margin-top: 6px;
     }
 
-    .timer-box::before {
-      content: "⏱";
-
-      margin-right: 5px;
-    }
-
-    /* =========================================================
-       VOLUME
-       ========================================================= */
-
-    .slider-stack {
-      display: grid;
-
-      grid-template-columns:
-        repeat(
-          2,
-          minmax(0, 1fr)
-        );
-
-      gap: 9px;
-    }
-
-    .slider-box {
-      min-height: 44px;
-
-      display: grid;
-
-      grid-template-columns:
-        auto
-        minmax(80px, 1fr)
-        42px;
-
+    .sound-sliders {
+      display: flex;
       align-items: center;
 
-      gap: 8px;
-
-      padding: 7px 11px;
-
-      color: var(--muted);
-
-      background:
-        linear-gradient(
-          180deg,
-          #ffffff,
-          #f7fced
-        );
-
-      border:
-        1px solid
-        rgba(68, 159, 67, 0.15);
-
-      border-radius: 14px;
-
-      font-size: 12px;
-      font-weight: 700;
+      gap: clamp(14px, 3vw, 36px);
     }
 
-    .slider-box input[type="range"] {
-      width: 100%;
-
-      cursor: pointer;
-
-      accent-color: var(--green-dark);
-    }
-
-    .slider-value {
-      text-align: right;
-
-      color: var(--green-dark);
-
-      font-size: 11px;
-      font-weight: 900;
-    }
-
-    /* =========================================================
-       PROGRESS
-       ========================================================= */
-
-    .progress-panel {
-      min-height: 62px;
-
-      display: grid;
-      align-content: center;
-
-      gap: 8px;
-
-      padding: 9px 13px;
-
-      background:
-        linear-gradient(
-          180deg,
-          #ffffff,
-          var(--green-pale)
-        );
-
-      border:
-        1px solid
-        rgba(68, 159, 67, 0.15);
-
-      border-radius: 14px;
-    }
-
-    .progress-meta {
+    .sound-sliders label {
       display: flex;
-
-      justify-content: space-between;
       align-items: center;
 
       gap: 10px;
 
-      color: var(--green-deep);
-
-      font-size: 12px;
-      font-weight: 900;
+      font-size: clamp(13px, 1.45vmin, 18px);
+      font-weight: 700;
     }
 
-    .progress-track {
-      width: 100%;
-      height: 11px;
+    input[type="range"] {
+      width: clamp(64px, 11vw, 150px);
+      height: 40px;
 
-      overflow: hidden;
-
-      border-radius: 999px;
-
-      background:
-        rgba(127, 194, 65, 0.18);
-
-      box-shadow:
-        inset 0 1px 3px
-        rgba(41, 88, 34, 0.08);
+      margin: 0;
+      accent-color: var(--forest);
     }
 
-    .progress-fill {
-      width: 0%;
-      height: 100%;
+    /* Dialogs */
 
-      border-radius: inherit;
+    dialog {
+      width: min(780px, calc(100% - 24px));
 
-      background:
-        linear-gradient(
-          90deg,
-          #9bd460 0%,
-          var(--green) 45%,
-          var(--green-dark) 100%
-        );
+      max-height: 90vh;
+      max-height: 90dvh;
 
-      box-shadow:
-        0 0 8px
-        rgba(127, 194, 65, 0.3);
+      padding: clamp(18px, 3vw, 30px);
 
-      transition:
-        width 0.25s ease;
+      border: 2px solid var(--forest);
+
+      background: var(--paper);
+      color: var(--forest);
+
+      overflow: auto;
     }
 
-    /* =========================================================
-       ANSWER MODAL
-       ========================================================= */
+    dialog::backdrop {
+      background: rgb(12 35 10 / .72);
+    }
 
-    /*
-      Modal is inside the 1600 x 900 design so it gets scaled
-      together with everything else.
-    */
-
-    .answer-modal {
-      position: absolute;
-      inset: 0;
-
-      z-index: 200;
-
+    dialog[open] {
       display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .dialog-heading {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
 
-      padding: 20px;
-
-      background:
-        rgba(24, 58, 25, 0.62);
-
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-
-      transition:
-        opacity 0.2s ease,
-        visibility 0.2s ease;
+      gap: 16px;
     }
 
-    .answer-modal.show {
-      opacity: 1;
-      visibility: visible;
-      pointer-events: auto;
+    dialog h2 {
+      font-size: clamp(26px, 4vw, 40px);
+      line-height: 1.1;
+      letter-spacing: -.035em;
     }
 
-    .answer-popup {
-      position: relative;
-
-      width: 900px;
-      max-height: 790px;
-
-      padding: 12px;
-
-      border-radius: 24px;
-
-      background: #ffffff;
-
-      border:
-        3px solid
-        rgba(127, 194, 65, 0.72);
-
-      box-shadow:
-        0 28px 80px
-        rgba(0, 0, 0, 0.35);
-
-      transform:
-        scale(0.94)
-        translateY(14px);
-
-      transition:
-        transform 0.25s ease;
+    dialog p {
+      font-size: 16px;
+      line-height: 1.5;
     }
 
-    .answer-modal.show .answer-popup {
-      transform:
-        scale(1)
-        translateY(0);
+    .close {
+      flex: 0 0 auto;
+
+      width: 44px;
+      height: 44px;
+
+      padding: 0;
+
+      background: none;
+      border: 1px solid var(--forest);
+
+      font-size: 28px;
+      font-weight: 700;
     }
 
-    .answer-image {
-      width: 100%;
-      max-height: 760px;
+    .dialog-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
 
+    .answer-content {
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .answer-key {
       display: block;
-
-      object-fit: contain;
-
-      border-radius: 14px;
-
-      background: #ffffff;
-    }
-
-    .answer-countdown {
-      position: absolute;
-
-      top: 20px;
-      right: 20px;
-
-      min-width: 46px;
-      height: 46px;
-
-      display: grid;
-      place-items: center;
-
-      border-radius: 50%;
-
-      background:
-        rgba(50, 126, 54, 0.92);
-
-      color: #ffffff;
-
-      font-weight: 900;
-
-      box-shadow:
-        0 6px 20px
-        rgba(0, 0, 0, 0.2);
-    }
-
-    /* =========================================================
-       WIN MODAL
-       ========================================================= */
-
-    .win-modal {
-      position: absolute;
-      inset: 0;
-
-      z-index: 210;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 20px;
-
-      background:
-        rgba(31, 67, 28, 0.46);
-
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-
-      opacity: 0;
-      visibility: hidden;
-
-      pointer-events: none;
-
-      transition:
-        opacity 0.25s ease,
-        visibility 0.25s ease;
-    }
-
-    .win-modal.show {
-      opacity: 1;
-      visibility: visible;
-
-      pointer-events: auto;
-    }
-
-    .win-popup {
-      position: relative;
-
-      width: 470px;
-
-      overflow: hidden;
-
-      padding:
-        38px
-        32px
-        30px;
-
-      text-align: center;
-
-      background:
-        linear-gradient(
-          180deg,
-          #ffffff 0%,
-          var(--green-pale) 100%
-        );
-
-      border:
-        1px solid
-        rgba(127, 194, 65, 0.25);
-
-      border-radius: 30px;
-
-      box-shadow:
-        0 28px 75px
-        rgba(32, 81, 28, 0.28);
-
-      transform:
-        translateY(18px)
-        scale(0.96);
-
-      transition:
-        transform 0.28s ease;
-    }
-
-    .win-modal.show .win-popup {
-      transform:
-        translateY(0)
-        scale(1);
-    }
-
-    .win-popup::before {
-      content: "";
-
-      position: absolute;
-
-      left: -90px;
-      top: -95px;
-
-      width: 180px;
-      height: 180px;
-
-      border-radius: 50%;
-
-      background:
-        rgba(127, 194, 65, 0.09);
-    }
-
-    .win-popup::after {
-      content: "🍎";
-
-      position: absolute;
-
-      right: 20px;
-      top: 17px;
-
-      font-size: 32px;
-
-      transform: rotate(8deg);
-    }
-
-    .win-icon {
-      width: 84px;
-      height: 84px;
-
-      margin: 0 auto 18px;
-
-      display: grid;
-      place-items: center;
-
-      border-radius: 50%;
-
-      color: #ffffff;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--green-light),
-          var(--green-dark)
-        );
-
-      box-shadow:
-        0 13px 28px
-        rgba(68, 159, 67, 0.25);
-
-      font-size: 40px;
-      font-weight: 900;
-    }
-
-    .win-popup h2 {
-      margin: 0 0 10px;
-
-      color: var(--green-deep);
-
-      font-size: 34px;
-    }
-
-    .win-popup p {
-      margin: 0 0 24px;
-
-      color: var(--muted);
-
-      font-size: 15px;
-
-      line-height: 1.6;
-    }
-
-    .win-popup .ui-btn {
       width: 100%;
-
-      min-height: 50px;
+      height: auto;
     }
 
-    /* =========================================================
-       TOAST
-       ========================================================= */
-
-    .toast {
-      position: absolute;
-
-      left: 50%;
-      bottom: 118px;
-
-      z-index: 220;
-
-      max-width: 1000px;
-
-      overflow: hidden;
-
-      padding: 11px 20px;
-
-      border-radius: 999px;
-
-      color: #ffffff;
-
-      background:
-        linear-gradient(
-          135deg,
-          var(--green-dark),
-          var(--green-deep)
-        );
-
-      box-shadow:
-        0 11px 28px
-        rgba(41, 98, 36, 0.25);
-
-      font-size: 13px;
-      font-weight: 900;
-
-      white-space: nowrap;
-
-      text-overflow: ellipsis;
-
-      opacity: 0;
-
-      pointer-events: none;
-
-      transform:
-        translateX(-50%)
-        translateY(16px);
-
-      transition:
-        opacity 0.25s ease,
-        transform 0.25s ease;
-    }
-
-    .toast.show {
-      opacity: 1;
-
-      transform:
-        translateX(-50%)
-        translateY(0);
-    }
-
-    /* =========================================================
-       PORTRAIT MODE
-       ---------------------------------------------------------
-       Landscape keeps the original layout exactly as supplied:
-       1600 x 900 logical canvas, 6 columns x 2 rows.
-
-       On a portrait screen we switch to a 900 x 1340 logical
-       canvas (same proportion as approximately 629 x 936) and
-       arrange the 12 cards as 4 columns x 3 rows.
-       ========================================================= */
-
-    .design-scaler.is-portrait {
-      --design-width: 900px;
-      --design-height: 1340px;
-    }
-
-    .design-scaler.is-portrait .app {
-      width: 900px;
-      height: 1340px;
-
-      /* Use almost the full portrait width so the 4 cards in
-         each row can be as large as possible. */
-      padding: 5px;
-
-      grid-template-rows:
-        82px
-        minmax(0, 1fr)
-        184px;
-
-      gap: 7px;
-    }
-
-    .design-scaler.is-portrait .game-header {
-      height: 82px;
-      padding: 8px 70px 8px 18px;
-      border-radius: 20px;
-    }
-
-    .design-scaler.is-portrait .header-best {
-      font-size: 34px;
-    }
-
-    .design-scaler.is-portrait .header-fukushima {
-      font-size: 48px;
-    }
-
-    .design-scaler.is-portrait .header-apple {
-      right: 22px;
-      width: 42px;
-      height: 42px;
-    }
-
-    .design-scaler.is-portrait .stage-wrap {
-      /* Minimal outer padding gives the 4 x 3 board more width. */
-      padding: 5px;
-      border-radius: 20px;
-    }
-
-    .design-scaler.is-portrait .stage {
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 7px;
-    }
-
-    .design-scaler.is-portrait .control-dock {
-      height: 184px;
-      grid-template-columns: 1fr;
-      grid-template-rows: 48px 54px 62px;
-      gap: 6px;
-      padding: 6px 8px;
-      border-radius: 20px;
-    }
-
-    .design-scaler.is-portrait .dock-buttons {
-      grid-template-columns: 1fr 1fr 1fr 112px;
-      gap: 6px;
-    }
-
-    .design-scaler.is-portrait .ui-btn,
-    .design-scaler.is-portrait .timer-box {
-      min-height: 42px;
-      font-size: 12px;
-    }
-
-    .design-scaler.is-portrait .slider-stack {
+    .answer-grid {
+      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .answer-pair h3 {
+      margin-bottom: 5px;
+
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .answer-images {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+
       gap: 6px;
     }
 
-    .design-scaler.is-portrait .slider-box {
-      min-height: 48px;
-      grid-template-columns: auto minmax(70px, 1fr) 38px;
-      padding: 5px 8px;
+    .answer-images img {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
-    .design-scaler.is-portrait .progress-panel {
-      min-height: 56px;
-      padding: 7px 10px;
+    noscript {
+      display: block;
+      padding: 20px;
     }
 
-    .design-scaler.is-portrait .answer-popup {
-      width: 790px;
-      max-height: 1160px;
-    }
+    /* Portrait: 3 columns × 4 rows. */
 
-    .design-scaler.is-portrait .answer-image {
-      max-height: 1120px;
-    }
-
-    .design-scaler.is-portrait .toast {
-      bottom: 202px;
-      max-width: 800px;
-    }
-
-    /* =========================================================
-       REDUCED MOTION
-       ========================================================= */
-
-    @media (prefers-reduced-motion: reduce) {
-      .card-inner,
-      .progress-fill,
-      .toast,
-      .ui-btn,
-      .win-modal,
-      .win-popup,
-      .answer-modal,
-      .answer-popup {
-        transition: none !important;
+    @media (orientation: portrait) {
+      .game {
+        --pad: clamp(12px, 2.2vw, 24px);
       }
 
-      .card.is-matched .card-inner {
-        animation: none;
+      .masthead {
+        padding: 20px 24px;
+      }
+
+      .board {
+        --gap-x: clamp(8px, 1.65vw, 18px);
+        --gap-y: clamp(12px, 1.4vh, 22px);
+      }
+    }
+
+    /* 1080 × 1920 and similar portrait displays. */
+
+    @media
+      (orientation: portrait)
+      and (min-width: 900px)
+      and (min-height: 1500px) {
+
+      .game {
+        --pad: 24px;
+        gap: 14px;
+      }
+
+      .masthead {
+        padding: 22px 28px;
+      }
+
+      .brand-name {
+        font-size: 34px;
+      }
+
+      .game-name {
+        font-size: 80px;
+      }
+
+      .header-subtitle {
+        margin-top: 10px;
+        font-size: 24px;
+      }
+
+      .logo-slot {
+        width: 190px;
+        height: 122px;
+      }
+
+      .scores {
+        padding: 8px 0 14px;
+      }
+
+      .board {
+        --gap-x: 18px;
+        --gap-y: 20px;
+      }
+
+      .button {
+        min-height: 58px;
+        font-size: 23px;
+      }
+    }
+
+    /* 1920 × 1080 and similar landscape displays. */
+
+    @media
+      (orientation: landscape)
+      and (min-width: 1600px)
+      and (min-height: 900px) {
+
+      .game {
+        --pad: 28px;
+        gap: 14px;
+      }
+
+      .masthead {
+        padding: 18px 28px;
+      }
+
+      .brand-name {
+        font-size: 30px;
+      }
+
+      .game-name {
+        font-size: 76px;
+      }
+
+      .board {
+        --gap-x: 20px;
+        --gap-y: 24px;
+      }
+    }
+
+    /* Smaller phones. */
+
+    @media (max-width: 600px) {
+      .game {
+        gap: 8px;
+      }
+
+      .masthead {
+        padding: 12px;
+        gap: 10px;
+      }
+
+      .brand-name {
+        font-size: clamp(16px, 4.4vw, 25px);
+      }
+
+      .game-name {
+        font-size: clamp(31px, 8.7vw, 47px);
+      }
+
+      .header-subtitle {
+        margin-top: 6px;
+        font-size: 14px;
+      }
+
+      .logo-slot {
+        width: 66px;
+        height: 66px;
+      }
+
+      .logo-fallback {
+        font-size: 12px;
+      }
+
+      .score {
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .scores {
+        padding: 2px 0 8px;
+      }
+
+      .score-label {
+        font-size: 13px;
+      }
+
+      .score-value {
+        font-size: 24px;
+      }
+
+      .board-heading h2 {
+        font-size: 15px;
+      }
+
+      .round {
+        font-size: 11px;
+      }
+
+      .board-heading {
+        padding-bottom: 4px;
+      }
+
+      .board-footer {
+        font-size: 12px;
+      }
+
+      .progress {
+        gap: 4px;
+      }
+
+      .progress span {
+        width: 10px;
+        height: 5px;
+      }
+
+      .controls {
+        padding-top: 8px;
+      }
+
+      .actions {
+        gap: 6px;
+      }
+
+      .button {
+        min-height: 44px;
+        font-size: 13px;
+        padding: 10px 5px;
+      }
+
+      .sound-row {
+        gap: 0;
+      }
+
+      .sound-sliders {
+        width: 100%;
+        justify-content: center;
+        gap: 20px;
+      }
+
+      .sound-sliders label {
+        font-size: 12px;
+        gap: 7px;
+      }
+
+      input[type="range"] {
+        width: clamp(68px, 18vw, 100px);
+        height: 34px;
+      }
+
+      .answer-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media
+      (orientation: portrait)
+      and (max-height: 700px) {
+
+      .game {
+        gap: 6px;
+      }
+
+      .masthead {
+        padding: 8px 12px;
+      }
+
+      .logo-slot {
+        height: 52px;
+      }
+
+      .game-name {
+        font-size: 30px;
+      }
+
+      .brand-name {
+        font-size: 16px;
+      }
+
+      .board {
+        --gap-y: 8px;
+      }
+
+      .board-heading {
+        padding-bottom: 2px;
+      }
+
+      .board-footer {
+        padding-top: 4px;
+      }
+    }
+
+    /* Compact layout for a sideways phone. */
+
+    @media
+      (orientation: landscape)
+      and (max-height: 600px) {
+
+      .game {
+        --pad: 8px;
+
+        min-height: 320px;
+        gap: 8px;
+
+        grid-template-columns:
+          clamp(144px, 21vw, 190px)
+          minmax(0, 1fr);
+
+        grid-template-rows:
+          auto
+          minmax(0, 1fr)
+          auto;
+      }
+
+      .masthead {
+        grid-column: 1;
+        grid-row: 1;
+
+        padding: 10px;
+        display: block;
+      }
+
+      .brand-name {
+        font-size: 17px;
+      }
+
+      .game-name {
+        font-size: 31px;
+      }
+
+      .header-subtitle {
+        margin-top: 4px;
+        font-size: 13px;
+      }
+
+      .logo-slot {
+        width: 90px;
+        height: 38px;
+
+        margin-top: 8px;
+        justify-content: flex-start;
+      }
+
+      .header-logo {
+        object-position: left center;
+      }
+
+      .logo-fallback {
+        font-size: 10px;
+        text-align: left;
+      }
+
+      .scores {
+        grid-column: 1;
+        grid-row: 2;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+
+        padding: 0;
+      }
+
+      .score {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 0 4px;
+        gap: 4px;
+      }
+
+      .score + .score {
+        border: 0;
+      }
+
+      .score-label {
+        font-size: 12px;
+      }
+
+      .score-value {
+        font-size: 22px;
+      }
+
+      .playfield {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+      }
+
+      .board-heading h2 {
+        font-size: 15px;
+      }
+
+      .round {
+        font-size: 11px;
+      }
+
+      .board-footer {
+        font-size: 11px;
+        padding-top: 4px;
+      }
+
+      .board {
+        --gap-x: 8px;
+        --gap-y: 10px;
+      }
+
+      .controls {
+        grid-column: 1 / -1;
+        grid-row: 3;
+
+        padding-top: 6px;
+      }
+
+      .button {
+        min-height: 40px;
+        padding: 8px 5px;
+        font-size: 14px;
+      }
+
+      .sound-row {
+        flex-wrap: nowrap;
+        margin-top: 2px;
+      }
+
+      .sound-sliders {
+        width: auto;
+        gap: 16px;
+      }
+
+      .sound-sliders label {
+        font-size: 12px;
+        gap: 6px;
+      }
+
+      input[type="range"] {
+        width: 65px;
+        height: 30px;
+      }
+
+      .progress span {
+        width: 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner {
+        transition: none;
+      }
+
+      .button:active:not(:disabled) {
+        transform: none;
       }
     }
   </style>
 </head>
 
 <body>
+  <main class="game">
 
-  <!-- =======================================================
-       REAL BROWSER VIEWPORT
-       ======================================================= -->
+    <header class="masthead">
+      <div class="title-block">
+        <h1 class="title">
+          <span class="brand-name">Australian Avocados</span>
+          <span class="game-name">Match Mania</span>
+        </h1>
 
-  <div class="viewport-shell">
-
-    <!--
-      This complete 1600 x 900 object is scaled proportionally
-      by JavaScript.
-    -->
-
-    <div
-      class="design-scaler"
-      id="designScaler"
-    >
-
-      <!-- ===================================================
-           MAIN APP
-           =================================================== -->
-
-      <main class="app">
-
-        <!-- HEADER -->
-
-        <header class="game-header">
-
-          <h1 class="header-title">
-
-            <span class="header-best">
-              <!-- Juilet -->
-            </span>
-
-            <span class="header-fukushima">
-              Juilet Apple
-            </span>
-
-          </h1>
-
-          <span
-            class="header-apple"
-            aria-hidden="true"
-          ></span>
-
-        </header>
-
-        <!-- GAME BOARD -->
-
-        <section class="stage-wrap">
-
-          <div
-            class="stage"
-            id="stage"
-          ></div>
-
-        </section>
-
-        <!-- CONTROL DOCK -->
-
-        <aside class="control-dock">
-
-          <!-- BUTTONS -->
-
-          <div class="dock-buttons">
-
-            <button
-              class="ui-btn secondary"
-              id="previewBtn"
-              type="button"
-            >
-              Preview 5s
-            </button>
-
-            <button
-              class="ui-btn answer-btn"
-              id="answerBtn"
-              type="button"
-            >
-              Show Answer
-            </button>
-
-            <button
-              class="ui-btn"
-              id="restartBtn"
-              type="button"
-            >
-              Restart
-            </button>
-
-            <div
-              class="timer-box"
-              id="timerText"
-            >
-              00:00
-            </div>
-
-          </div>
-
-          <!-- VOLUME -->
-
-          <div class="slider-stack">
-
-            <div class="slider-box">
-
-              <span aria-hidden="true">
-                🎵
-              </span>
-
-              <input
-                id="musicVol"
-                type="range"
-                min="0"
-                max="100"
-                value="50"
-                aria-label="Music volume"
-              >
-
-              <span
-                class="slider-value"
-                id="musicVolValue"
-              >
-                50%
-              </span>
-
-            </div>
-
-            <div class="slider-box">
-
-              <span aria-hidden="true">
-                🔊
-              </span>
-
-              <input
-                id="effectVol"
-                type="range"
-                min="0"
-                max="100"
-                value="50"
-                aria-label="Sound effect volume"
-              >
-
-              <span
-                class="slider-value"
-                id="effectVolValue"
-              >
-                50%
-              </span>
-
-            </div>
-
-          </div>
-
-          <!-- PROGRESS -->
-
-          <section class="progress-panel">
-
-            <div class="progress-meta">
-
-              <span id="pairText">
-                Pairs: 0 / 6
-              </span>
-
-              <span id="moveText">
-                Moves: 0
-              </span>
-
-            </div>
-
-            <div class="progress-track">
-
-              <div
-                class="progress-fill"
-                id="progressFill"
-              ></div>
-
-            </div>
-
-          </section>
-
-        </aside>
-
-      </main>
-
-      <!-- ===================================================
-           ANSWER POPUP
-           =================================================== -->
-
-      <div
-        class="answer-modal"
-        id="answerModal"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Correct answer"
-      >
-
-        <div class="answer-popup">
-
-          <img
-            src="./Key.png"
-            alt="Correct answers"
-            class="answer-image"
-            draggable="false"
-          >
-
-          <div
-            class="answer-countdown"
-            id="answerCountdown"
-          >
-            4
-          </div>
-
-        </div>
-
+        <p class="header-subtitle" lang="th">
+          เกมจับคู่ มหาสนุก
+        </p>
       </div>
 
-      <!-- ===================================================
-           WIN POPUP
-           =================================================== -->
+      <div class="logo-slot">
+        <img
+          id="headerLogo"
+          class="header-logo"
+          src="./LogoHeader.png"
+          alt="Australian Avocados"
+          draggable="false"
+        >
 
-      <div
-        class="win-modal"
-        id="winModal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="winTitle"
-        aria-describedby="winText"
-      >
+        <span
+          id="logoFallback"
+          class="logo-fallback"
+          hidden
+        >
+          Australian<br>Avocados
+        </span>
+      </div>
+    </header>
 
-        <div class="win-popup">
-
-          <div class="win-icon">
-            ✓
-          </div>
-
-          <h2 id="winTitle">
-            Well done!
-          </h2>
-
-          <p id="winText">
-            You matched all pairs.
-          </p>
-
-          <button
-            class="ui-btn"
-            id="playAgainBtn"
-            type="button"
-          >
-            Play Again
-          </button>
-
-        </div>
-
+    <section class="scores" aria-label="Game statistics">
+      <div class="score">
+        <span class="score-label">Pairs</span>
+        <strong id="pairs" class="score-value">0 / 6</strong>
       </div>
 
-      <!-- ===================================================
-           TOAST
-           =================================================== -->
+      <div class="score">
+        <span class="score-label">Moves</span>
+        <strong id="moves" class="score-value">0</strong>
+      </div>
 
-      <div
-        class="toast"
-        id="toast"
-        aria-live="polite"
-      ></div>
+      <div class="score">
+        <span class="score-label">Time</span>
+        <strong id="timer" class="score-value">00:00</strong>
+      </div>
+    </section>
 
+    <section class="playfield" aria-labelledby="boardTitle">
+      <div class="board-heading">
+        <h2 id="boardTitle">Find your match.</h2>
+
+        <span id="roundText" class="round">
+          Round 01 / 6 pairs
+        </span>
+      </div>
+
+      <div id="boardArea" class="board-area">
+        <div
+          id="board"
+          class="board"
+          role="group"
+          aria-label="Twelve matching cards"
+        ></div>
+      </div>
+
+      <div class="board-footer">
+        <span id="hint" role="status" aria-live="polite">
+          Choose any two cards.
+        </span>
+
+        <div
+          id="progress"
+          class="progress"
+          aria-label="0 of 6 pairs found"
+        ></div>
+      </div>
+    </section>
+
+    <footer class="controls" aria-label="Game controls">
+      <div class="actions">
+        <button
+          id="previewBtn"
+          class="button light"
+          type="button"
+        >
+          Preview 5s
+        </button>
+
+        <button
+          id="answerBtn"
+          class="button lime"
+          type="button"
+        >
+          Show answer
+        </button>
+
+        <button
+          id="restartBtn"
+          class="button"
+          type="button"
+        >
+          New game
+        </button>
+      </div>
+
+      <div class="sound-row">
+        <div class="sound-sliders">
+          <label for="musicVol">
+            Music
+
+            <input
+              id="musicVol"
+              type="range"
+              min="0"
+              max="100"
+              value="20"
+            >
+          </label>
+
+          <label for="effectsVol">
+            Effects
+
+            <input
+              id="effectsVol"
+              type="range"
+              min="0"
+              max="100"
+              value="75"
+            >
+          </label>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Answer dialog -->
+
+  <dialog id="answerDialog" aria-labelledby="answerTitle">
+    <div class="dialog-heading">
+      <h2 id="answerTitle">The matching pairs.</h2>
+
+      <button
+        id="closeAnswer"
+        class="close"
+        aria-label="Close answer"
+        type="button"
+      >
+        &times;
+      </button>
     </div>
 
-  </div>
+    <p id="answerNotice">Closes in 4 seconds.</p>
 
-  <!-- =======================================================
-       BACKGROUND MUSIC
-       ======================================================= -->
+    <div class="answer-content">
+      <img
+        id="answerKey"
+        class="answer-key"
+        alt="The six correct matching pairs"
+        hidden
+      >
+
+      <div id="answerGrid" class="answer-grid"></div>
+    </div>
+
+    <button
+      id="keepAnswer"
+      class="button light"
+      type="button"
+    >
+      Keep open
+    </button>
+  </dialog>
+
+  <!-- Win dialog -->
+
+  <dialog id="winDialog" aria-labelledby="winTitle">
+    <h2 id="winTitle">A perfect match.</h2>
+
+    <p id="winText"></p>
+
+    <div class="dialog-actions">
+      <button
+        id="playAgain"
+        class="button"
+        type="button"
+      >
+        Play again
+      </button>
+
+      <button
+        id="viewBoard"
+        class="button light"
+        type="button"
+      >
+        View board
+      </button>
+    </div>
+  </dialog>
 
   <audio
     id="music"
     src="./Song.mp3"
     loop
-    preload="auto"
+    preload="none"
   ></audio>
 
+  <noscript>
+    Enable JavaScript to play Australian Avocados Match Mania.
+  </noscript>
+
   <script>
-    /* =========================================================
-       FIXED DESIGN SCALE
-       ========================================================= */
+    "use strict";
 
-    /*
-      The game is ALWAYS designed at 1600 x 900.
+    /* Configuration */
 
-      We only scale the whole design according to the
-      real browser width and height.
+    const CONFIG = {
+      pairs: 6,
 
-      This means:
+      imageWidth: 859,
+      imageHeight: 860,
 
-      Desktop = same layout
-      Laptop  = same layout
-      Tablet  = same layout
-      Mobile  = same layout
-      TV      = same layout
-      Projector = same layout
+      portraitColumns: 3,
+      landscapeColumns: 6,
 
-      Nothing moves into different rows.
-    */
+      previewMs: 5000,
+      answerMs: 4000,
+      mismatchMs: 900
+    };
 
-    const LANDSCAPE_DESIGN_WIDTH = 1600;
-    const LANDSCAPE_DESIGN_HEIGHT = 900;
+    const $ = id => document.getElementById(id);
 
-    // Portrait logical canvas uses nearly the same aspect ratio
-    // as a 629 x 936 screen.
-    const PORTRAIT_DESIGN_WIDTH = 900;
-    const PORTRAIT_DESIGN_HEIGHT = 1340;
+    const board = $("board");
+    const area = $("boardArea");
+    const music = $("music");
 
-    const designScaler =
-      document.getElementById(
-        "designScaler"
-      );
+    const answerDialog = $("answerDialog");
+    const winDialog = $("winDialog");
 
-    function isPortraitScreen() {
-      return window.innerHeight > window.innerWidth;
-    }
-
-    function applyOrientationLayout() {
-      const portrait = isPortraitScreen();
-
-      designScaler.classList.toggle(
-        "is-portrait",
-        portrait
-      );
-
-      if (portrait) {
-        designScaler.style.width =
-          `${PORTRAIT_DESIGN_WIDTH}px`;
-
-        designScaler.style.height =
-          `${PORTRAIT_DESIGN_HEIGHT}px`;
-      } else {
-        designScaler.style.width =
-          `${LANDSCAPE_DESIGN_WIDTH}px`;
-
-        designScaler.style.height =
-          `${LANDSCAPE_DESIGN_HEIGHT}px`;
+    const deck = Array.from(
+      { length: CONFIG.pairs },
+      (_, i) => i + 1
+    ).flatMap(id => [
+      {
+        id,
+        type: "IMG",
+        src: `./${id}IMG.png`
+      },
+      {
+        id,
+        type: "DESC",
+        src: `./${id}DESC.png`
       }
-    }
-
-    function scaleGameToScreen() {
-      applyOrientationLayout();
-
-      const portrait = isPortraitScreen();
-
-      const designWidth = portrait
-        ? PORTRAIT_DESIGN_WIDTH
-        : LANDSCAPE_DESIGN_WIDTH;
-
-      const designHeight = portrait
-        ? PORTRAIT_DESIGN_HEIGHT
-        : LANDSCAPE_DESIGN_HEIGHT;
-
-      const screenWidth = window.innerWidth;
-      const screenHeight = window.innerHeight;
-
-      const scaleX = screenWidth / designWidth;
-      const scaleY = screenHeight / designHeight;
-
-      // contain: keep the complete game visible without cropping.
-      const scale = Math.min(scaleX, scaleY);
-
-      designScaler.style.transform =
-        `scale(${scale})`;
-    }
-
-    /* =========================================================
-       CONFIG
-       ========================================================= */
-
-    const TOTAL = 6;
-
-    const BACK =
-      "./BacksideCover.png";
-
-    const ANSWER_DURATION =
-      4000;
-
-    /* =========================================================
-       STATE
-       ========================================================= */
+    ]);
 
     let cards = [];
-
     let first = null;
-
-    let lock = false;
+    let mode = "idle";
 
     let matches = 0;
-
     let moves = 0;
+    let round = 0;
 
-    let effectVolume = 0.5;
+    let running = false;
+    let startedAt = 0;
+    let elapsed = 0;
 
-    let timerSeconds = 0;
+    let timerId;
+    let previewTicker;
+    let answerTicker;
+    let answerTask;
 
-    let timerInterval = null;
+    let layoutFrame = 0;
 
-    let timerStarted = false;
+    let musicLevel = .20;
+    let effectsLevel = .75;
 
-    let answerTimeout = null;
+    let duckUntil = 0;
+    let duckTimer;
 
-    let answerCountdownInterval = null;
+    let context;
+    let effectsBus;
+    let compressor;
+    let audioEpoch = 0;
 
-    let previewTimeout = null;
+    const tasks = new Set();
+    const voices = new Set();
+    const reportedImages = new Set();
 
-    /* =========================================================
-       ELEMENTS
-       ========================================================= */
+    const dialogsOpen = () =>
+      answerDialog.open || winDialog.open;
 
-    const stage =
-      document.getElementById(
-        "stage"
-      );
+    /*
+      Delayed callbacks belong to the current round.
+      Restarting prevents old callbacks from affecting a new game.
+    */
 
-    const toast =
-      document.getElementById(
-        "toast"
-      );
+    function later(fn, delay) {
+      const generation = round;
 
-    const winModal =
-      document.getElementById(
-        "winModal"
-      );
+      const id = setTimeout(() => {
+        tasks.delete(id);
 
-    const winText =
-      document.getElementById(
-        "winText"
-      );
-
-    const playAgainBtn =
-      document.getElementById(
-        "playAgainBtn"
-      );
-
-    const music =
-      document.getElementById(
-        "music"
-      );
-
-    const answerModal =
-      document.getElementById(
-        "answerModal"
-      );
-
-    const answerCountdown =
-      document.getElementById(
-        "answerCountdown"
-      );
-
-    const pairText =
-      document.getElementById(
-        "pairText"
-      );
-
-    const moveText =
-      document.getElementById(
-        "moveText"
-      );
-
-    const progressFill =
-      document.getElementById(
-        "progressFill"
-      );
-
-    const musicVol =
-      document.getElementById(
-        "musicVol"
-      );
-
-    const musicVolValue =
-      document.getElementById(
-        "musicVolValue"
-      );
-
-    const effectVol =
-      document.getElementById(
-        "effectVol"
-      );
-
-    const effectVolValue =
-      document.getElementById(
-        "effectVolValue"
-      );
-
-    const previewBtn =
-      document.getElementById(
-        "previewBtn"
-      );
-
-    const answerBtn =
-      document.getElementById(
-        "answerBtn"
-      );
-
-    const restartBtn =
-      document.getElementById(
-        "restartBtn"
-      );
-
-    const timerText =
-      document.getElementById(
-        "timerText"
-      );
-
-    /* =========================================================
-       CARD DATA
-       ========================================================= */
-
-    const data = [];
-
-    for (
-      let i = 1;
-      i <= TOTAL;
-      i++
-    ) {
-
-      data.push(
-        {
-          id: i,
-          type: "IMG",
-          src: `./${i}IMG.png`
-        },
-        {
-          id: i,
-          type: "DESC",
-          src: `./${i}DESC.png`
+        if (round === generation) {
+          fn();
         }
-      );
+      }, delay);
+
+      tasks.add(id);
+
+      return id;
     }
 
-    /* =========================================================
-       SHUFFLE
-       ========================================================= */
+    function shuffle(items) {
+      const copy = [...items];
 
-    function shuffle(arr) {
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
 
-      const cloned =
-        [...arr];
-
-      for (
-        let i =
-          cloned.length - 1;
-        i > 0;
-        i--
-      ) {
-
-        const j =
-          Math.floor(
-            Math.random() *
-            (i + 1)
-          );
-
-        [
-          cloned[i],
-          cloned[j]
-        ] =
-        [
-          cloned[j],
-          cloned[i]
+        [copy[i], copy[j]] = [
+          copy[j],
+          copy[i]
         ];
       }
 
-      return cloned;
+      return copy;
     }
 
-    /* =========================================================
-       TOAST
-       ========================================================= */
+    /* Timer and scores */
 
-    function showToast(message) {
-
-      toast.textContent =
-        message;
-
-      toast.classList.add(
-        "show"
-      );
-
-      clearTimeout(
-        showToast.timer
-      );
-
-      showToast.timer =
-        setTimeout(
-          () => {
-
-            toast.classList.remove(
-              "show"
-            );
-
-          },
-          1400
-        );
-    }
-
-    /* =========================================================
-       TIME FORMAT
-       ========================================================= */
-
-    function formatTime(seconds) {
-
-      const mins =
-        Math.floor(
-          seconds / 60
-        );
-
-      const secs =
-        seconds % 60;
+    function timeText(ms) {
+      const seconds = Math.floor(ms / 1000);
 
       return (
-        String(mins).padStart(
-          2,
-          "0"
-        )
-        +
-        ":"
-        +
-        String(secs).padStart(
-          2,
-          "0"
-        )
+        String(Math.floor(seconds / 60)).padStart(2, "0") +
+        ":" +
+        String(seconds % 60).padStart(2, "0")
       );
     }
 
-    /* =========================================================
-       TIMER
-       ========================================================= */
-
-    function updateTimer() {
-
-      timerText.textContent =
-        formatTime(
-          timerSeconds
-        );
-    }
-
-    function startTimer() {
-
-      if (timerStarted) {
-        return;
+    function tick() {
+      if (running) {
+        elapsed = performance.now() - startedAt;
       }
 
-      timerStarted = true;
+      $("timer").textContent = timeText(elapsed);
+    }
 
-      timerInterval =
-        setInterval(
-          () => {
+    function startGame() {
+      if (!running && matches < CONFIG.pairs) {
+        running = true;
+        startedAt = performance.now() - elapsed;
 
-            timerSeconds += 1;
+        timerId = setInterval(tick, 200);
+      }
 
-            updateTimer();
-
-          },
-          1000
-        );
+      playMusic();
     }
 
     function stopTimer() {
+      tick();
+      running = false;
 
-      clearInterval(
-        timerInterval
+      clearInterval(timerId);
+    }
+
+    function sync() {
+      $("pairs").textContent =
+        `${matches} / ${CONFIG.pairs}`;
+
+      $("moves").textContent = moves;
+
+      $("progress").setAttribute(
+        "aria-label",
+        `${matches} of ${CONFIG.pairs} pairs found`
       );
 
-      timerInterval = null;
+      [...$("progress").children].forEach((dot, i) => {
+        dot.classList.toggle("active", i < matches);
+      });
 
-      timerStarted = false;
+      const busy =
+        mode !== "idle" || dialogsOpen();
+
+      $("previewBtn").disabled = busy;
+      $("answerBtn").disabled = busy;
     }
 
-    function resetTimer() {
+    /* Music and generated sound effects */
 
-      stopTimer();
+    function updateMusicVolume() {
+      music.volume =
+        musicLevel *
+        (performance.now() < duckUntil ? .24 : 1);
 
-      timerSeconds = 0;
-
-      updateTimer();
+      if (!musicLevel) {
+        music.pause();
+      }
     }
 
-    /* =========================================================
-       PROGRESS
-       ========================================================= */
+    function playMusic() {
+      updateMusicVolume();
 
-    function updateProgress() {
-
-      pairText.textContent =
-        `Pairs: ${matches} / ${TOTAL}`;
-
-      moveText.textContent =
-        `Moves: ${moves}`;
-
-      progressFill.style.width =
-        `${
-          (matches / TOTAL) *
-          100
-        }%`;
+      if (
+        musicLevel &&
+        music.paused &&
+        !music.error &&
+        !document.hidden
+      ) {
+        music.play().catch(() => {});
+      }
     }
 
-    /* =========================================================
-       ANSWER POPUP
-       ========================================================= */
+    function duckMusic(ms) {
+      duckUntil = Math.max(
+        duckUntil,
+        performance.now() + ms
+      );
 
-    function showAnswer() {
+      updateMusicVolume();
+      clearTimeout(duckTimer);
 
-      if (lock) {
+      duckTimer = setTimeout(
+        updateMusicVolume,
+        Math.max(0, duckUntil - performance.now()) + 20
+      );
+    }
+
+    async function audioReady() {
+      const AudioType =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+      if (!AudioType) {
+        return null;
+      }
+
+      try {
+        if (!context) {
+          context = new AudioType();
+
+          effectsBus = context.createGain();
+          effectsBus.gain.value = effectsLevel * .85;
+
+          compressor =
+            context.createDynamicsCompressor();
+
+          compressor.threshold.value = -12;
+          compressor.knee.value = 16;
+          compressor.ratio.value = 4;
+          compressor.attack.value = .003;
+          compressor.release.value = .18;
+
+          effectsBus
+            .connect(compressor)
+            .connect(context.destination);
+        }
+
+        if (context.state === "suspended") {
+          await context.resume();
+        }
+
+        return context.state === "running"
+          ? context
+          : null;
+
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function note(
+      frequency,
+      time,
+      duration,
+      amplitude,
+      waveform,
+      channel,
+      endFrequency = frequency
+    ) {
+      const osc = context.createOscillator();
+      const gain = context.createGain();
+
+      osc.type = waveform;
+
+      osc.frequency.setValueAtTime(
+        frequency,
+        time
+      );
+
+      if (endFrequency !== frequency) {
+        osc.frequency.exponentialRampToValueAtTime(
+          endFrequency,
+          time + duration
+        );
+      }
+
+      gain.gain.setValueAtTime(.0001, time);
+
+      gain.gain.linearRampToValueAtTime(
+        amplitude,
+        time + .008
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        time + duration
+      );
+
+      osc.connect(gain).connect(effectsBus);
+
+      const voice = {
+        osc,
+        gain,
+        channel
+      };
+
+      voices.add(voice);
+
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+
+        voices.delete(voice);
+      };
+
+      osc.start(time);
+      osc.stop(time + duration + .02);
+    }
+
+    function stopVoices(channel) {
+      for (const voice of [...voices]) {
+        if (!channel || voice.channel === channel) {
+          try {
+            voice.osc.stop();
+          } catch (_) {}
+
+          voice.osc.disconnect();
+          voice.gain.disconnect();
+
+          voices.delete(voice);
+        }
+      }
+    }
+
+    async function playSound(kind) {
+      if (!effectsLevel) {
         return;
       }
 
-      startAudio();
-      startTimer();
-
-      clearTimeout(
-        answerTimeout
-      );
-
-      clearInterval(
-        answerCountdownInterval
-      );
-
-      answerModal.classList.add(
-        "show"
-      );
-
-      answerCountdown.textContent =
-        "4";
-
-      let secondsLeft = 4;
-
-      answerCountdownInterval =
-        setInterval(
-          () => {
-
-            secondsLeft -= 1;
-
-            if (
-              secondsLeft > 0
-            ) {
-
-              answerCountdown.textContent =
-                String(
-                  secondsLeft
-                );
-            }
-
-          },
-          1000
-        );
-
-      answerTimeout =
-        setTimeout(
-          closeAnswer,
-          ANSWER_DURATION
-        );
-    }
-
-    function closeAnswer() {
-
-      answerModal.classList.remove(
-        "show"
-      );
-
-      clearTimeout(
-        answerTimeout
-      );
-
-      clearInterval(
-        answerCountdownInterval
-      );
-
-      answerTimeout = null;
-
-      answerCountdownInterval = null;
-    }
-
-    /* =========================================================
-       FIXED 6 x 2 GRID
-       ========================================================= */
-
-    function updateGridLayout() {
-      const portrait = isPortraitScreen();
-
-      // Landscape: preserve original 6 x 2 layout.
-      // Portrait: 4 cards per row, 3 rows.
-      const columns = portrait ? 4 : 6;
-      const rows = portrait ? 3 : 2;
-      const gap = portrait ? 7 : 14;
-
-      stage.style.gridTemplateColumns =
-        `repeat(${columns}, 1fr)`;
-
-      stage.style.gridTemplateRows =
-        `repeat(${rows}, 1fr)`;
-
-      stage.style.gap = `${gap}px`;
-
-      const availableWidth = stage.clientWidth;
-      const availableHeight = stage.clientHeight;
-
-      const widthSize =
-        (availableWidth - gap * (columns - 1)) /
-        columns;
-
-      const heightSize =
-        (availableHeight - gap * (rows - 1)) /
-        rows;
-
-      let cardSize = Math.min(
-        widthSize,
-        heightSize
-      );
-
-      // In portrait, keep only a tiny breathing margin so cards
-      // occupy almost all available board width.
-      cardSize -= portrait ? 1 : 4;
-
-      cardSize = Math.max(80, cardSize);
-
-      stage.style.setProperty(
-        "--card-size",
-        `${cardSize}px`
-      );
-    }
-
-    /* =========================================================
-       CREATE CARD
-       ========================================================= */
-
-    function createCard(d) {
-
-      const el =
-        document.createElement(
-          "button"
-        );
-
-      el.type =
-        "button";
-
-      el.className =
-        "card";
-
-      el.setAttribute(
-        "aria-label",
-        `Hidden matching card ${d.id}`
-      );
-
-      el.innerHTML =
-      `
-        <div class="card-inner">
-
-          <div class="card-face card-back">
-
-            <img
-              src="${BACK}"
-              alt=""
-              draggable="false"
-            >
-
-          </div>
-
-          <div class="card-face card-front">
-
-            <img
-              src="${d.src}"
-              alt=""
-              draggable="false"
-              loading="eager"
-              decoding="async"
-            >
-
-          </div>
-
-        </div>
-      `;
-
-      el.addEventListener(
-        "click",
-        () => {
-
-          clickCard(
-            el,
-            d
-          );
-
-        }
-      );
-
-      return el;
-    }
-
-    /* =========================================================
-       GAME LOGIC
-       ========================================================= */
-
-    function clickCard(
-      el,
-      d
-    ) {
+      const generation = audioEpoch;
+      const ctx = await audioReady();
 
       if (
-        lock
-        ||
-        answerModal.classList.contains(
-          "show"
-        )
-        ||
-        winModal.classList.contains(
-          "show"
-        )
-        ||
-        el.classList.contains(
-          "is-flipped"
-        )
-        ||
-        el.classList.contains(
-          "is-matched"
-        )
+        !ctx ||
+        generation !== audioEpoch ||
+        !effectsLevel ||
+        document.hidden
       ) {
         return;
       }
 
-      startAudio();
+      const t = ctx.currentTime + .015;
 
-      startTimer();
+      if (kind === "flip") {
+        note(
+          660,
+          t,
+          .055,
+          .10,
+          "triangle",
+          "flip",
+          420
+        );
 
-      playClick();
+      } else if (kind === "wrong") {
+        stopVoices("wrong");
 
-      el.classList.add(
-        "is-flipped"
+        note(
+          196,
+          t,
+          .16,
+          .18,
+          "triangle",
+          "wrong"
+        );
+
+        note(
+          146.83,
+          t + .13,
+          .24,
+          .16,
+          "triangle",
+          "wrong"
+        );
+
+      } else {
+        const channel = "success";
+
+        stopVoices(channel);
+
+        const melody = kind === "win"
+          ? [
+              [523.25, 0, .30],
+              [659.25, .10, .30],
+              [783.99, .20, .35],
+              [1046.50, .32, .48],
+              [1318.51, .48, .85]
+            ]
+          : [
+              [523.25, 0, .24],
+              [659.25, .10, .28],
+              [783.99, .20, .36],
+              [1046.50, .32, .65]
+            ];
+
+        for (
+          const [frequency, offset, duration]
+          of melody
+        ) {
+          note(
+            frequency,
+            t + offset,
+            duration,
+            .32,
+            "sine",
+            channel
+          );
+
+          note(
+            frequency * 2,
+            t + offset,
+            duration * .62,
+            .055,
+            "triangle",
+            channel
+          );
+        }
+
+        if (kind === "win") {
+          note(
+            523.25,
+            t + .48,
+            .85,
+            .12,
+            "sine",
+            channel
+          );
+        }
+
+        duckMusic(
+          kind === "win" ? 1450 : 1050
+        );
+      }
+    }
+
+    /* Image loading */
+
+    function imageElement(
+      src,
+      missingText,
+      onLoad,
+      onError
+    ) {
+      const img = new Image();
+
+      img.alt = "";
+      img.draggable = false;
+
+      img.addEventListener(
+        "load",
+        () => {
+          if (onLoad) {
+            onLoad(img);
+          }
+        },
+        { once: true }
       );
 
-      if (!first) {
+      img.addEventListener(
+        "error",
+        () => {
+          const label =
+            document.createElement("span");
 
-        first = {
-          el,
-          d
-        };
+          label.className = "missing-art";
+          label.textContent = missingText;
+
+          img.replaceWith(label);
+
+          if (onError) {
+            onError();
+          }
+        },
+        { once: true }
+      );
+
+      img.src = src;
+
+      return img;
+    }
+
+    function warnImage(src, message) {
+      if (reportedImages.has(src)) {
+        return;
+      }
+
+      reportedImages.add(src);
+      console.warn(message, src);
+    }
+
+    function reveal(card, visible) {
+      card.el.classList.toggle(
+        "is-flipped",
+        visible
+      );
+
+      card.el.setAttribute(
+        "aria-pressed",
+        String(visible || card.matched)
+      );
+
+      const type =
+        card.item.type === "IMG"
+          ? "picture"
+          : "description";
+
+      const label = card.matched
+        ? `Matched ${type}`
+        : visible
+          ? `Revealed ${type} card ${card.item.id}`
+          : `Hidden card ${card.index + 1}`;
+
+      card.el.setAttribute("aria-label", label);
+    }
+
+    function createCard(item, index) {
+      const el =
+        document.createElement("button");
+
+      el.type = "button";
+      el.className = "card";
+      el.disabled = true;
+
+      const card = {
+        el,
+        item,
+        index,
+        matched: false,
+        loaded: false
+      };
+
+      el.innerHTML = `
+        <span class="card-inner" aria-hidden="true">
+          <span class="face back">
+            <span class="back-word">
+              <small>Australian Avocados</small>
+              match<br>mania
+            </span>
+          </span>
+
+          <span class="face front"></span>
+        </span>
+      `;
+
+      const back =
+        el.querySelector(".back");
+
+      const backImg = new Image();
+
+      backImg.alt = "";
+      backImg.draggable = false;
+      backImg.className = "back-image";
+
+      backImg.onload = () => {
+        back.querySelector(".back-word").hidden = true;
+      };
+
+      backImg.onerror = () => {
+        backImg.remove();
+      };
+
+      backImg.src = "./BacksideCover.png";
+      back.append(backImg);
+
+      el.querySelector(".front").append(
+        imageElement(
+          item.src,
+          `Missing ${item.id}${item.type}.png`,
+
+          img => {
+            card.loaded = true;
+            el.disabled = card.matched;
+
+            const expectedRatio =
+              CONFIG.imageWidth / CONFIG.imageHeight;
+
+            const actualRatio =
+              img.naturalWidth / img.naturalHeight;
+
+            if (
+              Math.abs(actualRatio - expectedRatio) > .0001
+            ) {
+              warnImage(
+                item.src,
+                "PNG is not 859:860; it stays uncropped but may leave space:"
+              );
+            }
+          },
+
+          () => {
+            warnImage(
+              item.src,
+              "Missing card image. Place this PNG beside the HTML:"
+            );
+          }
+        )
+      );
+
+      reveal(card, false);
+
+      el.addEventListener("click", event => {
+        flip(card, event.detail === 0);
+      });
+
+      return card;
+    }
+
+    /* Matching logic */
+
+    function flip(card, keyboard) {
+      if (
+        mode !== "idle" ||
+        dialogsOpen() ||
+        card.matched ||
+        !card.loaded ||
+        card === first
+      ) {
+        return;
+      }
+
+      startGame();
+      reveal(card, true);
+
+      if (!first) {
+        first = card;
+
+        playSound("flip");
+
+        $("hint").textContent =
+          "Now find its partner.";
 
         return;
       }
 
-      moves += 1;
+      const previous = first;
 
-      updateProgress();
+      first = null;
+      moves++;
 
       const isMatch =
-        first.d.id === d.id
-        &&
-        first.d.type !== d.type;
+        previous.item.id === card.item.id &&
+        previous.item.type !== card.item.type;
 
       if (isMatch) {
+        for (const c of [previous, card]) {
+          c.matched = true;
 
-        first.el.classList.add(
-          "is-matched"
+          c.el.classList.add("is-matched");
+          c.el.disabled = true;
+
+          reveal(c, true);
+        }
+
+        matches++;
+
+        $("hint").textContent =
+          matches === CONFIG.pairs
+            ? "All six pairs found."
+            : "That's a match.";
+
+        playSound(
+          matches === CONFIG.pairs
+            ? "win"
+            : "match"
         );
 
-        el.classList.add(
-          "is-matched"
-        );
-
-        matches += 1;
-
-        updateProgress();
-
-        playMatch();
-
-        showToast(
-          "Great! Match found 🍎"
-        );
-
-        first = null;
-
-        if (
-          matches === TOTAL
-        ) {
-
+        if (matches === CONFIG.pairs) {
+          mode = "won";
           stopTimer();
 
-          lock = true;
+          later(() => {
+            $("winText").textContent =
+              `All six pairs in ${moves} moves ` +
+              `and ${timeText(elapsed)}.`;
 
-          winText.textContent =
-            `You completed all ${TOTAL} pairs in ${moves} moves and ${formatTime(timerSeconds)}.`;
+            winDialog.showModal();
+            $("playAgain").focus();
 
-          setTimeout(
-            () => {
+            sync();
+          }, 550);
 
-              winModal.classList.add(
-                "show"
-              );
-
-              playAgainBtn.focus();
-
-            },
-            350
+        } else if (keyboard) {
+          const next = cards.find(
+            c => !c.matched && c.loaded
           );
+
+          if (next) {
+            next.el.focus();
+          }
         }
 
       } else {
+        mode = "compare";
 
-        playWrong();
+        playSound("wrong");
 
-        lock = true;
+        $("hint").textContent =
+          "Not this time. Try another pair.";
 
-        const previousCard =
-          first.el;
+        later(() => {
+          reveal(previous, false);
+          reveal(card, false);
 
-        setTimeout(
-          () => {
+          mode = "idle";
 
-            el.classList.remove(
-              "is-flipped"
-            );
+          $("hint").textContent =
+            "Choose any two cards.";
 
-            previousCard.classList.remove(
-              "is-flipped"
-            );
-
-            first = null;
-
-            lock = false;
-
-          },
-          700
-        );
-      }
-    }
-
-    /* =========================================================
-       PREVIEW
-       ========================================================= */
-
-    function preview() {
-
-      if (
-        lock
-        ||
-        answerModal.classList.contains(
-          "show"
-        )
-        ||
-        winModal.classList.contains(
-          "show"
-        )
-      ) {
-        return;
+          sync();
+        }, CONFIG.mismatchMs);
       }
 
-      startAudio();
-
-      startTimer();
-
-      lock = true;
-
-      previewBtn.disabled =
-        true;
-
-      clearTimeout(
-        previewTimeout
-      );
-
-      cards.forEach(
-        card => {
-
-          if (
-            !card.classList.contains(
-              "is-matched"
-            )
-          ) {
-
-            card.classList.add(
-              "is-flipped"
-            );
-          }
-
-        }
-      );
-
-      showToast(
-        "Memorize the cards!"
-      );
-
-      previewTimeout =
-        setTimeout(
-          () => {
-
-            cards.forEach(
-              card => {
-
-                if (
-                  !card.classList.contains(
-                    "is-matched"
-                  )
-                ) {
-
-                  card.classList.remove(
-                    "is-flipped"
-                  );
-                }
-
-              }
-            );
-
-            first = null;
-
-            lock = false;
-
-            previewBtn.disabled =
-              false;
-
-          },
-          5000
-        );
+      sync();
     }
 
-    /* =========================================================
-       RENDER
-       ========================================================= */
+    /* Restart */
 
-    function render() {
+    function newGame() {
+      round++;
+      audioEpoch++;
 
-      stage.innerHTML =
-        "";
+      stopVoices();
 
-      const shuffled =
-        shuffle(
-          data
-        );
+      tasks.forEach(clearTimeout);
+      tasks.clear();
 
-      cards = [];
+      clearInterval(timerId);
+      clearInterval(previewTicker);
+      clearInterval(answerTicker);
 
-      shuffled.forEach(
-        d => {
+      clearTimeout(duckTimer);
 
-          const card =
-            createCard(
-              d
-            );
+      duckUntil = 0;
+      updateMusicVolume();
 
-          cards.push(
-            card
-          );
-
-          stage.appendChild(
-            card
-          );
-
+      for (const dialog of [answerDialog, winDialog]) {
+        if (dialog.open) {
+          dialog.close();
         }
-      );
-
-      updateProgress();
-
-      updateTimer();
-
-      requestAnimationFrame(
-        () => {
-
-          requestAnimationFrame(
-            updateGridLayout
-          );
-
-        }
-      );
-    }
-
-    /* =========================================================
-       RESTART
-       ========================================================= */
-
-    function restart() {
-
-      clearTimeout(
-        previewTimeout
-      );
-
-      previewTimeout = null;
+      }
 
       first = null;
-
-      lock = false;
+      mode = "idle";
 
       matches = 0;
-
       moves = 0;
 
-      previewBtn.disabled =
-        false;
+      elapsed = 0;
+      running = false;
 
-      closeAnswer();
+      $("previewBtn").textContent =
+        "Preview 5s";
 
-      winModal.classList.remove(
-        "show"
+      $("hint").textContent =
+        "Choose any two cards.";
+
+      $("roundText").textContent =
+        `Round ${String(round).padStart(2, "0")} / 6 pairs`;
+
+      cards = shuffle(deck).map(createCard);
+
+      board.replaceChildren(
+        ...cards.map(c => c.el)
       );
 
-      resetTimer();
-
-      render();
+      sync();
+      tick();
+      scheduleLayout();
     }
 
-    /* =========================================================
-       AUDIO
-       ========================================================= */
+    /* Preview */
 
-    music.volume = 0.5;
-
-    const AudioContextClass =
-      window.AudioContext
-      ||
-      window.webkitAudioContext;
-
-    let ctx = null;
-
-    if (AudioContextClass) {
-
-      ctx =
-        new AudioContextClass();
-    }
-
-    function startAudio() {
-
-      if (ctx) {
-
-        if (
-          ctx.state ===
-          "suspended"
-        ) {
-
-          ctx.resume()
-            .catch(
-              () => {}
-            );
-        }
-      }
-
-      if (music.paused) {
-
-        music.play()
-          .catch(
-            () => {}
-          );
-      }
-    }
-
-    document.body.addEventListener(
-      "pointerdown",
-      startAudio,
-      {
-        once: true
-      }
-    );
-
-    function beep(
-      freq,
-      dur = 0.1,
-      type = "sine",
-      vol = 1
-    ) {
-
-      if (!ctx) {
+    function previewCards() {
+      if (mode !== "idle" || dialogsOpen()) {
         return;
       }
 
-      if (
-        ctx.state ===
-        "suspended"
-      ) {
+      startGame();
 
-        ctx.resume()
-          .catch(
-            () => {}
-          );
-      }
+      first = null;
+      mode = "preview";
 
-      const oscillator =
-        ctx.createOscillator();
+      sync();
 
-      const gain =
-        ctx.createGain();
-
-      oscillator.type =
-        type;
-
-      oscillator.frequency.value =
-        freq;
-
-      gain.gain.value =
-        effectVolume *
-        vol;
-
-      oscillator.connect(
-        gain
+      const visible = cards.filter(
+        c => !c.matched
       );
 
-      gain.connect(
-        ctx.destination
-      );
+      visible.forEach(c => {
+        reveal(c, true);
+      });
 
-      oscillator.start();
+      const end =
+        performance.now() + CONFIG.previewMs;
 
-      oscillator.stop(
-        ctx.currentTime +
-        dur
-      );
-    }
+      $("hint").textContent =
+        "Take a look. Remember the pairs.";
 
-    function playClick() {
-
-      beep(
-        500,
-        0.05,
-        "square",
-        0.25
-      );
-    }
-
-    function playMatch() {
-
-      beep(
-        700,
-        0.08,
-        "triangle",
-        0.4
-      );
-
-      setTimeout(
-        () => {
-
-          beep(
-            860,
-            0.10,
-            "triangle",
-            0.4
-          );
-
-        },
-        80
-      );
-    }
-
-    function playWrong() {
-
-      beep(
-        200,
-        0.10,
-        "sawtooth",
-        0.25
-      );
-    }
-
-    /* =========================================================
-       VOLUME EVENTS
-       ========================================================= */
-
-    musicVol.value =
-      Math.round(
-        music.volume *
-        100
-      );
-
-    musicVolValue.textContent =
-      `${musicVol.value}%`;
-
-    musicVol.addEventListener(
-      "input",
-      e => {
-
-        music.volume =
-          Number(
-            e.target.value
+      const update = () => {
+        const remaining = Math.max(
+          0,
+          Math.ceil(
+            (end - performance.now()) / 1000
           )
-          /
-          100;
+        );
 
-        musicVolValue.textContent =
-          `${e.target.value}%`;
+        $("previewBtn").textContent =
+          `Preview ${remaining}s`;
+      };
+
+      update();
+
+      previewTicker =
+        setInterval(update, 100);
+
+      later(() => {
+        clearInterval(previewTicker);
+
+        visible.forEach(c => {
+          reveal(c, false);
+        });
+
+        mode = "idle";
+
+        $("previewBtn").textContent =
+          "Preview 5s";
+
+        $("hint").textContent =
+          "Your turn. Find a pair.";
+
+        sync();
+      }, CONFIG.previewMs);
+    }
+
+    /* Answer dialog */
+
+    function showAnswers() {
+      if (mode !== "idle" || dialogsOpen()) {
+        return;
       }
-    );
 
-    effectVol.value =
-      Math.round(
-        effectVolume *
-        100
+      startGame();
+
+      $("keepAnswer").hidden = false;
+
+      const end =
+        performance.now() + CONFIG.answerMs;
+
+      const update = () => {
+        const remaining = Math.max(
+          0,
+          Math.ceil(
+            (end - performance.now()) / 1000
+          )
+        );
+
+        $("answerNotice").textContent =
+          `Closes in ${remaining} seconds.`;
+      };
+
+      update();
+
+      answerDialog.showModal();
+      sync();
+
+      answerTicker =
+        setInterval(update, 100);
+
+      answerTask = later(() => {
+        answerDialog.close();
+      }, CONFIG.answerMs);
+    }
+
+    function cancelAnswerTimer() {
+      clearInterval(answerTicker);
+      clearTimeout(answerTask);
+
+      tasks.delete(answerTask);
+      answerTask = null;
+    }
+
+    function buildAnswers() {
+      for (let id = 1; id <= CONFIG.pairs; id++) {
+        const pair =
+          document.createElement("section");
+
+        pair.className = "answer-pair";
+
+        const heading =
+          document.createElement("h3");
+
+        heading.textContent = `Pair ${id}`;
+
+        const images =
+          document.createElement("div");
+
+        images.className = "answer-images";
+
+        images.append(
+          imageElement(
+            `./${id}IMG.png`,
+            `Image ${id}`
+          ),
+
+          imageElement(
+            `./${id}DESC.png`,
+            `Description ${id}`
+          )
+        );
+
+        pair.append(heading, images);
+        $("answerGrid").append(pair);
+      }
+
+      const key = $("answerKey");
+
+      key.onload = () => {
+        key.hidden = false;
+        $("answerGrid").hidden = true;
+      };
+
+      key.onerror = () => {
+        key.hidden = true;
+        $("answerGrid").hidden = false;
+      };
+
+      key.src = "./Key.png";
+    }
+
+    /*
+      Responsive sizing.
+
+      One scale factor is applied to both dimensions:
+      width  = 859 × scale
+      height = 860 × scale
+    */
+
+    function resizeBoard() {
+      const portrait =
+        matchMedia("(orientation: portrait)").matches;
+
+      const cols = portrait
+        ? CONFIG.portraitColumns
+        : CONFIG.landscapeColumns;
+
+      const rows = Math.ceil(
+        CONFIG.pairs * 2 / cols
       );
 
-    effectVolValue.textContent =
-      `${effectVol.value}%`;
+      const css = getComputedStyle(board);
+      const ac = getComputedStyle(area);
 
-    effectVol.addEventListener(
-      "input",
-      e => {
+      const gapX =
+        parseFloat(css.columnGap) || 0;
 
-        effectVolume =
-          Number(
-            e.target.value
+      const gapY =
+        parseFloat(css.rowGap) || 0;
+
+      const width =
+        area.clientWidth -
+        parseFloat(ac.paddingLeft) -
+        parseFloat(ac.paddingRight);
+
+      const height =
+        area.clientHeight -
+        parseFloat(ac.paddingTop) -
+        parseFloat(ac.paddingBottom);
+
+      const scale = Math.max(
+        .001,
+        Math.min(
+          (
+            width -
+            gapX * (cols - 1)
+          ) / (
+            cols * CONFIG.imageWidth
+          ),
+
+          (
+            height -
+            gapY * (rows - 1)
+          ) / (
+            rows * CONFIG.imageHeight
           )
-          /
-          100;
+        )
+      );
 
-        effectVolValue.textContent =
-          `${e.target.value}%`;
+      board.style.setProperty("--columns", cols);
+      board.style.setProperty("--rows", rows);
+
+      board.style.setProperty(
+        "--card-w",
+        `${CONFIG.imageWidth * scale}px`
+      );
+
+      board.style.setProperty(
+        "--card-h",
+        `${CONFIG.imageHeight * scale}px`
+      );
+    }
+
+    function scheduleLayout() {
+      cancelAnimationFrame(layoutFrame);
+
+      layoutFrame =
+        requestAnimationFrame(resizeBoard);
+    }
+
+    /* Header logo */
+
+    const logo = $("headerLogo");
+
+    function logoResult(ok) {
+      logo.hidden = !ok;
+      $("logoFallback").hidden = ok;
+    }
+
+    logo.onload = () => {
+      logoResult(true);
+    };
+
+    logo.onerror = () => {
+      logoResult(false);
+    };
+
+    if (logo.complete) {
+      logoResult(logo.naturalWidth > 0);
+    }
+
+    /* Controls */
+
+    $("previewBtn").onclick = previewCards;
+    $("answerBtn").onclick = showAnswers;
+    $("restartBtn").onclick = newGame;
+    $("playAgain").onclick = newGame;
+
+    $("viewBoard").onclick = () => {
+      winDialog.close();
+    };
+
+    $("closeAnswer").onclick = () => {
+      answerDialog.close();
+    };
+
+    $("keepAnswer").onclick = () => {
+      cancelAnswerTimer();
+
+      $("answerNotice").textContent =
+        "Take your time. Close this view to return to the game.";
+
+      $("keepAnswer").hidden = true;
+      $("closeAnswer").focus();
+    };
+
+    answerDialog.addEventListener("close", () => {
+      cancelAnswerTimer();
+      sync();
+    });
+
+    winDialog.addEventListener("close", sync);
+
+    $("musicVol").oninput = event => {
+      musicLevel =
+        Number(event.target.value) / 100;
+
+      updateMusicVolume();
+
+      if (running) {
+        playMusic();
       }
-    );
+    };
 
-    /* =========================================================
-       BUTTON EVENTS
-       ========================================================= */
+    $("effectsVol").oninput = event => {
+      effectsLevel =
+        Number(event.target.value) / 100;
 
-    previewBtn.addEventListener(
-      "click",
-      preview
-    );
-
-    answerBtn.addEventListener(
-      "click",
-      showAnswer
-    );
-
-    restartBtn.addEventListener(
-      "click",
-      restart
-    );
-
-    playAgainBtn.addEventListener(
-      "click",
-      restart
-    );
-
-    /* =========================================================
-       ANSWER MODAL EVENT
-       ========================================================= */
-
-    answerModal.addEventListener(
-      "click",
-      e => {
-
-        if (
-          e.target ===
-          answerModal
-        ) {
-
-          closeAnswer();
-        }
-
+      if (context && effectsBus) {
+        effectsBus.gain.setTargetAtTime(
+          effectsLevel * .85,
+          context.currentTime,
+          .015
+        );
       }
-    );
 
-    /* =========================================================
-       WIN MODAL EVENT
-       ========================================================= */
-
-    winModal.addEventListener(
-      "click",
-      e => {
-
-        if (
-          e.target ===
-          winModal
-        ) {
-
-          restart();
-        }
-
+      if (!effectsLevel) {
+        audioEpoch++;
+        stopVoices();
       }
-    );
+    };
 
-    /* =========================================================
-       KEYBOARD
-       ========================================================= */
+    music.addEventListener("error", () => {
+      console.info(
+        "Optional Song.mp3 is unavailable. " +
+        "Generated game sounds still work."
+      );
+    });
 
     document.addEventListener(
-      "keydown",
-      e => {
+      "visibilitychange",
+      () => {
+        if (document.hidden) {
+          music.pause();
 
-        if (
-          e.key ===
-          "Escape"
-          &&
-          answerModal.classList.contains(
-            "show"
-          )
-        ) {
-
-          closeAnswer();
-
-          return;
+          audioEpoch++;
+          stopVoices();
         }
-
-        if (
-          e.key ===
-          "Escape"
-          &&
-          winModal.classList.contains(
-            "show"
-          )
-        ) {
-
-          restart();
-        }
-
       }
     );
 
-    /* =========================================================
-       RESIZE / ORIENTATION
-       ========================================================= */
+    /* Start */
 
-    let resizeTimer;
+    for (let i = 0; i < CONFIG.pairs; i++) {
+      const dot =
+        document.createElement("span");
 
-    function handleResize() {
+      dot.setAttribute("aria-hidden", "true");
+      $("progress").append(dot);
+    }
 
-      clearTimeout(
-        resizeTimer
-      );
+    buildAnswers();
+    newGame();
 
-      resizeTimer =
-        setTimeout(
-          () => {
-
-            /*
-              Only scale the whole application.
-
-              We do NOT change columns, rows,
-              controls, or layout.
-            */
-
-            scaleGameToScreen();
-            updateGridLayout();
-
-          },
-          50
-        );
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(
+        scheduleLayout
+      ).observe(area);
     }
 
     window.addEventListener(
       "resize",
-      handleResize
+      scheduleLayout
     );
 
     window.addEventListener(
       "orientationchange",
-      () => {
-
-        setTimeout(
-          () => {
-            scaleGameToScreen();
-            updateGridLayout();
-          },
-          100
-        );
-
-      }
+      scheduleLayout
     );
-
-    /*
-      Helps mobile browsers when the browser
-      address/navigation bars change viewport size.
-    */
-
-    if (window.visualViewport) {
-
-      window.visualViewport.addEventListener(
-        "resize",
-        () => {
-          scaleGameToScreen();
-          updateGridLayout();
-        }
-      );
-    }
-
-    /* =========================================================
-       IMAGE ERROR FALLBACK
-       ========================================================= */
-
-    document.addEventListener(
-      "error",
-      event => {
-
-        const target =
-          event.target;
-
-        if (
-          target &&
-          target.tagName ===
-          "IMG"
-        ) {
-
-          console.warn(
-            "Image could not be loaded:",
-            target.src
-          );
-        }
-
-      },
-      true
-    );
-
-    /* =========================================================
-       START
-       ========================================================= */
-
-    scaleGameToScreen();
-
-    resetTimer();
-
-    render();
-
-    /*
-      Run scaling one more time after page resources
-      have finished loading.
-    */
 
     window.addEventListener(
       "load",
-      () => {
-
-        scaleGameToScreen();
-
-        updateGridLayout();
-
-      }
+      scheduleLayout
     );
-  </script>
 
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        "resize",
+        scheduleLayout
+      );
+    }
+
+    if (document.fonts) {
+      document.fonts.ready.then(scheduleLayout);
+
+      document.fonts.addEventListener(
+        "loadingdone",
+        scheduleLayout
+      );
+    }
+  </script>
 </body>
 </html>
